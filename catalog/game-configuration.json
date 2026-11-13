@@ -1,0 +1,153 @@
+{
+  "schema_version": 1,
+  "configuration_id": "seven-player-extension-001",
+  "status": "specification_not_implemented",
+  "authority": "Designer request increasing the maximum to seven and specifying Asimov/Adams centre restrictions",
+  "printed_rulebook_maximum_players": 6,
+  "minimum_players": 2,
+  "maximum_players": 7,
+  "per_player_components": {
+    "rocket_tokens": 40,
+    "action_tokens": 4,
+    "action_boards": 1,
+    "player_aids": 1
+  },
+  "full_supply": {
+    "rocket_tokens": 280,
+    "action_tokens": 28,
+    "action_boards": 7,
+    "player_aids": 7
+  },
+  "shared_supply": {
+    "tech_cards": 30,
+    "event_cards": 30,
+    "explore_tokens": 16,
+    "additional_space_feature_tokens": 4,
+    "first_player_markers": 1,
+    "system_designs_in_catalogue": 14,
+    "maximum_systems_in_play": 13
+  },
+  "initial_per_player_rockets": {
+    "settlements_on_home_planet": 3,
+    "ships_in_home_system": 3,
+    "reserve": 34
+  },
+  "pool_rules": {
+    "random_home_pool": "six_original_home_designs",
+    "random_hidden_pool": "six_original_non_home_designs",
+    "unused_home_designs_allowed_in_hidden_pool": false,
+    "special_centres_allowed_in_random_pools": false,
+    "special_centres_allowed_together": false
+  },
+  "original_system_hex_versions_confirmed_latest": true,
+  "setup_by_player_count": [
+    {
+      "player_count": 2,
+      "original_face_up_home_tiles": 2,
+      "original_hidden_non_home_tiles": 2,
+      "centre_system_id": null,
+      "centre_initially_face_up": false,
+      "centre_is_home": false,
+      "initially_face_up_home_systems": 2,
+      "initially_face_up_systems": 2,
+      "total_systems": 4,
+      "outer_layout_source": "Space Force rules v1.80.pdf, page 4, 2-player diagram",
+      "event_deck_size": 10,
+      "baseline_rounds": 6
+    },
+    {
+      "player_count": 3,
+      "original_face_up_home_tiles": 3,
+      "original_hidden_non_home_tiles": 3,
+      "centre_system_id": null,
+      "centre_initially_face_up": false,
+      "centre_is_home": false,
+      "initially_face_up_home_systems": 3,
+      "initially_face_up_systems": 3,
+      "total_systems": 6,
+      "outer_layout_source": "Space Force rules v1.80.pdf, page 4, 3-player diagram",
+      "event_deck_size": 10,
+      "baseline_rounds": 6
+    },
+    {
+      "player_count": 4,
+      "original_face_up_home_tiles": 4,
+      "original_hidden_non_home_tiles": 4,
+      "centre_system_id": null,
+      "centre_initially_face_up": false,
+      "centre_is_home": false,
+      "initially_face_up_home_systems": 4,
+      "initially_face_up_systems": 4,
+      "total_systems": 8,
+      "outer_layout_source": "Space Force rules v1.80.pdf, page 4, 4-player diagram",
+      "event_deck_size": 8,
+      "baseline_rounds": 5
+    },
+    {
+      "player_count": 5,
+      "original_face_up_home_tiles": 5,
+      "original_hidden_non_home_tiles": 5,
+      "centre_system_id": null,
+      "centre_initially_face_up": false,
+      "centre_is_home": false,
+      "initially_face_up_home_systems": 5,
+      "initially_face_up_systems": 5,
+      "total_systems": 10,
+      "outer_layout_source": "Space Force rules v1.80.pdf, page 4, 5-player diagram",
+      "event_deck_size": 8,
+      "baseline_rounds": 5
+    },
+    {
+      "player_count": 6,
+      "original_face_up_home_tiles": 6,
+      "original_hidden_non_home_tiles": 6,
+      "centre_system_id": "system.asimov",
+      "centre_initially_face_up": true,
+      "centre_is_home": false,
+      "initially_face_up_home_systems": 6,
+      "initially_face_up_systems": 7,
+      "total_systems": 13,
+      "outer_layout_source": "Space Force rules v1.80.pdf, page 4, 6-player diagram",
+      "event_deck_size": 8,
+      "baseline_rounds": 5
+    },
+    {
+      "player_count": 7,
+      "original_face_up_home_tiles": 6,
+      "original_hidden_non_home_tiles": 6,
+      "centre_system_id": "system.adams",
+      "centre_initially_face_up": true,
+      "centre_is_home": true,
+      "initially_face_up_home_systems": 7,
+      "initially_face_up_systems": 7,
+      "total_systems": 13,
+      "outer_layout_source": "Space Force rules v1.80.pdf, page 4, 6-player diagram",
+      "event_deck_size": 8,
+      "baseline_rounds": 5
+    }
+  ],
+  "player_identity": {
+    "required_distinct_colours": 7,
+    "required_distinct_rocket_silhouettes": 7,
+    "required_distinct_chip_rim_patterns": 7,
+    "original_six_silhouette_source": {
+      "source_id": "pdf.rules",
+      "pdf_page": 2
+    },
+    "seventh_player": {
+      "style_id": "player-style.seven",
+      "colour_name": "Orange",
+      "colour_hex": "#E87522",
+      "rocket_shape_id": "rocket.twin-pod",
+      "rocket_shape_description": "Two rocket bodies joined by a narrow bridge",
+      "chip_rim_pattern_id": "rim.triangles",
+      "status": "provisional_design_choice_pending_art_or_STL_review",
+      "additional_components": {
+        "rocket_tokens": 40,
+        "action_tokens": 4,
+        "action_boards": 1,
+        "player_aids": 1
+      }
+    }
+  }
+}

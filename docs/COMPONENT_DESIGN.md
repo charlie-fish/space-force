@@ -1,22 +1,27 @@
 # Component design and player identity
 
-Confirmed by the designer on 13 November 2026. These requirements guide the future interface; this document does not claim that graphics or snapping have been implemented.
+Updated for the designer's seven-player extension on 13 November 2026. Requirements guide the future interface; graphics and snapping have not been implemented. Specific seventh-player visual choices below are provisional design choices.
 
 ## Visual reference
 
 Use the supplied `SPACE FORCE.png` front-cover graphic as the branding reference: dark violet space, orange and sage spacecraft, cream highlights, textured illustration, and retro lettering. Preserve it as a replaceable cover asset. Detailed card text and interactive controls still need readable semantic HTML/SVG.
 
-The six player rocket silhouettes come from **rulebook page 2**, not from recolouring the spacecraft on the cover. The page shows six visibly different outlines. Use these consistently until the designer's rocket STL files can be used to verify the exact forms and colour mapping.
+The six original player rocket silhouettes come from **rulebook page 2**, not from recolouring the spacecraft on the cover. Preserve those visibly different outlines. Add a seventh distinct silhouette in a new player colour. Use the forthcoming STL files to verify the original forms and colour mapping.
+
+The provisional seventh-player style is **orange (`#E87522`)**, a **twin-pod rocket silhouette** (two rocket bodies joined by a narrow bridge), and a **triangular chip-rim pattern**. These are replaceable visual choices, not designer-supplied final art. Keep the seventh silhouette and rim pattern distinct from all six original identities, including in greyscale.
 
 ## Supply and ownership
 
-| Component | Per player | Base-game total | Identification |
+| Component | Per player | Seven-player supply | Identification |
 | --- | ---: | ---: | --- |
-| Rockets | 40 | 240 | Player colour plus that player's distinct rocket shape |
-| Action tokens | 4 | 24 | Poker-chip face in player colour with matching rocket silhouette; distinct rim/side pattern |
-| Player action boards | 1 | 6 | One separate board for each player, each with four receiving indentations |
+| Rockets | 40 | 280 | Player colour plus that player's distinct rocket shape |
+| Action tokens | 4 | 28 | Poker-chip face in player colour with matching rocket silhouette; distinct rim/side pattern |
+| Player action boards | 1 | 7 | One separate board for each player, each with four receiving indentations |
+| Player aids | 1 | 7 | Reuse the current aid template for every player |
 
-Keep identity stable across the board, chips, action boards, player summaries, action history, tooltips, and scoring. A future seventh player will need an additional silhouette and rim pattern. Do not identify a player using colour alone.
+Keep all seven identities stable across the board, chips, action boards, player summaries, action history, tooltips, and scoring. The seventh player is part of current scope. Any future increase beyond seven needs further distinct identities and rules. Do not identify a player using colour alone.
+
+The extra player adds 40 rockets, four chips, one board, and one aid. Shared supplies remain 30 Tech cards, 30 Event cards, 16 Explore tokens, four additional feature tokens, and one first-player marker. There are fourteen system designs in the asset catalogue; six/seven-player boards use the original twelve plus exactly one special centre, for thirteen systems in play. See [game-configuration.json](../catalog/game-configuration.json).
 
 Rockets use the same player's shape in every role. Clearly distinguish Ships, Settlements, Credits, Investments, Reserve, and Tech markers through location and role presentation, without changing their owner's identity.
 
@@ -34,21 +39,21 @@ Define a shared chip diameter in board coordinates, rather than fixing an unrela
 
 `chip diameter = system sun diameter = action-board receiving cutout diameter`
 
-Each system has a centre anchor at its sun. A placed action token snaps to that anchor and joins the top of its stack. When resolved, it snaps into the semicircular indentation for its chosen action on its owner's board. The four slots are MOVE INTO, SETTLE, PRODUCE, and ATTACK. There are six such action boards, not one shared board.
+Each system has a centre anchor at its sun. A placed action token snaps to that anchor and joins the top of its stack. When resolved, it snaps into the semicircular indentation for its chosen action on its owner's board. The four slots are MOVE INTO, SETTLE, PRODUCE, and ATTACK. There are seven separate action boards, one per player.
 
 Scale the artwork and geometry together when zooming or resizing. Normalise centre/sun measurements across the final tile assets; do not guess them from screen pixels after an image has loaded. Touch hit areas may be larger than visible pieces without changing the shared visible diameter. Tapping a legal system or slot must support the same snap result as dragging.
 
-The blank six-player centre needs an equivalent central snap anchor. Its final appearance is still to be added; its lack of planets does not remove its ability to hold Ships or action tokens.
+Use the sun of **Asimov** as the centre anchor in six-player games, and the sun of **Adams** in seven-player games. Both designs are supplied in `13th hex.pdf`. Asimov replaces the former blank-centre placeholder; it has no planets. Adams is a home system with a capacity-six planet, four capacity-two planets, and a black hole. Each special tile is allowed only at its stated player count and central position.
 
-## Asset and version checks
+## Asset status
 
-- The designer wants to confirm that the supplied system hexes are the latest versions before their art/topology is finalised.
-- Add the blank centre-system hex for six-player games. It has no printed planets or space features and represents the existing central playable system.
-- Await the six rocket STL designs and use them to check shape identity and colour mapping.
+- The designer has confirmed that the original twelve system hexes are the latest versions. Routine transcription/geometry checks still apply when encoding them.
+- Asimov and Adams have been supplied. Use Asimov only at the six-player centre and Adams only at the seven-player centre. Neither enters a random tile pool.
+- Await the original rocket STL files, check colour mapping, and refine the provisional seventh-player silhouette as appropriate.
 - Keep source assets, optimised web art, hit areas, and semantic game data separate so replacements do not change stable piece IDs.
 
 See [REMINDERS.md](REMINDERS.md) for the handoff list and [ASSETS.md](ASSETS.md) for source-file provenance.
 
 ## Future visual verification
 
-Verify the six silhouettes and six rim patterns in greyscale, at phone sizes, and in mixed stacks. Check that keyboard focus/tap details identify every chip in order. Verify that chips sit correctly in system centres and action-board cutouts at different board zoom levels, and that each of the six players has an independent four-slot board. These checks belong to the interface milestone.
+Verify all seven silhouettes and rim patterns in greyscale, at phone sizes, and in mixed stacks. Check that keyboard focus/tap details identify every chip in order. Verify that chips sit correctly in system centres and action-board cutouts at different board zoom levels, including Asimov and Adams, and that each of the seven players has an independent four-slot board. These checks belong to the interface milestone.

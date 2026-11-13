@@ -7,11 +7,13 @@ Updated planning baseline: 13 November 2026. Confirmed items record the designer
 | ID | Item | Current position |
 | --- | --- | --- |
 | D01 | TTS Workshop link, saved-table JSON, associated images, and any scripts | Awaiting material. Helpful for asset extraction and layout verification; engine planning can continue without it. |
-| D02 | First online play mode | **Confirmed:** normal turns first, then the selectable simultaneous-actions variant. Both support six connected players. |
-| D03 | Rules baseline and errata | Written rules/cards v1.80 plus the designer's explicit corrections. **R01–R08 are resolved.** Rapid Advance follows the almanac rather than its card. Older aid/art/video remain supporting references; current hex versions still need checking. |
+| D02 | First online play mode | **Confirmed:** normal turns first, then the selectable simultaneous-actions variant. Both now support up to seven connected players. |
+| D03 | Rules baseline and errata | Written rules/cards v1.80 plus the designer's corrections and seven-player extension. **R01–R08 are resolved.** Rapid Advance follows the almanac rather than its card. The original hex versions are now confirmed current. |
 | D04 | Cover and player identity | **Confirmed:** use `SPACE FORCE.png` as the cover reference; give each colour its own rocket silhouette from rulebook p2; use poker-chip action tokens with matching silhouettes and distinct rim patterns. Await rocket STLs. |
-| D05 | Boards and chip geometry | **Confirmed:** six action boards, one per player; chips snap to system suns and board indentations, with matching chip/sun/cutout diameters. |
-| D06 | System assets | **Confirmed task:** add a blank six-player centre hex. Designer to check whether the supplied system hexes are the latest versions. |
+| D05 | Boards and chip geometry | **Confirmed:** seven action boards, one per player; chips snap to system suns and board indentations, with matching chip/sun/cutout diameters. |
+| D06 | System assets | **Confirmed:** original twelve hexes are current. Supplied Asimov replaces the blank centre only at six players; Adams is the central seventh home only at seven players. Both are excluded from random pools. |
+| D07 | Maximum player count and supply | **Confirmed:** two to seven players; 40 rockets, four chips, one action board, and one player aid per player. At seven: 280 rockets, 28 chips, seven boards, seven aids. |
+| D08 | Seventh-player visual identity | **Provisional design choice:** orange (`#E87522`), a twin-pod rocket silhouette, and a triangular chip-rim pattern. Keep these distinct and replaceable pending design/STL review. |
 
 The concrete handoff checklist is in [REMINDERS.md](REMINDERS.md).
 
@@ -28,7 +30,7 @@ Proposed player access: invite-only rooms with guest names, a protected seat-res
 | Item | Why it is needed |
 | --- | --- |
 | Preferred domain and approximate monthly hosting budget | Choose a viable realtime host, database, asset storage, and operational setup. |
-| Expected playtest/public audience and simultaneous room count | Set load targets and cost limits; six players in one room does not define overall service capacity. |
+| Expected playtest/public audience and simultaneous room count | Set load targets and cost limits; seven players in one room does not define overall service capacity. |
 | Owner/admin identity and preferred login method | Configure private administration with the real owner, without sharing a password in chat. |
 | Controller/sender name, jurisdiction, and public contact address | Complete accurate privacy information and named newsletter consent. |
 | Intended audience, including whether children are expected | Choose appropriate account/data practices and final privacy wording. |
@@ -49,7 +51,7 @@ These are launch inputs, not reasons to stop the rules engine or board prototype
 - Active/confirmed newsletter subscribers exported by default, with suppression maintained separately.
 - Current/previous major browsers as the initial compatibility target; older requirements to be named.
 
-The separate rocket silhouettes, chip face/rim identity, snapping geometry, six action boards, and normal-turn-first delivery order are confirmed requirements, not optional defaults.
+The seven-player limit, separate rocket silhouettes, chip face/rim identity, snapping geometry, seven action boards, exclusive Asimov/Adams centre rules, and normal-turn-first delivery order are confirmed requirements. Player seven's specific orange/twin-pod/triangular visual style is a provisional choice.
 
 ## Decision history
 
@@ -64,5 +66,8 @@ The separate rocket silhouettes, chip face/rim identity, snapping geometry, six 
 | 2026-11-13 | Designer confirmed normal turns first, then the selectable variant; specified colourblind-accessible rocket/chip design and the six individual action boards. |
 | 2026-11-13 | Designer corrected the hidden tile pool, answered R01–R08, and clarified Prophecy on capacity-one planets and connectivity through warps. |
 | 2026-11-13 | Designer supplied `SPACE FORCE.png` as a cover reference and requested reminders for TTS files, rocket STLs, and the latest-hex check; the blank centre hex is now an explicit additional asset. |
+| 2026-11-13 | Designer subsequently increased the limit to seven, adding 40 rockets, four chips, and a board; extend the reusable aid to the seventh player as well. |
+| 2026-11-13 | Designer confirmed the original hexes are current and supplied `13th hex.pdf`: Asimov only at the six-player centre, Adams only at the seven-player centre. This supersedes the earlier blank-hex task. |
+| 2026-11-13 | Planning setup retains the existing twelve-tile outer layout at six/seven players, with Adams as the seventh home when used. Seven-player Events/rounds follow the existing four-plus-player rule. |
 
 No hosting provider, paid service, final privacy text, or application deployment has been selected in this planning stage.

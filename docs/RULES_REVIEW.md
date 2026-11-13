@@ -4,31 +4,39 @@ Reviewed against `Space Force rules v1.80.pdf` and `SpaceForce Cards v1.80.pdf`,
 
 Updated with the designer's clarifications on 13 November 2026. R01–R08 below are resolved. Where specified, these rulings take precedence over conflicting printed wording.
 
+Current scope also includes the designer's seven-player extension and `13th hex.pdf`. The printed rulebook describes up to six players; the extension below is the designer's project instruction, not a claim about the printed edition.
+
 This is an implementation outline and question register, not a replacement rulebook. The attached documents are game reference material. The user's explicit instructions about software scope, ignored pages, and additional component copies take precedence as project instructions.
 
 ## Components and state
 
-The base supply is 40 rockets and four action tokens per player, up to six players; 30 Tech cards; 30 Event cards; 16 Explore tokens; 12 illustrated systems; **six player action boards, one per player**; six player aids; four additional feature tokens; and a first-player marker (rulebook p3). Add a blank centre-system hex for six-player games; it represents the already-playable central space and has no printed planets or features. The designer still wants to check that the supplied system hexes are the latest versions.
+The current supply is **40 rockets, four poker-chip action tokens, one action board, and one player aid per player, up to seven players**: 280 rockets, 28 action chips, seven boards, and seven aids. The shared supply remains 30 Tech cards, 30 Event cards, 16 Explore tokens, four additional feature tokens, and one first-player marker. The system catalogue contains fourteen designs: the original twelve, confirmed current by the designer, plus Asimov and Adams from `13th hex.pdf`. Use only the count-appropriate centre tile, so six/seven-player boards contain thirteen hexes. See [game-configuration.json](../catalog/game-configuration.json).
 
 A rocket has a role determined by its location: Reserve, Credit, Ship in space, Settlement on a planet, invested rocket, or Tech ownership marker. Model these explicitly and preserve the physical supply limit. Destroyed Ships/Settlements normally become Credits; do not put them back in Reserve. Specific effects such as Famine and Sabotage explicitly use Reserve instead.
 
 Planets hold settlements from multiple players. Ships occupy systems. An action-token stack is ordered, and only its top token is normally available. Each player board has four distinct slots: MOVE INTO, SETTLE, PRODUCE, ATTACK.
 
-Use the six distinct rocket silhouettes shown on rulebook p2, with a different shape for each player colour. Action tokens are poker chips carrying the player's colour and rocket silhouette, plus a different visible rim/side pattern for each player. Chips snap to the sun at each system's centre. Each chip is the same diameter as the sun and fits a semicircular receiving indentation on its owner's action board. Keep stack order and rim patterns visible. See [component design](COMPONENT_DESIGN.md).
+Preserve the six distinct rocket silhouettes shown on rulebook p2 and add a seventh distinct shape in a new colour. The provisional seventh-player style is orange with a twin-pod rocket silhouette and a triangular chip-rim pattern. Action tokens are poker chips carrying the player's colour and rocket silhouette, plus a different visible rim/side pattern for each player. Chips snap to the sun at each system's centre, including Asimov and Adams. Each chip is the same diameter as the sun and fits a semicircular receiving indentation on its owner's action board. Keep stack order and rim patterns visible. See [component design](COMPONENT_DESIGN.md).
 
-## Setup: rulebook pp4–5
+## Setup: rulebook pp4–5 plus the seven-player extension
 
-| Players | Illustrated tiles | Initially face-up homes | Event cards | Baseline rounds |
-| ---: | ---: | ---: | ---: | ---: |
-| 2 | 4 | 2 | 10 | 6 |
-| 3 | 6 | 3 | 10 | 6 |
-| 4 | 8 | 4 | 8 | 5 |
-| 5 | 10 | 5 | 8 | 5 |
-| 6 | 12, plus playable empty centre | 6 | 8 | 5 |
+| Players | Systems in play | Centre tile | Initially face-up homes | Hidden non-home tiles | Event cards | Baseline rounds |
+| ---: | ---: | --- | ---: | ---: | ---: | ---: |
+| 2 | 4 | — | 2 | 2 | 10 | 6 |
+| 3 | 6 | — | 3 | 3 | 10 | 6 |
+| 4 | 8 | — | 4 | 4 | 8 | 5 |
+| 5 | 10 | — | 5 | 5 | 8 | 5 |
+| 6 | 13 | Asimov | 6 | 6 | 8 | 5 |
+| 7 | 13 | Adams | 7 | 6 | 8 | 5 |
 
-Use the actual diagrams rather than a generic hexagon of an arbitrary radius. The five-player layout uses the additional asteroid-belt token. The six-player central space can contain Ships and action tokens and is described as an empty system.
+Use the actual diagrams rather than a generic hexagon of an arbitrary radius. The five-player layout uses the additional asteroid-belt token. For six/seven players, retain the original twelve-tile outer layout and put the appropriate special hex at the centre, face-up:
 
-Select the required home tiles randomly and reveal them. Choose the face-down tiles only from the six non-home designs: **unused home designs are excluded from the hidden pool**. Return those unused home designs to the box. Players choose a home in order and begin with three Settlements on its capacity-six home planet and three Ships in that system. Their other rockets remain in Reserve.
+- **Six players: Asimov only.** It has a sun and no printed planets, black holes, warps, or belts. It replaces the former empty/blank centre and holds Ships and action-token stacks normally.
+- **Seven players: Adams only.** It has a capacity-six home planet, four capacity-two planets, and one black hole. It supplies the seventh home system; all seven revealed homes participate in normal player-order home selection.
+
+Asimov and Adams are excluded from all random home/hidden pools. Neither is used in games with two to five players. They are never used together. Adams' face-up setup does not place Explore tokens on its capacity-two planets; Explore tokens are placed on newly revealed systems by MOVE INTO, or by an applicable effect such as Prophecy. The initial three Ships at an Adams home are placed by setup, so its black hole does not destroy one then; later MOVE INTO actions apply its normal loss.
+
+For two to six players, select the required home tiles randomly from the six original home designs and reveal them. At seven players, use all six original homes plus Adams. Choose the face-down tiles only from the six original non-home designs: **unused home designs are excluded from the hidden pool**. Return unused original home designs and unused special centre tiles to the box. Players choose a home in order and begin with three Settlements on its capacity-six home planet and three Ships in that system. Their other 34 rockets remain in Reserve.
 
 Display ten Techs for the game, either selected randomly or using a named preset. Keep the remainder available server-side for Technological Singularity. Prepare the shuffled Event draw pile and Explore supply. Record setup choices and randomness privately for reproducibility.
 
@@ -36,7 +44,7 @@ The physical rule for choosing the first player can be represented by a lobby ch
 
 ## Round flow: rulebook pp6–13
 
-**PLAN.** Clear last round's action-board tokens. In player order, place one action token on a system's stack, on top of existing tokens; continue until all have been placed. No passing unless an effect permits it. Face-down systems and the six-player centre are valid locations. Strategic Stall, Disruptor, Earth First, Politics, Filibuster, and Scrambler require explicit timing hooks.
+**PLAN.** Clear last round's action-board tokens. In player order, place one action token on a system's stack, on top of existing tokens; continue until all have been placed. No passing unless an effect permits it. Face-down systems and the count-appropriate centre system are valid locations. Strategic Stall, Disruptor, Earth First, Politics, Filibuster, and Scrambler require explicit timing hooks.
 
 **ACTIONS.** In order, resolve one eligible top token. Skip a player with no available top token; otherwise they cannot pass. Remove that token, choose an unused action-board slot, and perform that action in the token's system or Invest the action with a rocket from Reserve. Each slot can normally be used once per round. The resolution sequence must account for Insurance and for Cyber Attack's use of other players' tokens.
 
@@ -66,7 +74,7 @@ There are no automatic replenishments of the displayed Tech market after ordinar
 
 ## End of game: rulebook pp6,12,14
 
-The designer confirmed that playing the last pair of Events does not immediately end the game: there is a further action round, and then an Event step with nothing left to draw. Finish after Tech in that final Economy phase, without Reinforce or passing first player. Ragnarök can shorten the game; consuming the last pair during its extra Event step follows the same later no-cards-to-draw boundary. Normal games therefore last six rounds for 2–3 players and five rounds for 4–6 players unless an effect shortens them.
+The designer confirmed that playing the last pair of Events does not immediately end the game: there is a further action round, and then an Event step with nothing left to draw. Finish after Tech in that final Economy phase, without Reinforce or passing first player. Ragnarök can shorten the game; consuming the last pair during its extra Event step follows the same later no-cards-to-draw boundary. Normal games therefore last six rounds for 2–3 players and five rounds for 4–7 players unless an effect shortens them.
 
 Resolve Eminent Domain and other applicable endgame effects, then score:
 
@@ -80,11 +88,11 @@ Ties use the greatest number of Credits; any remaining tie is a shared win. Reco
 
 **Simpler Events, p12:** use Event cards only as a round tracker, ignore their effects, skip the auction, and exclude Foresight from the Tech pool. Treat this as an explicit game setting.
 
-**Delivery order agreed:** implement normal turns first, then add this variant as a selectable game setting. Six players can be connected in either mode.
+**Delivery order agreed:** implement normal turns first, then add this variant as a selectable game setting. Up to seven players can be connected in either mode.
 
 **Simultaneous actions, p14:** remove Cyber Attack from Events and Gravity Drive from Techs. PLAN and ECONOMY remain unchanged. During ACTIONS, every eligible player selects a top token, then assigns it secretly to an unused action slot. **Only token/slot choices are secret.** Reveal together, then players carry out their actions simultaneously; action parameters are not separately committed in secret. Any player can declare a dependency, which switches resolution to the disambiguation order **for all participating players**: MOVE INTO before SETTLE before PRODUCE before ATTACK, with player order where needed.
 
-Online implementation needs separate selection, assignment, reveal, and resolution states. Do not expose a player's secret slot assignment while another can still change theirs. The server must resolve dependencies consistently; simply allowing six browsers to submit ordinary turns at the same time would not implement this variant.
+Online implementation needs separate selection, assignment, reveal, and resolution states. Do not expose a player's secret slot assignment while another can still change theirs. The server must resolve dependencies consistently; simply allowing seven browsers to submit ordinary turns at the same time would not implement this variant.
 
 **Presets, p24:** Aggressive, Cunning, Economic, Family, and Peaceful each contain ten Techs. They are indexed in [tech-presets.json](../catalog/tech-presets.json). Replace each preset card excluded by the chosen variant with a random legal Tech of printed value **2 or 3**, keeping ten distinct Techs in the display. Select replacements from eligible cards not already in the display and record the actual choices with the setup.
 
@@ -120,14 +128,16 @@ Assume the player owns Population Explosion, Government Incentives, Frontier Pio
 - **Asteroid isolation with warps:** removing edge paths is permitted when warp links keep the board connected. Connectivity validation must use both kinds of link.
 - **Setup pool correction:** hidden tiles come only from non-home designs; unused home designs are excluded.
 
-All eight original questions are answered. The outstanding asset/version checks and file handoffs are tracked in [REMINDERS.md](REMINDERS.md). Further rule interactions can be checked during playtests without reopening these settled rulings.
+All eight original questions are answered, and the original hex versions are confirmed. Outstanding artwork/STL preparation and file handoffs are tracked in [REMINDERS.md](REMINDERS.md). Further rule interactions can be checked during playtests without reopening settled rulings.
 
 ## Verification cases to preserve
 
 - Four action slots, actual stack order, skipped turns, and component conservation, including Tech markers and Investments.
-- Six separate player action boards; six rocket silhouettes; poker-chip faces and distinct visible rim patterns; snapping to suns and matching action-board indentations.
+- Seven separate player action boards and player aids; seven rocket silhouettes; 280 rockets and 28 poker chips at maximum player count; distinct chip rim patterns; snapping to suns and matching action-board indentations.
 - Correct setup pools for every player count, with unused home designs excluded from hidden tiles.
-- Correct entry orientations, warp adjacency, barrier connectivity including warp routes, black-hole loss, and the six-player blank centre hex.
+- Asimov only at the six-player centre; Adams only at the seven-player centre; both excluded from all random pools and never used together. Both boards contain thirteen systems.
+- Adams as the seventh home: capacity six plus four capacity-two planets, normal starting pieces, no setup black-hole loss, and normal loss on later MOVE INTO.
+- Correct entry orientations, warp adjacency, barrier connectivity including warp routes, and black-hole loss.
 - The five-player setup consumes the one additional asteroid token, so Kessler Syndrome cannot place that same token while it remains on the board.
 - Mixed-player planet fullness, one shared Arcologies extra space, fullness at capacity and capacity plus one, production allocation, limited Reserve supply, and settling shared planets.
 - Prophecy's opponent-Settlement token on a capacity-one planet, including no normal space for the acting player and the Arcologies/Soylent Green cases.

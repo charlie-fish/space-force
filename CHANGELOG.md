@@ -1,5 +1,19 @@
 # Change log
 
+## 0.3.0 — 2026-11-13
+
+- Increased the planned player limit to seven for normal turns and the subsequent selectable simultaneous-actions variant.
+- Added the seventh player's 40 rockets, four poker-chip action tokens, action board, and player aid: 280 rockets, 28 chips, seven boards, and seven aids in total.
+- Proposed orange, a twin-pod rocket silhouette, and a triangular chip-rim pattern for player seven; these visual choices remain replaceable pending design/STL review.
+- Registered `13th hex.pdf`: Adams on the left and Asimov on the right of page one, bringing the catalogue to fourteen system designs.
+- Replaced the blank-centre placeholder with Asimov, permitted only in the centre of six-player games.
+- Added Adams only in the centre of seven-player games. Its capacity-six home planet supplies the seventh home; it also has four capacity-two planets and a black hole.
+- Specified the existing twelve-tile outer layout for six/seven players, with the appropriate exclusive centre tile; both setups contain thirteen systems.
+- Recorded the designer's confirmation that the original twelve system hexes are current and closed the version-check reminder.
+- Added structured component/setup configuration and expanded planned multiplayer verification to seven clients. Other shared supplies remain unchanged; seven-player games use the existing four-plus-player Event/round rules.
+
+This remains a documentation/catalogue release; there is no playable application yet.
+
 ## 0.2.0 — 2026-11-13
 
 - Confirmed normal turns first, followed by the selectable simultaneous-actions variant.

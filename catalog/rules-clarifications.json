@@ -1,18 +1,32 @@
 {
-  "schema_version": 1,
-  "clarification_id": "designer-clarifications-001",
+  "schema_version": 2,
+  "clarification_id": "designer-clarifications-002",
   "date": "2026-11-13",
-  "authority": "Designer follow-up in the project conversation",
+  "authority": "Designer follow-up messages in the project conversation, including the seven-player extension",
   "printed_rules_version": "1.80",
   "status": "confirmed_specification_not_implemented",
-  "delivery_order": ["normal_turns", "selectable_simultaneous_actions_variant"],
+  "delivery_order": [
+    "normal_turns",
+    "selectable_simultaneous_actions_variant"
+  ],
   "setup": {
     "unused_home_designs_allowed_in_hidden_pool": false,
     "hidden_pool": "non_home_designs_only",
-    "player_action_board_count": 6,
+    "player_action_board_count": 7,
     "boards_per_player": 1,
-    "six_player_blank_centre_system_id": "system.blank-centre",
-    "latest_supplied_system_hex_version_confirmed": false
+    "latest_supplied_system_hex_version_confirmed": true,
+    "minimum_players": 2,
+    "maximum_players": 7,
+    "player_aid_count": 7,
+    "full_supply_rocket_tokens": 280,
+    "full_supply_action_tokens": 28,
+    "special_centre_system_ids": {
+      "6": "system.asimov",
+      "7": "system.adams"
+    },
+    "special_centres_allowed_in_random_pools": false,
+    "special_centres_allowed_together": false,
+    "adams_is_seventh_home_system": true
   },
   "rulings": {
     "R01": {
@@ -56,12 +70,20 @@
     },
     "R06": {
       "status": "resolved",
-      "secret_choices": ["action_token_choice", "action_board_slot_choice"],
+      "secret_choices": [
+        "action_token_choice",
+        "action_board_slot_choice"
+      ],
       "action_parameters_secretly_committed_before_reveal": false,
       "action_parameters_chosen": "during_action_resolution_after_reveal",
       "any_participating_player_can_declare_dependency": true,
       "dependency_switches_all_participants_to_ordered_resolution": true,
-      "action_order": ["move_into", "settle", "produce", "attack"],
+      "action_order": [
+        "move_into",
+        "settle",
+        "produce",
+        "attack"
+      ],
       "remaining_disambiguation": "player_order"
     },
     "R07": {
@@ -110,5 +132,7 @@
       "include_warp_links_in_board_connectivity_check": true,
       "edge_isolation_allowed_if_warps_keep_board_connected": true
     }
-  }
+  },
+  "supersedes": "designer-clarifications-001",
+  "configuration_reference": "game-configuration.json"
 }

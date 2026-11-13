@@ -1,8 +1,8 @@
 # Space Force
 
-An online implementation of Charlie Fish's board game, planned for 2–6 players using desktop and mobile browsers.
+An online implementation of Charlie Fish's board game, planned for 2–7 players using desktop and mobile browsers.
 
-**Current status: specification v0.2, 13 November 2026.** This repository contains the project plan, component catalogue, and confirmed designer rulings R01–R08. A playable application has not been implemented or deployed.
+**Current status: specification v0.3, 13 November 2026.** This repository contains the project plan, component catalogue, confirmed designer rulings R01–R08, and seven-player extension. A playable application has not been implemented or deployed.
 
 ## Project documents
 
@@ -18,7 +18,8 @@ An online implementation of Charlie Fish's board game, planned for 2–6 players
 
 - [Source register](catalog/sources.csv)
 - [Tech and Event cards](catalog/cards.csv): 30 of each, with PDF page references.
-- [Systems](catalog/systems.csv): 12 supplied illustrated hexes plus the requested blank six-player centre hex; the designer's latest-version check is pending.
+- [Systems](catalog/systems.csv): 14 supplied designs. Asimov is the centre only for six players; Adams is the centre only for seven. The original twelve designs are confirmed current.
+- [Game configuration](catalog/game-configuration.json): player limit, component quantities, setup by player count, and provisional orange seventh-player style.
 - [Explore tokens](catalog/explore-tokens.csv): the complete 16-token distribution, including the three extra copies specified by the designer.
 - [Tech presets](catalog/tech-presets.json): the five presets from rulebook page 24.
 - [Designer rulings](catalog/rules-clarifications.json): confirmed rules, variant replacement policy, and the five-Tech PRODUCE example, ready to guide engine implementation.
@@ -29,9 +30,11 @@ The catalogue is an inventory, not an executable ruleset. Visual transcriptions 
 
 Use Git branches and pull requests for implementation, meaningful rules and multiplayer tests, and versioned releases. Record the engine, content, settings, and deployed release used by each game. Keep artwork references separate from rule identifiers so art can change independently.
 
-The agreed delivery order is normal turns first, then the simultaneous-actions variant on rulebook page 14 as a selectable mode. Both support six connected players. Apply the designer's clarifications alongside the printed rules; Rapid Advance uses the almanac wording and does not perform a SETTLE action.
+The agreed delivery order is normal turns first, then the simultaneous-actions variant on rulebook page 14 as a selectable mode. Both support up to seven connected players. Apply the designer's clarifications alongside the printed rules; Rapid Advance uses the almanac wording and does not perform a SETTLE action.
 
-Use the supplied `SPACE FORCE.png` front-cover graphic as the visual reference, six distinct rocket silhouettes from rulebook page 2, and poker-chip action tokens with individual rim patterns. Token diameter, system suns, and action-board receiving indentations must match.
+Use the supplied `SPACE FORCE.png` front-cover graphic as the visual reference, the six original rocket silhouettes from rulebook page 2 plus a seventh distinct silhouette, and poker-chip action tokens with individual rim patterns. Token diameter, system suns, and action-board receiving indentations must match.
+
+At seven players the supply is **280 rockets, 28 action chips, seven action boards, and seven player aids**. The original twelve tiles form the outer layout; use Adams as the seventh home system in the centre. At six players, use Asimov in the centre. Each of those setups uses thirteen hexes; the two special centre tiles are never used together.
 
 ## Data and ownership
 
