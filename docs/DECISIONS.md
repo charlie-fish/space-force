@@ -1,18 +1,23 @@
 # Decisions and information needed
 
-Planning baseline: 13 November 2026. “Proposed” means a working recommendation, not an answer already given by the designer.
+Updated planning baseline: 13 November 2026. Confirmed items record the designer's follow-up. “Proposed” still means a working recommendation for items the designer has not answered.
 
 ## Useful next
 
 | ID | Item | Current position |
 | --- | --- | --- |
 | D01 | TTS Workshop link, saved-table JSON, associated images, and any scripts | Awaiting material. Helpful for asset extraction and layout verification; engine planning can continue without it. |
-| D02 | First online play mode | Question sent: normal turns first, simultaneous variant first, or both. Proposed default if no preference: normal turns first, then the selectable variant. All options support six connected players. |
-| D03 | Rules baseline and errata | Proposed baseline: written rules and cards v1.80, plus explicit corrections in the user's message. Older aid/art/video are supporting references. Ask whether any newer rulings exist, including in TTS. |
+| D02 | First online play mode | **Confirmed:** normal turns first, then the selectable simultaneous-actions variant. Both support six connected players. |
+| D03 | Rules baseline and errata | Written rules/cards v1.80 plus the designer's explicit corrections. **R01–R08 are resolved.** Rapid Advance follows the almanac rather than its card. Older aid/art/video remain supporting references; current hex versions still need checking. |
+| D04 | Cover and player identity | **Confirmed:** use `SPACE FORCE.png` as the cover reference; give each colour its own rocket silhouette from rulebook p2; use poker-chip action tokens with matching silhouettes and distinct rim patterns. Await rocket STLs. |
+| D05 | Boards and chip geometry | **Confirmed:** six action boards, one per player; chips snap to system suns and board indentations, with matching chip/sun/cutout diameters. |
+| D06 | System assets | **Confirmed task:** add a blank six-player centre hex. Designer to check whether the supplied system hexes are the latest versions. |
+
+The concrete handoff checklist is in [REMINDERS.md](REMINDERS.md).
 
 ## Resolve while building the engine
 
-The [rules review](RULES_REVIEW.md) keeps the actual questions with page references. Prioritise free-action trigger chains and Event timing; then resolve interactions as their handlers are implemented. Decisions must become versioned rules notes and meaningful test cases rather than implicit code behaviour.
+The [rules review](RULES_REVIEW.md) records the confirmed answers to all eight original questions, with page references and the full five-Tech PRODUCE example. [rules-clarifications.json](../catalog/rules-clarifications.json) captures the same decisions for future engine work. Turn these rulings and the Prophecy/warp edge cases into meaningful scenarios as the engine is implemented; they are no longer outstanding questions.
 
 For undo, the proposed default permits corrections before information reveals or subsequent actions, with table approval for a larger rollback. Ask the designer to confirm this policy before remote playtesting.
 
@@ -44,15 +49,20 @@ These are launch inputs, not reasons to stop the rules engine or board prototype
 - Active/confirmed newsletter subscribers exported by default, with suppression maintained separately.
 - Current/previous major browsers as the initial compatibility target; older requirements to be named.
 
+The separate rocket silhouettes, chip face/rim identity, snapping geometry, six action boards, and normal-turn-first delivery order are confirmed requirements, not optional defaults.
+
 ## Decision history
 
 | Date | Decision/evidence |
 | --- | --- |
 | 2026-11-13 | User requires their `charlie-fish/space-force` GitHub repository and version control. |
-| 2026-11-13 | GitHub reports the repository is public and empty, with push permission available through the connected integration. |
+| 2026-11-13 | At initial inspection, GitHub reported the repository was public and empty, with push permission available through the connected integration; the initial planning documents were subsequently committed. |
 | 2026-11-13 | All four PDFs downloaded and reviewed; original checksums recorded. |
 | 2026-11-13 | User's three extra Explore copies produce the complete 16-token supply. |
 | 2026-11-13 | Written rulebook explicitly includes a simultaneous-actions variant, with two card exclusions. |
 | 2026-11-13 | Video access was throttled; no claim is made to have watched or transcribed it. |
+| 2026-11-13 | Designer confirmed normal turns first, then the selectable variant; specified colourblind-accessible rocket/chip design and the six individual action boards. |
+| 2026-11-13 | Designer corrected the hidden tile pool, answered R01–R08, and clarified Prophecy on capacity-one planets and connectivity through warps. |
+| 2026-11-13 | Designer supplied `SPACE FORCE.png` as a cover reference and requested reminders for TTS files, rocket STLs, and the latest-hex check; the blank centre hex is now an explicit additional asset. |
 
 No hosting provider, paid service, final privacy text, or application deployment has been selected in this planning stage.

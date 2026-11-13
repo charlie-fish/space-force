@@ -2,7 +2,19 @@
   "schema_version": 1,
   "source": "Space Force rules v1.80.pdf",
   "source_pdf_page": 24,
-  "variant_replacement_policy": "Awaiting designer ruling R08",
+  "variant_replacement_policy": {
+    "source_ruling": "R08",
+    "selection": "random",
+    "eligible_printed_costs": [
+      2,
+      3
+    ],
+    "must_be_legal_for_selected_variants": true,
+    "exclude_cards_already_in_display": true,
+    "draw_without_replacement": true,
+    "target_display_size": 10,
+    "record_selected_replacements_in_game_setup": true
+  },
   "presets": [
     {
       "preset_id": "preset.aggressive",

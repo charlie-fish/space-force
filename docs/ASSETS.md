@@ -10,8 +10,10 @@ Inventory checked on 13 November 2026. Page references below are **one-based PDF
 | Space Force A4 Cardboard 1.40.pdf | 7 | Twelve system fronts, repeated action board, first-player marker, feature tokens, and Explore-token art. |
 | SpaceForce Cards v1.80.pdf | 65 | Thirty Tech and thirty Event faces, their backs, and an additional first-player marker. |
 | SpaceForce Player aid v1.50.pdf | 4 | Action reference, play sequence, scoring, quick-start layouts, and presets. Includes repeated print copies and more developed branding. |
+| SPACE FORCE.png | — | Front-cover graphic supplied in chat; visual reference for branding, colours, and illustrated style. The original binary has not been archived in this checkout. |
 | [Rules video](https://www.youtube.com/watch?v=b5LjEQc_m4Y) | — | Supplementary explanation. Automated access was throttled during discovery; its contents have not been verified. The rulebook itself warns the video may predate refinements. |
 | Tabletop Simulator mod | — | Not supplied yet; a Workshop link and exported save/assets would help verify layouts and reuse component images. |
+| Rocket STL files | — | Awaiting the designer's files; use to verify and reproduce the six distinct rocket shapes. |
 
 The [source register](../catalog/sources.csv) records sizes and SHA-256 checksums for the PDFs so later replacements can be recognised precisely. Checksums identify files; they do not make the catalogue an approved production ruleset.
 
@@ -41,9 +43,13 @@ Card IDs, printed titles, canonical titles, costs, timing, and rulebook referenc
 | 6 | Le Guin | Lem | Action board |
 | 7 | — | — | First-player marker, four additional feature tokens, 13 Explore-token images |
 
-Banks, Attwood, Butler, Bujold, Clarke, and Simak have home planets. The six other tiles are non-home systems. A spare home tile can still be among the face-down systems when setup calls for randomly chosen remaining tiles; do not restrict hidden tiles to the six non-home designs.
+Banks, Attwood, Butler, Bujold, Clarke, and Simak have home planets. The six other tiles are non-home systems. **Designer correction: unused home designs are excluded from the hidden pool.** Choose hidden tiles only from the six non-home designs.
 
-[systems.csv](../catalog/systems.csv) includes visually transcribed planet capacities and fixed features. Verify these against a second source/TTS before locking engine data. Tile coordinates, planet anchors, edge indices, and rotations still need to be encoded. In a six-player game, the empty centre is a virtual playable system, not an additional illustrated tile. The five-player diagram also places the spare asteroid-belt token at setup.
+[systems.csv](../catalog/systems.csv) includes the twelve supplied designs plus a separate blank centre-system entry. It records visually transcribed planet capacities and fixed features. **The designer wants to check that the supplied system hexes are the latest versions before their data/art is finalised.** Keep that version check open, alongside a second transcription check against TTS or confirmed artwork. Tile coordinates, planet anchors, edge indices, and rotations still need to be encoded.
+
+**Add a blank hex for six-player games.** It makes the already-playable centre visible and provides a central action-chip snap target. It has no printed planets, warps, black holes, or asteroid belts; it remains a system for ordinary gameplay rules. The supplied cardboard PDF contains twelve system fronts, so the blank hex is a requested additional asset, not an image claimed to exist in that PDF. The five-player diagram also places the spare asteroid-belt token at setup.
+
+There are six action boards in total, one per player. Each has four semicircular receiving indentations. Poker-chip action tokens, system suns, and these indentations have matching diameters. The board design is reusable across players while chip colour, rocket silhouette, and rim pattern identify ownership. Details are in [COMPONENT_DESIGN.md](COMPONENT_DESIGN.md).
 
 ## Complete Explore supply
 
@@ -65,10 +71,16 @@ Retain original PDFs and future source art in a controlled asset archive. Record
 
 Cards must have readable semantic text in the interface. Images can show the original design, but must not be the only representation of rules, costs, or available actions. New images should be replaceable without editing the engine or changing saved-game IDs. Responsive image sizes and lazy loading will keep the PDFs' print resolution out of the initial download.
 
-The supplied sheets do not provide a standalone complete web asset set for all rocket/action pieces or all component backs. Simple SVG pieces and neutral backs are suitable provisional assets. Final fonts, banners, and visual direction can be chosen from the existing material or new artwork; the player aid contains additional branding worth preserving.
+The supplied front cover gives a visual direction of dark violet space, muted orange, sage green, cream, retro lettering, and textured illustration. Keep it as a replaceable cover asset; create optimised web copies when its source binary is archived. It is not the template for all six player rocket silhouettes: those come from rulebook page 2 and the forthcoming STLs.
+
+The supplied sheets do not provide a standalone complete web asset set for all rocket/action pieces or all component backs. Provisional SVG rockets must retain the six different silhouettes; a single recoloured rocket would not satisfy the accessibility requirement. Poker-chip faces and visible rim patterns must remain distinct in greyscale and when stacked. Neutral backs are suitable provisional assets. Preserve the compatible branding in the player aid as well.
+
+The cover is available as a visual reference in the conversation, but has no local original-file checksum yet. Do not fabricate file metadata or claim the PNG is committed. The source register records that distinction.
 
 ## Tabletop Simulator handoff
 
 Please provide the Workshop URL and, ideally, a saved table `.json` plus its image/deck sheets and any Lua scripts in a ZIP. I can inspect object data, positions, rotations, card IDs, image links, and scripts. A public Workshop page may help discovery, but direct access to every linked asset is not guaranteed.
 
 TTS saves contain setup information and references rather than embedding all image/model files. Exporting the accompanying assets avoids broken or inaccessible links. Running the mod in the Steam application is separate from inspecting and converting its files. See the official [importing guidance](https://kb.tabletopsimulator.com/custom-content/importing-mods/) and [save-file format](https://kb.tabletopsimulator.com/custom-content/save-file-format/).
+
+The handoff reminder also covers rocket STL files and the latest-hex check: see [REMINDERS.md](REMINDERS.md).

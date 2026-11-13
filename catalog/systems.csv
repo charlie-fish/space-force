@@ -1,13 +1,14 @@
-system_id,name,cardboard_pdf_page,sheet_position,home_design,planet_capacities,fixed_black_holes,fixed_warps,printed_asteroid_edge,status
-system.banks,Banks,1,left,true,6;3;3;3;2,0,0,,visually_transcribed_pending_second_check
-system.attwood,Attwood,1,right,true,6;2;2;2,0,0,,visually_transcribed_pending_second_check
-system.butler,Butler,2,left,true,6;3;2;1,0,0,,visually_transcribed_pending_second_check
-system.bujold,Bujold,2,right,true,6;3;1;1,0,0,,visually_transcribed_pending_second_check
-system.clarke,Clarke,3,left,true,6;3;3;3;3,1,0,,visually_transcribed_pending_second_check
-system.simak,Simak,3,right,true,6;2;2;2,0,0,,visually_transcribed_pending_second_check
-system.heinlein,Heinlein,4,left,false,2;2;2;1;1;1,0,1,left vertical edge,visually_transcribed_pending_second_check
-system.harrison,Harrison,4,right,false,2;2;2;2,0,0,left vertical edge,visually_transcribed_pending_second_check
-system.jemisin,Jemisin,5,left,false,3;2;2;1,0,0,left vertical edge,visually_transcribed_pending_second_check
-system.willis,Willis,5,right,false,3;3;1;1,0,0,left vertical edge,visually_transcribed_pending_second_check
-system.le-guin,Le Guin,6,left,false,2;2;1;1;1,0,0,left vertical edge,visually_transcribed_pending_second_check
-system.lem,Lem,6,right,false,2;2;1;1;1,1,1,right vertical edge,visually_transcribed_pending_second_check
+system_id,name,cardboard_pdf_page,sheet_position,home_design,planet_capacities,fixed_black_holes,fixed_warps,printed_asteroid_edge,status,planet_count,setup_role,source_version_status
+system.banks,Banks,1,left,true,6;3;3;3;2,0,0,,visually_transcribed_pending_second_check,5,initial_face_up_home_only,designer_latest_hex_version_check_pending
+system.attwood,Attwood,1,right,true,6;2;2;2,0,0,,visually_transcribed_pending_second_check,4,initial_face_up_home_only,designer_latest_hex_version_check_pending
+system.butler,Butler,2,left,true,6;3;2;1,0,0,,visually_transcribed_pending_second_check,4,initial_face_up_home_only,designer_latest_hex_version_check_pending
+system.bujold,Bujold,2,right,true,6;3;1;1,0,0,,visually_transcribed_pending_second_check,4,initial_face_up_home_only,designer_latest_hex_version_check_pending
+system.clarke,Clarke,3,left,true,6;3;3;3;3,1,0,,visually_transcribed_pending_second_check,5,initial_face_up_home_only,designer_latest_hex_version_check_pending
+system.simak,Simak,3,right,true,6;2;2;2,0,0,,visually_transcribed_pending_second_check,4,initial_face_up_home_only,designer_latest_hex_version_check_pending
+system.heinlein,Heinlein,4,left,false,2;2;2;1;1;1,0,1,left vertical edge,visually_transcribed_pending_second_check,6,hidden_non_home_pool,designer_latest_hex_version_check_pending
+system.harrison,Harrison,4,right,false,2;2;2;2,0,0,left vertical edge,visually_transcribed_pending_second_check,4,hidden_non_home_pool,designer_latest_hex_version_check_pending
+system.jemisin,Jemisin,5,left,false,3;2;2;1,0,0,left vertical edge,visually_transcribed_pending_second_check,4,hidden_non_home_pool,designer_latest_hex_version_check_pending
+system.willis,Willis,5,right,false,3;3;1;1,0,0,left vertical edge,visually_transcribed_pending_second_check,4,hidden_non_home_pool,designer_latest_hex_version_check_pending
+system.le-guin,Le Guin,6,left,false,2;2;1;1;1,0,0,left vertical edge,visually_transcribed_pending_second_check,5,hidden_non_home_pool,designer_latest_hex_version_check_pending
+system.lem,Lem,6,right,false,2;2;1;1;1,1,1,right vertical edge,visually_transcribed_pending_second_check,5,hidden_non_home_pool,designer_latest_hex_version_check_pending
+system.blank-centre,Blank centre,,,false,,0,0,,logical_system_confirmed_blank_hex_art_pending,0,six_player_centre_only,new_blank_hex_requested

@@ -1,0 +1,114 @@
+{
+  "schema_version": 1,
+  "clarification_id": "designer-clarifications-001",
+  "date": "2026-11-13",
+  "authority": "Designer follow-up in the project conversation",
+  "printed_rules_version": "1.80",
+  "status": "confirmed_specification_not_implemented",
+  "delivery_order": ["normal_turns", "selectable_simultaneous_actions_variant"],
+  "setup": {
+    "unused_home_designs_allowed_in_hidden_pool": false,
+    "hidden_pool": "non_home_designs_only",
+    "player_action_board_count": 6,
+    "boards_per_player": 1,
+    "six_player_blank_centre_system_id": "system.blank-centre",
+    "latest_supplied_system_hex_version_confirmed": false
+  },
+  "rulings": {
+    "R01": {
+      "status": "resolved",
+      "free_actions_trigger_applicable_tech_hooks": true,
+      "spice_granted_produce_triggers_spice": false,
+      "spice_granted_produce_triggers_other_applicable_techs": true,
+      "spice_bonus_follows_complete_first_produce_chain": true,
+      "rapid_advance_effect": "optional_direct_conversion_of_one_ship_to_settlement",
+      "rapid_advance_is_settle_action": false,
+      "rapid_advance_wording_authority": "rulebook_almanac_over_card"
+    },
+    "R02": {
+      "status": "resolved",
+      "round_event_effect_begins": "event_selected_by_auction_winner",
+      "round_event_effect_ends": "discard_previous_event_in_subsequent_economy_event_step",
+      "includes_selecting_economy_remaining_steps": true,
+      "includes_next_economy_investments": true,
+      "plan_cleanup_preserves_active_event_restrictions": true
+    },
+    "R03": {
+      "status": "resolved",
+      "terminal_condition": "event_step_has_no_events_left_to_draw",
+      "last_pair_draw_ends_game_immediately": false,
+      "final_economy_step": "tech",
+      "final_economy_reinforce_or_marker_pass": false,
+      "ragnarok_last_pair_uses_same_later_no_draw_boundary": true
+    },
+    "R04": {
+      "status": "resolved",
+      "empty_action_may_be_chosen_for_tech_hooks": true,
+      "nonzero_main_effect_required_for_tech_hooks": false
+    },
+    "R05": {
+      "status": "resolved",
+      "arcologies_extra_spaces_per_planet": 1,
+      "extra_space_shared_across_arcologies_owners": true,
+      "extra_space_usable_by_arcologies_owner": true,
+      "fullness_for_produce_and_soylent_green": "settlement_count_at_least_printed_capacity",
+      "fullness_includes_capacity_plus_one": true
+    },
+    "R06": {
+      "status": "resolved",
+      "secret_choices": ["action_token_choice", "action_board_slot_choice"],
+      "action_parameters_secretly_committed_before_reveal": false,
+      "action_parameters_chosen": "during_action_resolution_after_reveal",
+      "any_participating_player_can_declare_dependency": true,
+      "dependency_switches_all_participants_to_ordered_resolution": true,
+      "action_order": ["move_into", "settle", "produce", "attack"],
+      "remaining_disambiguation": "player_order"
+    },
+    "R07": {
+      "status": "resolved",
+      "sabotage_destruction_value_with_research_lab": "undiscounted_value",
+      "sabotage_can_target_sabotage": false
+    },
+    "R08": {
+      "status": "resolved",
+      "variant_excluded_preset_card_replacement": "random_legal_tech_of_printed_value_2_or_3",
+      "policy_reference": "tech-presets.json#/variant_replacement_policy"
+    }
+  },
+  "confirmed_r01_example": {
+    "owned_tech_ids": [
+      "tech.population-explosion",
+      "tech.government-incentives",
+      "tech.frontier-pioneer",
+      "tech.rapid-advance",
+      "tech.spice"
+    ],
+    "assumes_player_uses_applicable_optional_effects": true,
+    "first_produce_source": "standard_action",
+    "chain_after_each_produce": [
+      "Population Explosion grants a free SETTLE",
+      "Frontier Pioneer adds a Ship before that SETTLE",
+      "Government Incentives grants a MOVE INTO before that SETTLE",
+      "Resolve MOVE INTO, then Rapid Advance's optional direct conversion",
+      "Rapid Advance does not trigger SETTLE hooks",
+      "Complete Population Explosion's SETTLE after its before-effects"
+    ],
+    "second_produce_source": "tech.spice",
+    "second_produce_repeats_full_chain": true,
+    "second_produce_grants_third_produce_from_spice": false
+  },
+  "edge_cases": {
+    "prophecy_opponent_settlement_on_capacity_one": {
+      "explore_reward_resolves_before_acting_player_settlement": true,
+      "reward_recipient_must_be_opponent": true,
+      "placed_reward_fills_planet": true,
+      "acting_player_can_then_settle_only_if": "arcologies_or_soylent_green_applies",
+      "soylent_green_requires_all_system_planets_full": true,
+      "component_supply_limits_still_apply": true
+    },
+    "asteroid_connectivity": {
+      "include_warp_links_in_board_connectivity_check": true,
+      "edge_isolation_allowed_if_warps_keep_board_connected": true
+    }
+  }
+}
