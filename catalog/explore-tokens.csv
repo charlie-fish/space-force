@@ -1,0 +1,7 @@
+effect_id,effect,cardboard_pdf_page,printed_quantity,additional_quantity,total_quantity,correction_source
+explore.credits-1,Gain 1 Credit,7,2,0,2,Supplied artwork
+explore.credits-2,Gain 2 Credits,7,3,1,4,Designer message
+explore.credits-3,Gain 3 Credits,7,1,0,1,Supplied artwork
+explore.other-player-ships-2,Choose another player; they gain 2 Ships in this system,7,1,2,3,Designer message
+explore.other-player-settlement-1,Choose another player; they gain 1 Settlement on this planet,7,4,0,4,Supplied artwork
+explore.black-hole,Black hole remains in this system,7,2,0,2,Supplied artwork

@@ -1,0 +1,88 @@
+{
+  "schema_version": 1,
+  "source": "Space Force rules v1.80.pdf",
+  "source_pdf_page": 24,
+  "variant_replacement_policy": "Awaiting designer ruling R08",
+  "presets": [
+    {
+      "preset_id": "preset.aggressive",
+      "name": "Aggressive",
+      "tech_ids": [
+        "tech.agility",
+        "tech.artificial-warp",
+        "tech.assembly-line",
+        "tech.cloaking",
+        "tech.death-sun",
+        "tech.mercenaries",
+        "tech.planet-killer",
+        "tech.soylent-green",
+        "tech.spice",
+        "tech.strategic-stall"
+      ]
+    },
+    {
+      "preset_id": "preset.cunning",
+      "name": "Cunning",
+      "tech_ids": [
+        "tech.disruptor",
+        "tech.filibuster",
+        "tech.foresight",
+        "tech.frontier-pioneer",
+        "tech.genesis",
+        "tech.government-incentives",
+        "tech.gravity-drive",
+        "tech.patents",
+        "tech.sabotage",
+        "tech.strategic-stall"
+      ]
+    },
+    {
+      "preset_id": "preset.economic",
+      "name": "Economic",
+      "tech_ids": [
+        "tech.agility",
+        "tech.arcologies",
+        "tech.artificial-warp",
+        "tech.banking",
+        "tech.flexible-economy",
+        "tech.insurance",
+        "tech.planet-nine",
+        "tech.rapid-advance",
+        "tech.research-lab",
+        "tech.spice"
+      ]
+    },
+    {
+      "preset_id": "preset.family",
+      "name": "Family",
+      "tech_ids": [
+        "tech.agility",
+        "tech.artificial-warp",
+        "tech.assembly-line",
+        "tech.banking",
+        "tech.disruptor",
+        "tech.genesis",
+        "tech.kessler-syndrome",
+        "tech.patents",
+        "tech.planet-killer",
+        "tech.planet-nine"
+      ]
+    },
+    {
+      "preset_id": "preset.peaceful",
+      "name": "Peaceful",
+      "tech_ids": [
+        "tech.arcologies",
+        "tech.disruptor",
+        "tech.frontier-pioneer",
+        "tech.genesis",
+        "tech.government-incentives",
+        "tech.gravity-drive",
+        "tech.insurance",
+        "tech.kessler-syndrome",
+        "tech.patrol",
+        "tech.rapid-advance"
+      ]
+    }
+  ]
+}

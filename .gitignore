@@ -1,0 +1,26 @@
+# Local configuration and credentials
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+
+# Dependencies and generated files
+node_modules/
+dist/
+coverage/
+playwright-report/
+test-results/
+*.log
+.DS_Store
+
+# Original supplied artwork and local discovery files
+source-assets/
+work/
+
+# Runtime information is private and must not be committed
+private-data/
+backups/
+*.sqlite
+*.sqlite3
+*.db

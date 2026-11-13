@@ -1,0 +1,61 @@
+card_id,kind,name,source_title,cost,cards_pdf_page,rulebook_pdf_page,timing,simultaneous_allowed,notes,content_pack,status
+tech.assembly-line,tech,Assembly Line,Assembly line,4,3,15,reinforce,true,,base-1.80,inventoried_not_implemented
+tech.rapid-advance,tech,Rapid Advance,Rapid Advance,5,4,18,after_move_into,true,,base-1.80,inventoried_not_implemented
+tech.frontier-pioneer,tech,Frontier Pioneer,Frontier Pioneer,6,5,16,before_settle,true,,base-1.80,inventoried_not_implemented
+tech.genesis,tech,Genesis,Genesis,6,6,16,on_acquisition,true,,base-1.80,inventoried_not_implemented
+tech.population-explosion,tech,Population Explosion,POpulation Explosion,4,7,18,after_produce,true,,base-1.80,inventoried_not_implemented
+tech.soylent-green,tech,Soylent Green,Soylent Green,10,8,19,during_settle,true,,base-1.80,inventoried_not_implemented
+tech.planet-killer,tech,Planet Killer,Planet Killer,6,9,18,on_acquisition,true,,base-1.80,inventoried_not_implemented
+tech.artificial-warp,tech,Artificial Warp,Artificial Warp,3,10,15,on_acquisition,true,,base-1.80,inventoried_not_implemented
+tech.arcologies,tech,Arcologies,Arcologies,5,11,15,during_settle,true,,base-1.80,inventoried_not_implemented
+tech.kessler-syndrome,tech,Kessler Syndrome,Kessler Syndrome,5,12,17,on_acquisition,true,,base-1.80,inventoried_not_implemented
+tech.planet-nine,tech,Planet Nine,Planet nine,4,13,18,on_acquisition,true,,base-1.80,inventoried_not_implemented
+tech.mercenaries,tech,Mercenaries,Mercenaries,9,14,17,after_move_into,true,,base-1.80,inventoried_not_implemented
+tech.banking,tech,Banking,Banking,7,15,15,during_actions,true,,base-1.80,inventoried_not_implemented
+tech.spice,tech,Spice,SPICE,12,16,19,after_produce,true,,base-1.80,inventoried_not_implemented
+tech.agility,tech,Agility,Agility,4,17,15,during_move_into,true,,base-1.80,inventoried_not_implemented
+tech.gravity-drive,tech,Gravity Drive,Gravity Drive,6,18,17,during_move_into,false,,base-1.80,inventoried_not_implemented
+tech.foresight,tech,Foresight,Foresight,2,19,16,ongoing_private_information,true,Excluded with simplified Events,base-1.80,inventoried_not_implemented
+tech.patents,tech,Patents,Patents,3,20,17,ongoing,true,,base-1.80,inventoried_not_implemented
+tech.research-lab,tech,Research Lab,Research Lab,5,21,18,tech_purchase,true,,base-1.80,inventoried_not_implemented
+tech.death-sun,tech,Death Sun,death Sun,11,22,15,during_attack,true,,base-1.80,inventoried_not_implemented
+tech.cloaking,tech,Cloaking,Cloaking,8,23,15,before_attack,true,,base-1.80,inventoried_not_implemented
+tech.strategic-stall,tech,Strategic Stall,Strategic stall,5,24,19,during_plan,true,,base-1.80,inventoried_not_implemented
+tech.filibuster,tech,Filibuster,Filibuster,6,25,16,after_plan,true,,base-1.80,inventoried_not_implemented
+tech.patrol,tech,Patrol,Patrol,6,26,18,ongoing_attack_restriction,true,,base-1.80,inventoried_not_implemented
+tech.insurance,tech,Insurance,Insurance,3,27,17,skipped_actions_turn,true,,base-1.80,inventoried_not_implemented
+tech.eminent-domain,tech,Eminent Domain,Eminent Domain,3,28,16,before_endgame_scoring,true,,base-1.80,inventoried_not_implemented
+tech.disruptor,tech,Disruptor,Disruptor,7,29,16,on_acquisition_next_round_restriction,true,,base-1.80,inventoried_not_implemented
+tech.sabotage,tech,Sabotage,Sabotage,X,30,19,on_acquisition,true,,base-1.80,inventoried_not_implemented
+tech.flexible-economy,tech,Flexible Economy,Flexible Economy,2,31,16,ongoing,true,,base-1.80,inventoried_not_implemented
+tech.government-incentives,tech,Government Incentives,Government Incentives,7,32,17,before_settle,true,,base-1.80,inventoried_not_implemented
+event.cyber-attack,event,Cyber Attack,Cyber Attack,,35,20,round_actions,false,,base-1.80,inventoried_not_implemented
+event.ceasefire,event,Ceasefire,Ceasefire,,36,20,round_attack_restriction,true,,base-1.80,inventoried_not_implemented
+event.communist-decree,event,Communist Decree,Communist Decree,,37,20,immediate_all_players,true,,base-1.80,inventoried_not_implemented
+event.ragnarok,event,Ragnarök,RagnarOK,,38,22,immediate_repeat_event_step,true,Canonical name follows rulebook,base-1.80,inventoried_not_implemented
+event.stealth-invasion,event,Stealth Invasion,Stealth Invasion,,39,23,immediate_selector,true,,base-1.80,inventoried_not_implemented
+event.scrambler,event,Scrambler,Scrambler,,40,22,round_after_plan_selector,true,,base-1.80,inventoried_not_implemented
+event.economic-boom,event,Economic Boom,Economic Boom,,41,21,round_investments,true,,base-1.80,inventoried_not_implemented
+event.luddite-decree,event,Luddite Decree,Luddite Decree,,42,22,round_tech_suppression,true,,base-1.80,inventoried_not_implemented
+event.all-your-base,event,All Your Base,All your base,,43,20,immediate_selector_free_move,true,,base-1.80,inventoried_not_implemented
+event.technological-singularity,event,Technological Singularity,Technological Singularity,,44,23,immediate_shared_market,true,,base-1.80,inventoried_not_implemented
+event.flexibility,event,Flexibility,Flexibity,,45,21,round_actions_selector,true,Canonical name follows rulebook,base-1.80,inventoried_not_implemented
+event.multicultural-tension,event,Multicultural Tension,Multicultural Tension,,46,22,immediate_selector,true,,base-1.80,inventoried_not_implemented
+event.consolidation,event,Consolidation,Consolidation,,47,20,immediate_selector_free_settle,true,,base-1.80,inventoried_not_implemented
+event.spacetime-rip,event,Spacetime Rip,Spacetime Rip,,48,22,round_movement_selector,true,,base-1.80,inventoried_not_implemented
+event.politics,event,Politics,Politics,,49,22,immediate_all_players_next_actions,true,,base-1.80,inventoried_not_implemented
+event.vorsprung,event,Vorsprung,Vorsprung,,50,23,immediate_selector,true,,base-1.80,inventoried_not_implemented
+event.turtling,event,Turtling,Turtling,,51,23,immediate_all_players,true,,base-1.80,inventoried_not_implemented
+event.gravitational-lensing,event,Gravitational Lensing,Gravitational Lensing,,52,21,round_movement,true,,base-1.80,inventoried_not_implemented
+event.migration,event,Migration,Migration,,53,22,immediate_selector,true,,base-1.80,inventoried_not_implemented
+event.recession,event,Recession,Recession,,54,22,round_produce_restriction,true,,base-1.80,inventoried_not_implemented
+event.hive-mind,event,Hive Mind,Hive Mind,,55,21,immediate_selector,true,,base-1.80,inventoried_not_implemented
+event.ammo-shortage,event,Ammo Shortage,Ammo Shortage,,56,20,round_attack,true,,base-1.80,inventoried_not_implemented
+event.famine,event,Famine,Famine,,57,21,immediate_all_players,true,,base-1.80,inventoried_not_implemented
+event.el-mayarah,event,El Mayarah,El Mayarah,,58,21,round_production_selector,true,,base-1.80,inventoried_not_implemented
+event.capital-injection,event,Capital Injection,Capital Injection,,59,20,immediate_selector,true,,base-1.80,inventoried_not_implemented
+event.galactic-summit,event,Galactic Summit,Galactic Summit,,60,21,immediate_selector,true,,base-1.80,inventoried_not_implemented
+event.black-cloud,event,Black Cloud,Black Cloud,,61,20,round_attack_restriction,true,,base-1.80,inventoried_not_implemented
+event.earth-first,event,Earth First,Earth First,,62,21,round_plan,true,,base-1.80,inventoried_not_implemented
+event.prophecy,event,Prophecy,Prophecy,,63,22,immediate_selector_then_public_reveal,true,,base-1.80,inventoried_not_implemented
+event.alliance,event,Alliance,Alliance,,64,20,immediate_selection_round_restriction,true,,base-1.80,inventoried_not_implemented
