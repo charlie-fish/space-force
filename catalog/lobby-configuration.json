@@ -68,5 +68,14 @@
     "skippable": true,
     "replayable_from_help": true,
     "status": "open_reminder_not_implemented"
+  },
+  "active_match_dropout": {
+    "policy_reference": "dropout-policy.json",
+    "confirmed_idle_timeout_seconds": 300,
+    "confirmed_approval": "strict_majority_of_other_active_players",
+    "automatic_kick": false,
+    "removed_players_future_turns_skipped": true,
+    "sole_remaining_player_wins": true,
+    "integration_details_status": "P01_to_P05_for_designer_review"
   }
 }

@@ -1,6 +1,6 @@
 # Space Force: project brief
 
-Version 0.4 · 15 November 2026 · Planning baseline with public/private lobbies, TTS review, and release checks
+Version 0.5 · 15 November 2026 · Planning baseline with gameplay navigation and confirmed idle-removal core
 
 ## Intended result
 
@@ -18,7 +18,8 @@ The user's message defines the software requirements. Attached documents supply 
 | Setup | Support all player counts from 2 to 7, the correct layouts, random content selection, and documented Tech presets. Exclude unused home designs from hidden tiles. Use Asimov only as the six-player centre and Adams only as the seven-player centre/home; neither enters random pools. Replace variant-excluded preset Techs with random legal value-2/3 Techs. Record the selected variables. |
 | Rules | Enforce legal actions, action-token stacks, limited rocket supply, sealed auctions, Tech/Event effects, end conditions, scoring, and ties. |
 | Multiplayer | Synchronise accepted actions and phase changes; preserve hidden information; reject duplicate, stale, out-of-turn, or unauthorised commands. |
-| Recovery | Save games durably. A returning player resumes the same seat through a protected resume credential. A dropped connection does not immediately end a game. |
+| Recovery | Save games durably and protect seat resumption. After five minutes of qualifying inactivity, a majority of the other active players can approve removal; skip all remaining turns of that participant and award a win if only one non-removed player remains. See the reviewed/proposed details in [DROPOUTS.md](DROPOUTS.md). |
+| Navigation | Reach Board, Techs, Event, and My Board through visible controls; keep Reserve/Credits accessible. Support phone pinch/pan/swipe and safe desktop shortcuts with non-gesture alternatives. |
 | Undo | Let players correct mistakes, with clear limits around information reveals and actions taken by other players. Keep an audit record. |
 | Guidance | Highlight legal choices, explain unavailable actions/current effects, preview consequences, and provide contextual Help. Track a skippable first-play tutorial in issue #1. |
 | Feedback | Allow feedback during or after play, with an optional game reference and optional reply address. Store and manage submissions privately. |
@@ -40,7 +41,7 @@ The designer has answered R01–R08 and supplied additional setup, Prophecy, and
 
 ## Interface and accessibility
 
-Use a responsive board with a persistent phase/turn indicator, selected-system details, a compact player summary, and a readable action history. On phones, show system and card details in panels instead of requiring the entire table to fit on screen. Offer pan/zoom with an obvious reset control.
+Use the four persistent destinations in [GAMEPLAY_UI.md](GAMEPLAY_UI.md): Board, Techs, Event, and My Board. Keep phase/turn/waiting status, Reserve, and Credits accessible throughout. My Board includes all four action slots and the two labelled resource areas. On phones, use labelled navigation and detail panels with pinch zoom, background pan, and carefully scoped swipes; on desktop, use the proposed B/T/E/A view shortcuts and camera controls. Preserve camera/draft context and provide Fit board and button alternatives.
 
 All essential interactions must work by tapping or clicking; dragging can be an additional convenience. Tooltips must also open on tap and keyboard focus. Pair player colours with names and distinct rocket shapes, keep text legible, and provide keyboard controls and a text view of important board state.
 
@@ -85,7 +86,7 @@ The server validates undo requests and restores all affected state together. Bro
 
 For every game, record an ID, creation/start/end/last-activity timestamps, status and end reason, player count and seat order, room visibility and selected mode, engine/content/clarification/schema versions, application release/commit, chosen settings, selected Tech/Event pools, board layout, initial systems/orientations, server-private random setup, and the accepted action history.
 
-For completed games, store per-player settled-planet points, ship-system points, Tech points, total score, tie-break Credits, and all winner IDs. For unfinished games, store an explicitly labelled provisional score if useful; never present it as an official final result. Distinguish a disconnected player from an abandoned game. Define inactivity and retention policies before launch.
+For completed games, store per-player settled-planet points, ship-system points, Tech points, total score, tie-break Credits, and all winner IDs. For a last-player victory, record the winner by `last_player_remaining`, removal/approval history, forfeited flags, and the reviewed scoring basis; a position-points snapshot must not imply that the points leader won. For unfinished games, store an explicitly labelled provisional score if useful; never present it as an official final result. Distinguish temporary disconnect, approved idle removal, voluntary resignation, normal completion, and abandonment. The five-minute majority-removal core is confirmed; [DROPOUTS.md](DROPOUTS.md) identifies remaining integration proposals. Retention remains a launch input.
 
 Newsletter addresses and optional feedback contact details are separate from gameplay identities. Collect only the personal data needed for the chosen features, and keep it out of public source control and public game views.
 
@@ -113,7 +114,7 @@ Run multiplayer integration tests with seven independent browser contexts, inclu
 | --- | --- | --- |
 | 0 — Organise | This brief, source catalogue, seven-player configuration, confirmed rulings, decision register, component design, and reminder list in GitHub. | Counts and page mappings checked; R01–R08 recorded; original hex versions confirmed; outstanding asset handoffs tracked. |
 | 1 — Rules foundation | Pure engine and an inspectable local board for normal turns, plus mode infrastructure. | Legal setup/actions, conservation, a complete base-flow game, scoring, and deterministic replay pass. |
-| 2 — Remote play | Public/private lobby, protected seats, ready checks, seven connected clients, sealed auctions, save/resume, and undo. | Seven-client game, private listing isolation, final-seat/start races, and disconnect/restart/retry scenarios pass. |
+| 2 — Remote play | Public/private lobby, protected seats, ready checks, seven connected clients, sealed auctions, save/resume, and undo. | Seven-client game, private listing isolation, final-seat/start races, disconnect/restart/retry, and reviewed majority-removal/last-player-win scenarios pass. |
 | 3 — Full base content and second mode | All 30 Techs/30 Events and presets; add the selectable simultaneous variant after normal-turn play works, with its 4+ player recommendation. | Card scenarios, rulings, interactions, and recommendation/host-choice checks pass; designer playtest agrees with intended rules. |
 | 4 — Private beta | Owner login, game history, change log, feedback management, and optional consented news sign-up/export. | Authorisation and persistence checked; privacy details and real service configuration supplied. |
 | 5 — Release | Responsive polish, onboarding, animations, browser checks, deployment, monitoring, and backups. | A complete external playtest on phones/desktops; measured performance; successful backup restore. |

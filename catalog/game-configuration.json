@@ -150,5 +150,7 @@
       }
     }
   },
-  "lobby_configuration_reference": "lobby-configuration.json"
+  "lobby_configuration_reference": "lobby-configuration.json",
+  "interaction_configuration_reference": "interaction-configuration.json",
+  "dropout_policy_reference": "dropout-policy.json"
 }

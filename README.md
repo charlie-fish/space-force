@@ -2,11 +2,14 @@
 
 An online implementation of Charlie Fish's board game, planned for 2–7 players using desktop and mobile browsers.
 
-**Current status: specification v0.4, 15 November 2026.** This repository contains the project plan, component catalogue, confirmed rulings, seven-player extension, public/private lobby requirements, and TTS archive review. A playable application has not been implemented or deployed.
+**Current status: specification v0.5, 15 November 2026.** This repository contains the game plan/catalogues, seven-player extension, lobby and navigation requirements, confirmed five-minute majority-removal rule, and TTS review. Detailed dropout integration proposals are marked for review. A playable application has not been implemented or deployed.
 
 ## Project documents
 
+- [Designer review checklist and next steps](docs/REVIEW_CHECKLIST.md)
 - [Project brief and delivery stages](docs/PROJECT_BRIEF.md)
+- [In-game views, gestures, and shortcuts](docs/GAMEPLAY_UI.md)
+- [Idle-player removal and continued play](docs/DROPOUTS.md)
 - [Rules review and implementation questions](docs/RULES_REVIEW.md)
 - [Source files and artwork plan](docs/ASSETS.md)
 - [Rocket, chip, and action-board design](docs/COMPONENT_DESIGN.md)
@@ -24,6 +27,8 @@ An online implementation of Charlie Fish's board game, planned for 2–7 players
 - [Systems](catalog/systems.csv): 14 supplied designs. Asimov is the centre only for six players; Adams is the centre only for seven. The original twelve designs are confirmed current.
 - [Game configuration](catalog/game-configuration.json): player limit, component quantities, setup by player count, and provisional orange seventh-player style.
 - [Lobby configuration](catalog/lobby-configuration.json): public/private rooms, readiness, and the four-plus-player recommendation with explicit host mode choice.
+- [Interaction defaults](catalog/interaction-configuration.json): four views, persistent resources, gestures, and scoped shortcuts.
+- [Dropout policy](catalog/dropout-policy.json): confirmed five-minute majority removal and separately marked integration proposals.
 - [TTS inventory](catalog/tts-inventory.json): received save/preview, deck and model counts, and external asset dependencies.
 - [Explore tokens](catalog/explore-tokens.csv): the complete 16-token distribution, including the three extra copies specified by the designer.
 - [Tech presets](catalog/tech-presets.json): the five presets from rulebook page 24.
@@ -41,7 +46,7 @@ Use the supplied `SPACE FORCE.png` front-cover graphic as the visual reference, 
 
 At seven players the supply is **280 rockets, 28 action chips, seven action boards, and seven player aids**. The original twelve tiles form the outer layout; use Adams as the seventh home system in the centre. At six players, use Asimov in the centre. Each of those setups uses thirteen hexes; the two special centre tiles are never used together.
 
-The lobby supports creating public games, joining waiting public games, and creating/joining unlisted private rooms. A skippable first-play teaching mode is tracked in [tutorial issue #1](https://github.com/charlie-fish/space-force/issues/1).
+The lobby supports creating public games, joining waiting public games, and creating/joining unlisted private rooms. In play, use Board, Techs, Event, and My Board views with visible Reserve/Credits. After five minutes of qualifying inactivity, a majority of the other active players can remove the idle participant; their future turns are skipped and a sole remaining player wins. A skippable first-play teaching mode is tracked in [tutorial issue #1](https://github.com/charlie-fish/space-force/issues/1).
 
 ## Data and ownership
 

@@ -17,14 +17,17 @@ Updated planning baseline: 15 November 2026. Confirmed items record the designer
 | D09 | Lobby | **Confirmed:** join private rooms, browse/join public waiting games, and create public games. Use [LOBBY.md](LOBBY.md) for the proposed ready/host/cleanup policies. |
 | D10 | First-play teaching | **Requested reminder:** skippable tutorial guidance during a first actual game; tracked as [issue #1](https://github.com/charlie-fish/space-force/issues/1). |
 | D11 | Platform practices | **Proposed baseline:** [PLATFORM_REVIEW.md](PLATFORM_REVIEW.md) adds public-room, recovery, security, accessibility, loading, and operational checks. |
+| D12 | Gameplay controls | **Confirmed scope:** Board, Techs, Event, and My Board with Reserve/Credits; phone gestures and desktop shortcuts. [GAMEPLAY_UI.md](GAMEPLAY_UI.md) proposes exact controls. |
+| D13 | Idle-player progression | **Confirmed:** five-minute idle threshold, majority approval by the other active players, skip removed players' remaining turns, and automatic win for a sole remaining player. |
+| D14 | Dropout integration | **For review:** P01–P05 in [DROPOUTS.md](DROPOUTS.md), including exact inactivity/electorate rules, remaining pieces/Techs, unfinished choices/bids, and forfeit score presentation. |
 
-The concrete handoff checklist is in [REMINDERS.md](REMINDERS.md).
+The designer review hub is [REVIEW_CHECKLIST.md](REVIEW_CHECKLIST.md); the live handoff list is [REMINDERS.md](REMINDERS.md).
 
 ## Resolve while building the engine
 
 The [rules review](RULES_REVIEW.md) records the confirmed answers to all eight original questions, with page references and the full five-Tech PRODUCE example. [rules-clarifications.json](../catalog/rules-clarifications.json) captures the same decisions for future engine work. Turn these rulings and the Prophecy/warp edge cases into meaningful scenarios as the engine is implemented; they are no longer outstanding questions.
 
-For undo, the proposed default permits corrections before information reveals or subsequent actions, with table approval for a larger rollback. Ask the designer to confirm this policy before remote playtesting.
+For undo, the proposed default permits corrections before information reveals or subsequent actions, with table approval for a larger rollback. This remains a review item alongside dropout proposals P01–P05; independent rules/UI foundation work can proceed meanwhile.
 
 Player access now includes public waiting-game discovery and private invitations, with guest names, protected seat-resume credentials, and no compulsory account. Room hosts manage waiting-room seats/settings; rules, scoring, and secret views remain server-enforced. The public lobby is now in scope; ranked matchmaking, global chat, competitive ratings, bots, and solo rules remain future features. Proposed lobby defaults are a 120-second waiting-room host-transfer grace and a 30-minute empty-lobby expiry, both configurable and subject to playtesting.
 
@@ -75,5 +78,7 @@ The seven-player limit, separate rocket silhouettes, chip face/rim identity, sna
 | 2026-11-15 | Designer supplied the TTS ZIP and requested a public/private lobby, a 4+ player simultaneous-mode recommendation, and a tutorial reminder. |
 | 2026-11-15 | ZIP inspected: saved JSON and preview; six-player components and externally linked assets; table-control Lua only. Tutorial task created as issue #1. |
 | 2026-11-15 | Added proposed public-room, mobile recovery, security, accessibility, performance, deployment, and operations acceptance checks. |
+| 2026-11-15 | Designer requested intuitive Board/Techs/Event/My Board access and a dropout progression rule, then confirmed five minutes and majority approval by the other active players. |
+| 2026-11-15 | Added the interface defaults, confirmed removal core, reviewable phase/forfeit proposals, and a linked designer review/next-step checklist. |
 
 No hosting provider, paid service, final privacy text, or application deployment has been selected in this planning stage.

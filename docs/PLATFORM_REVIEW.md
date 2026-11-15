@@ -10,7 +10,7 @@ Preserve a seat through refresh, network changes, and phone sleep. Show connecte
 
 The server advances phases and any configured deadlines. Hidden tabs throttle timers and animation callbacks, so client timers cannot decide whose turn ends. Pause decorative work in background tabs and resynchronise when visible. Test locking a phone, switching apps, returning through browser history, and changing between Wi-Fi and mobile data. [MDN: Page Visibility API](https://developer.mozilla.org/en-US/docs/Web/API/Page_Visibility_API).
 
-Do not mark a temporary disconnect as an abandoned match. Public rooms also need the ready checks, stale-listing cleanup, and host handover in [LOBBY.md](LOBBY.md). A game must not depend on a particular player's device remaining open.
+Do not mark a temporary disconnect as an abandoned match. The new [idle-removal rule](DROPOUTS.md) uses the confirmed five-minute threshold and majority approval, with explicit server-owned eligibility and forfeit results. Review its proposed integration details before implementation. Public rooms also need the ready checks, stale-listing cleanup, and host handover in [LOBBY.md](LOBBY.md). A game must not depend on a particular player's device remaining open.
 
 ## 2. Public-room and realtime security
 
@@ -24,7 +24,7 @@ Give public-room users a report action and the owner tools to delist abusive roo
 
 ## 3. Accessibility and first-play usability
 
-Retain tap/click alternatives to every drag interaction, keyboard navigation, visible focus, text game summaries, and player identification by colour, shape, and pattern. Aim for 44 CSS-pixel primary controls; dense board interactions can use larger hit areas or an equivalent accessible detail panel. The WCAG 2.2 minimum target rule is 24 CSS pixels with specified exceptions; larger primary controls are a product target. Support text/browser zoom and portrait/landscape without disabling browser zoom. [W3C: Target Size (Minimum)](https://www.w3.org/WAI/WCAG22/Understanding/target-size-minimum.html).
+Use the four-view [gameplay navigation specification](GAMEPLAY_UI.md), with persistent Reserve/Credits, safe pinch/pan/swipe separation, and focus-scoped shortcuts. Retain tap/click alternatives to every drag interaction, keyboard navigation, visible focus, text game summaries, and player identification by colour, shape, and pattern. Aim for 44 CSS-pixel primary controls; dense board interactions can use larger hit areas or an equivalent accessible detail panel. The WCAG 2.2 minimum target rule is 24 CSS pixels with specified exceptions; larger primary controls are a product target. Support text/browser zoom and portrait/landscape without disabling browser zoom. [W3C: Target Size (Minimum)](https://www.w3.org/WAI/WCAG22/Understanding/target-size-minimum.html).
 
 Announce the current turn/phase and action results accessibly without moving focus unexpectedly or reading unrevealed choices. Confirm expensive or destructive actions with a concise consequence preview. Show why an action is unavailable and which player is currently needed. Sound, if added, is optional and starts after user interaction; visual status must suffice.
 

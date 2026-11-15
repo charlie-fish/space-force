@@ -1,0 +1,44 @@
+# Designer review, reminders, and next steps
+
+Updated 15 November 2026 · Specification v0.5
+
+There is no playable application yet. Review the documents/data now; interaction and browser checks become concrete in the first prototype. These checks do not reopen the already-resolved R01–R08 or the confirmed original-hex versions.
+
+## Check next
+
+| Priority | Item | Where to review |
+| --- | --- | --- |
+| 1 | Idle-removal integration: five minutes and majority approval are confirmed. Review P01–P05, particularly keeping an abandoned empire/Techs, completing compulsory choices, handling bids, and reporting forfeit scores. | [Dropout rule](DROPOUTS.md) |
+| 2 | Four destinations, persistent Reserve/Credits counts, phone pinch/pan/swipe separation, and the proposed B/T/E/A shortcuts with camera/help controls. | [Gameplay interface](GAMEPLAY_UI.md) |
+| 3 | Confirm the provisional seventh player's orange colour, twin-pod silhouette, and triangular chip rim; check the final six/seven shape-to-colour mapping when STLs arrive. | [Component design](COMPONENT_DESIGN.md), [game configuration](../catalog/game-configuration.json) |
+| 4 | Undo policy: latest reversible action before later actions/reveals; wider rollback with table approval; no undo to replace learned hidden information. | [Project brief: undo](PROJECT_BRIEF.md#undo-proposal) |
+| 5 | Public/private lobby, ready/start behaviour, the 4+ recommendation with host choice, and proposed waiting-room handover/expiry defaults. Those waiting-room timers are separate from confirmed five-minute in-game inactivity. | [Lobby](LOBBY.md), [lobby configuration](../catalog/lobby-configuration.json) |
+| 6 | Verify transcribed planet capacities, features, tile anchors/orientations, and layouts when the board prototype is shown. Current source versions are confirmed; Asimov is six-player centre only and Adams seven-player centre only. | [Asset map](ASSETS.md), [systems catalogue](../catalog/systems.csv), [rules review](RULES_REVIEW.md) |
+| 7 | Admin game/score records, forfeit labels, feedback management, email export and consent wording, data retention, and whether the proposed browser/size targets meet your audience's needs. | [Project brief](PROJECT_BRIEF.md), [platform review](PLATFORM_REVIEW.md) |
+| 8 | First-game tutorial scope: personal contextual guidance, skip/replay, and no forced multiplayer script. | [Tutorial issue #1](https://github.com/charlie-fish/space-force/issues/1) |
+
+## Outstanding from you
+
+- Rocket STL files and colour mapping, including a seventh design if available. Provisional silhouettes let development continue.
+- Optional Tabletop Simulator Workshop URL. The supplied TTS ZIP has already been received and inspected; there is no need to resend it.
+- When preparing hosting: domain and budget, expected simultaneous rooms, owner login preference, privacy controller/contact and jurisdiction, audience/retention preferences, any mailing provider, and code/art licensing choices. These are launch inputs, not prerequisites for a local rules/UI prototype. See [DECISIONS.md](DECISIONS.md#needed-before-public-deployment-or-collecting-addresses).
+
+## Outstanding implementation reminders
+
+- Build first-play teaching tracked in [issue #1](https://github.com/charlie-fish/space-force/issues/1).
+- Prepare optimised component art from the PDFs and approved TTS links, ingest the cover source, and encode Asimov/Adams anchors.
+- Implement seven distinct silhouettes/rim patterns, responsive navigation, public/private rooms, simultaneous play and its recommendation, and reviewed dropout handling.
+- Implement the private admin area, game audit/results, feedback, and optional consented news sign-up/export.
+
+The live checklist is [REMINDERS.md](REMINDERS.md). TTS review: [TTS_REVIEW.md](TTS_REVIEW.md). Original-hex confirmation and TTS-save receipt are completed items.
+
+## Next development steps
+
+1. Build the deterministic normal-turn rules engine and meaningful setup/action/resource/scoring tests for two to seven players, using the confirmed rules and versioned data.
+2. Build a playable local board with the four views, Reserve/Credits display, safe gestures/shortcuts, and provisional replaceable art. Review it on a phone and desktop.
+3. Add server-authoritative public/private rooms, seven independent clients, secret bids, save/rejoin, undo, and the reviewed five-minute majority-removal policy.
+4. Complete all Techs/Events and combinations; add selectable simultaneous actions, dependency handling, and the four-plus-player recommendation.
+5. Add owner administration, game/result audit, feedback, and optional newsletter consent/export, using real deployment/privacy configuration.
+6. Add the tracked tutorial and finish accessibility, browser/device, load, deployment/recovery, and backup-restore verification before release.
+
+Rules/UI foundation work can proceed while asset handoffs and the explicitly proposed dropout details are reviewed.

@@ -1,5 +1,16 @@
 # Change log
 
+## 0.5.0 — 2026-11-15
+
+- Specified Board, Techs, Event, and My Board views, with persistent Reserve/Credits totals and full action-board/supply details.
+- Added proposed phone pinch/pan/swipe controls and visible alternatives, plus focus-scoped, disableable desktop shortcuts that respect text fields and browser commands.
+- Recorded the designer's confirmation of a five-minute idle threshold and removal approved by a majority of the other active players. Removal is explicit, skips the departed player's remaining turns, and awards an automatic win when exactly one non-removed player remains.
+- Added phase integration requirements to clear blocking unresolved action tokens, preserve original setup, reject stale controls, and keep play progressing.
+- Marked inactivity/electorate details, abandoned-empire handling, pending-choice/bid handling, and forfeit scoring as concrete proposals for designer review.
+- Added a linked designer review checklist with outstanding handoffs, launch inputs, and the next implementation steps.
+
+This is a specification/catalogue release. The application and these behaviours are not implemented yet.
+
 ## 0.4.0 — 2026-11-15
 
 - Added a lobby for public game creation/discovery/joining and unlisted private rooms, with ready checks, atomic joins/start, and proposed host handover/cleanup policies.

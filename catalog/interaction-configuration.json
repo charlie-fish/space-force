@@ -1,0 +1,69 @@
+{
+  "schema_version": 1,
+  "status": "specification_not_implemented",
+  "view_ids": [
+    "board",
+    "techs",
+    "event",
+    "my_board"
+  ],
+  "persistent_resource_counts": [
+    "reserve",
+    "credits"
+  ],
+  "my_board_contents": [
+    "move_into_slot",
+    "settle_slot",
+    "produce_slot",
+    "attack_slot",
+    "reserve_supply",
+    "credits_supply"
+  ],
+  "preserve_on_view_change": [
+    "camera",
+    "selection",
+    "scroll_position",
+    "valid_draft",
+    "focus_context"
+  ],
+  "navigation_commits_game_actions": false,
+  "phone_proposed_defaults": {
+    "board_pinch": "zoom_about_gesture_focus",
+    "background_drag": "pan_camera",
+    "navigation_swipe_scope": "dedicated_header_or_handle",
+    "required_visible_alternatives": [
+      "destination_tabs",
+      "zoom_in",
+      "zoom_out",
+      "fit_board",
+      "pan_or_detail_controls"
+    ]
+  },
+  "keyboard_proposed_defaults": {
+    "B": "board",
+    "T": "techs",
+    "E": "event",
+    "A": "my_board",
+    "R": "fit_board",
+    "+": "zoom_in",
+    "-": "zoom_out",
+    "ArrowKeys": "pan_board",
+    "Escape": "close_overlay_restore_focus",
+    "?": "shortcut_help"
+  },
+  "keyboard_safeguards": {
+    "focus_scope": "game_interface",
+    "camera_requires_board_focus": true,
+    "ignore_editable_fields": true,
+    "preserve_browser_modifiers": [
+      "Control",
+      "Meta",
+      "Alt"
+    ],
+    "character_shortcuts_disableable": true,
+    "global_shortcut_commits_game_actions": false
+  },
+  "exact_bindings_status": "proposed_for_prototype_review",
+  "idle_warning_visible_in_all_views": true,
+  "dropout_policy_reference": "dropout-policy.json"
+}

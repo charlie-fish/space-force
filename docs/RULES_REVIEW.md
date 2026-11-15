@@ -84,6 +84,10 @@ Resolve Eminent Domain and other applicable endgame effects, then score:
 
 Ties use the greatest number of Credits; any remaining tie is a shared win. Record the components of the score, not only the total. Distinct-planet and distinct-system counting matters; neither is a count of pieces.
 
+## Online idle-removal adaptation
+
+The designer requested a way to continue without a player who does not return, and confirmed **five minutes** and **a majority of the other active players**. After approved removal, skip that participant's remaining turns; if exactly one non-removed participant remains, that participant automatically wins. The initial board, mode, and round setup stay fixed. [DROPOUTS.md](DROPOUTS.md) covers stack/phase progression and labels the detailed inactivity, abandoned-piece/Tech, pending-choice/bid, and scoring proposals that still need review. This is an online adaptation alongside the printed rules, separate from the settled R01–R08.
+
 ## Variants and presets
 
 **Simpler Events, p12:** use Event cards only as a round tracker, ignore their effects, skip the auction, and exclude Foresight from the Tech pool. Treat this as an explicit game setting.
@@ -149,4 +153,4 @@ All eight original questions are answered, and the original hex versions are con
 - Event selection/expiry boundaries, Politics through PLAN cleanup, Ragnarök, last-round Sabotage prohibition, endgame settlement, and shared wins.
 - Simultaneous token/slot secrecy, parameters chosen after reveal, a dependency declaration switching all participants to ordered resolution, stale submissions, disconnects, and approved undo checkpoints.
 
-No rules-engine tests have been run at this planning stage; the engine does not yet exist.
+Include the reviewed idle-removal scenarios for every phase, majority thresholds, hidden choices, token-stack unblocking, preservation of the starting setup, and last-player completion. No rules-engine tests have been run at this planning stage; the engine does not yet exist.

@@ -1,6 +1,6 @@
 # Lobby, rooms, and mode recommendations
 
-Version 0.4 · 15 November 2026 · Specification, not implemented
+Version 0.5 · 15 November 2026 · Specification, not implemented
 
 ## Confirmed scope
 
@@ -44,7 +44,7 @@ The server owns the room and game state. A host's browser closing must not delet
 
 Hide stale public listings when no connected participant can host them, and expire empty waiting rooms after a configurable idle period; proposed initial value: 30 minutes. Treat these as lobby cleanup policies, not rules for abandoning an active match.
 
-In an active match, reserve disconnected seats, show whom the game is waiting for, allow recovery, and support an explicit pause/save or recorded abandonment path. Do not invent bids, consume secret choices, or grant a disconnected player's seat to a stranger. Define any eventual competitive timer separately; the initial friendly-play experience has no enforced turn clock.
+In an active match, reserve disconnected seats and allow recovery until the reviewed removal policy applies. The designer confirmed **five minutes** and **majority approval by the other active players**: offer an explicit removal option, skip the removed player's remaining turns, and award a win to a sole remaining participant. This is not an automatic kick or an ordinary enforced turn clock. Do not grant the seat to a stranger. [DROPOUTS.md](DROPOUTS.md) specifies server validation, stack/phase progression, and clearly marked proposals for unfinished choices, pieces, and scoring. The waiting-room 120-second grace and empty-room expiry above are separate proposed policies.
 
 Provide plain-text display names/titles, bounded creation/join attempts, host kick controls before start, and a report action routed to the private admin area. Keep public visibility and abuse handling explicit. Public discovery does not require ranked matchmaking or global chat.
 
@@ -62,5 +62,6 @@ This is a tracked feature to schedule with onboarding, not a tutorial already im
 - The recommendation appears at four seated players, preserves host choice, and never enables an undelivered variant.
 - A seven-player room can start with the correct reviewed count and applies the existing Asimov/Adams restrictions for the resulting match.
 - A disconnected host or phone does not lose the game, duplicate a seat, or disclose secrets on reconnect.
+- Confirmed five-minute majority removal skips remaining turns, clears blocking waits according to the reviewed policy, and distinguishes a last-player victory from mere connection loss.
 
 Structured policy: [lobby-configuration.json](../catalog/lobby-configuration.json). Additional release checks: [PLATFORM_REVIEW.md](PLATFORM_REVIEW.md).
