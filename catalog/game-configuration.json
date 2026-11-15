@@ -1,6 +1,6 @@
 {
-  "schema_version": 1,
-  "configuration_id": "seven-player-extension-001",
+  "schema_version": 2,
+  "configuration_id": "seven-player-extension-002",
   "status": "specification_not_implemented",
   "authority": "Designer request increasing the maximum to seven and specifying Asimov/Adams centre restrictions",
   "printed_rulebook_maximum_players": 6,
@@ -9,14 +9,12 @@
   "per_player_components": {
     "rocket_tokens": 40,
     "action_tokens": 4,
-    "action_boards": 1,
-    "player_aids": 1
+    "action_boards": 1
   },
   "full_supply": {
     "rocket_tokens": 280,
     "action_tokens": 28,
-    "action_boards": 7,
-    "player_aids": 7
+    "action_boards": 7
   },
   "shared_supply": {
     "tech_cards": 30,
@@ -25,7 +23,8 @@
     "additional_space_feature_tokens": 4,
     "first_player_markers": 1,
     "system_designs_in_catalogue": 14,
-    "maximum_systems_in_play": 13
+    "maximum_systems_in_play": 13,
+    "player_aids": 1
   },
   "initial_per_player_rockets": {
     "settlements_on_home_planet": 3,
@@ -145,12 +144,20 @@
       "additional_components": {
         "rocket_tokens": 40,
         "action_tokens": 4,
-        "action_boards": 1,
-        "player_aids": 1
+        "action_boards": 1
       }
     }
   },
   "lobby_configuration_reference": "lobby-configuration.json",
   "interaction_configuration_reference": "interaction-configuration.json",
-  "dropout_policy_reference": "dropout-policy.json"
+  "dropout_policy_reference": "dropout-policy.json",
+  "shared_player_aid": {
+    "quantity": 1,
+    "side_count": 2,
+    "both_sides_visible": true,
+    "view_id": "player_aid"
+  },
+  "undo_policy_reference": "undo-policy.json",
+  "tutorial_configuration_reference": "tutorial-configuration.json",
+  "supersedes": "seven-player-extension-001"
 }

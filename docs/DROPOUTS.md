@@ -1,6 +1,6 @@
 # Idle-player removal and continued play
 
-Version 0.5 · 15 November 2026 · Specification, not implemented
+Version 0.6 · 15 November 2026 · Specification, not implemented
 
 The previous specification covered temporary disconnects, reconnection, waiting-room host handover, and pause/save. It did not define a complete in-match removal-and-skip rule. The designer has now requested that progression rule and confirmed **five minutes** and **approval by a majority of the other active players**.
 
@@ -11,7 +11,7 @@ The previous specification covered temporary disconnects, reconnection, waiting-
 3. Once removed, the player forfeits participation and all remaining turns are skipped.
 4. When exactly one non-removed player remains, that player immediately wins. Being the only connected browser does not by itself establish a winner.
 
-Display the five-minute policy before a match starts. Keep it fixed during that match. Proposed detailed interpretation of inactivity and the integration cases below remain for designer review; the duration and majority approval are settled.
+Display the five-minute policy before a match starts. Keep it fixed during that match. The five-minute majority rule and P02–P05 are confirmed. Only P01's exact inactivity/electorate interpretation remains for review.
 
 ## Eligibility and voting safeguards — proposed detail P01
 
@@ -33,24 +33,28 @@ Skip the forfeited player's remaining PLAN placements, normal ACTIONS turns, sim
 
 Keep the initial board, selected mode, Event deck, and round structure. A seven-player game does not replace Adams or regenerate its setup when fewer participants remain. Record starting and remaining player counts separately.
 
-## Board state and unfinished choices — proposed details
+## Board state and unfinished choices — confirmed P02–P05
 
-| ID | Proposed integration rule | What the designer should check |
-| --- | --- | --- |
-| P02 | Leave the removed player's existing Ships, Settlements, Tech ownership, and recorded resources in place. Pieces remain legal targets, normal casualty Credits remain with their owner, and applicable passive Tech effects continue. Removed players cannot win or receive new turns. | Whether the abandoned empire and its passive Techs should remain, or whether a different cleanup rule is desired. |
-| P03 | Decline the removed player's future optional actions. If a compulsory public choice is still needed, delegate it to the next non-removed player in existing player order. Preserve completed effects; never reroll revealed outcomes. | Especially Event selection and mandatory card/Explore choices; the substitute selector is a game-design choice. |
-| P04 | Cancel their unrevealed auction bid and release any reservation without exposing it. Preserve bids/payments already revealed and resolved. If the removed player won but had not chosen an Event, use P03 to finish selection. | Confirm this before/after-reveal distinction and delegation, rather than replaying an auction whose bids are already known. |
-| P05 | For a last-player win, store a final position-points snapshot and mark it as a forfeit result; optional normal endgame choices do not delay the automatic win. | Confirm how scores from a forfeit game should appear and be included in statistics. |
+The designer approved these rulings, including the explicit P03 delegation wording below.
 
-Reserve/Credits/invested rockets remain accounted for in the forfeited participant's record. They generate no future interactive allocation waits. Any automatic rule affecting those pieces/resources must preserve the forty-rocket invariant; any mandatory decision owned by that participant follows the reviewed P03 policy. New choices of another participating player use the remaining roster where the rule permits; existing pieces still retain their original owner.
+| ID | Confirmed rule |
+| --- | --- |
+| P02 | Automatically remove the player's action tokens from board stacks. Other components stay: Ships, Settlements, Tech ownership, and recorded resources. Pieces remain legal targets, casualty Credits stay with their owner, and applicable passive Tech effects continue. Removed players cannot win or take further turns. |
+| P03 | Decisions that would break or stall the game if ignored go to the next non-removed player in player order, **to decide on behalf of the removed player**. Optional choices that can safely be ignored are declined/skipped. Preserve completed effects and revealed outcomes. |
+| P04 | Cancel an unrevealed auction bid and release its reservation without exposing it. Preserve bids/payments already revealed and resolved. If a removed winner had not selected the Event, apply P03. |
+| P05 | A last-player win records the final position-points snapshot and a forfeit result. Optional normal endgame choices do not delay the automatic win. Position points do not determine that winner. |
+
+For P03, keep the removed player as the decision's original actor: ownership, costs, targets, and effects are evaluated on that player's behalf. The delegate supplies the choice and does not spend their own resources or gain the removed player's benefit merely by deciding. Supply only the information needed for that decision, without handing over the entire private seat.
+
+Reserve/Credits/invested rockets remain accounted for in the removed participant's record. They generate no future interactive allocation waits. Automatic effects preserve the forty-rocket invariant; a decision that cannot be skipped safely follows P03. Existing pieces retain their original owner. Stack cleanup removes unresolved tokens; already-completed actions and legitimately resolved slots remain as recorded.
 
 ## Completion and private records
 
-Apply the sole-remaining-player check after approved removal. Record status `completed`, finish reason `last_player_remaining`, and that player's winner ID, even if another participant has more position points. Do not classify this as an ordinary points victory. Under proposed P05, store the position-points breakdown separately with `normal_endgame_scoring_completed = false` and forfeited-player flags.
+Apply the sole-remaining-player check after approved removal. Record status `completed`, finish reason `last_player_remaining`, and that player's winner ID, even if another participant has more position points. Do not classify this as an ordinary points victory. Under confirmed P05, store the position-points breakdown separately with `normal_endgame_scoring_completed = false` and forfeited-player flags.
 
 If nobody remains, preserve an abandoned/no-winner result. If everyone simply disconnects, keep the game recoverable under the save/retention policy; disconnection alone does not create an automatic winner.
 
-Privately log eligibility times/reasons, policy version and timeout, warning/acknowledgement events needed for audit, proposer, electorate/approvals, affected phase, resolution checkpoint, skipped turns, remaining roster, and result. Distinguish voluntary resignation, idle removal, ordinary completion, and abandonment. An ordinary move undo cannot silently reverse a removal; any authorised result correction needs its own audit trail.
+Privately log eligibility times/reasons, policy version and timeout, warning/acknowledgement events needed for audit, proposer, electorate/approvals, affected phase, resolution checkpoint, skipped turns, remaining roster, and result. Distinguish voluntary resignation, idle removal, ordinary completion, and abandonment. A committed removal cannot be reversed through game Undo. Any authorised record correction needs its own audit trail and is separate from the player Undo feature.
 
 ## Acceptance scenarios
 
@@ -62,4 +66,4 @@ Privately log eligibility times/reasons, policy version and timeout, warning/ack
 - Exactly one non-removed player wins by the explicit result reason. One connected player among temporarily disconnected participants does not win automatically.
 - No participant loses/gains an unaccounted rocket and no forfeited participant can act through an old tab or resume token.
 
-Policy data: [dropout-policy.json](../catalog/dropout-policy.json). Review P01–P05 in [REVIEW_CHECKLIST.md](REVIEW_CHECKLIST.md) before treating those proposed details as settled engine rules.
+Policy data: [dropout-policy.json](../catalog/dropout-policy.json). P02–P05 are settled. Only P01 remains proposed in [REVIEW_CHECKLIST.md](REVIEW_CHECKLIST.md). Verify that delegated decisions use the removed player as actor and that stack cleanup leaves other components intact.

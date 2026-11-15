@@ -1,21 +1,22 @@
 # In-game navigation and controls
 
-Version 0.5 · 15 November 2026 · Specification, not implemented
+Version 0.6 · 15 November 2026 · Specification, not implemented
 
-The designer requires intuitive access to the board, Techs, active Event, and the player's action board with Reserve and Credits. Phone gestures and desktop shortcuts complement visible controls. Exact bindings/layout below are proposed defaults to validate in the first playable prototype.
+The designer requires easy access to Board, Techs, Event, Actions, and Player Aid. Actions contains the player's action board with Reserve and Credits; Player Aid contains one shared two-sided reference visible to all players. Phone gestures and desktop shortcuts complement visible controls. Exact bindings/layout below are proposed defaults to validate in the first playable prototype.
 
-## Four persistent destinations
+## Five persistent destinations
 
 | Destination | Contents |
 | --- | --- |
 | Board | Whole-map view, legal selections, system/planet details, action-token stack order, zoom controls, and Fit board |
 | Techs | Shared displayed Techs, costs and public ownership, the player's owned Techs, readable card details, and purchase eligibility when relevant |
 | Event | Active Event and its remaining duration; the two publicly revealed candidates and bidding/selection controls during the Event step; a clear empty state when no Event is active |
-| My Board | Four action slots and their used/available/Invested/Event-blocked states, plus the player's Reserve and Credits, each with a distinct label and count |
+| Actions | Four action slots and their used/available/Invested/Event-blocked states, plus the player's Reserve and Credits, each with a distinct label and count |
+| Player Aid | One shared reference with both faces rendered together: Actions and Play Sequence/Scoring |
 
-Always show a compact current-turn/phase indicator, waiting/pending-action status, and the player's Reserve/Credits totals. Keep those two resource counts accessible while inspecting Techs or the Event. My Board expands them into the corresponding supply areas using the player's rocket silhouette and colour. Explain the other rocket roles through a supply breakdown so all forty rockets remain understandable.
+Always show a compact current-turn/phase indicator, waiting/pending-action status, and the player's Reserve/Credits totals. Keep those two resource counts accessible while inspecting Techs or the Event. Actions expands them into the corresponding supply areas using the player's rocket silhouette and colour. Explain the other rocket roles through a supply breakdown so all forty rockets remain understandable.
 
-Use a labelled bottom navigation bar or equivalent on phones. On larger screens, keep the board visible with docked detail panels where space permits. The same four destinations and names work in either layout. Provide obvious close/back controls and a Return to required action button when a decision is waiting in another view.
+Use a labelled bottom navigation bar or equivalent on phones. On larger screens, keep the board visible with docked detail panels where space permits. The same five destinations and names work in either layout. Provide obvious close/back controls and a Return to required action button when a decision is waiting in another view.
 
 Preserve map pan/zoom, selected system, card scroll position, and keyboard focus when switching views. Switching views never submits a game action, loses a draft bid, or reveals a secret. Label draft previews separately from confirmed resource totals. The Event view shows only information the player is entitled to see; Foresight's private peek remains restricted.
 
@@ -30,6 +31,10 @@ Preserve map pan/zoom, selected system, card scroll position, and keyboard focus
 
 The single-pointer alternatives follow [W3C guidance on pointer gestures](https://www.w3.org/WAI/WCAG22/Understanding/pointer-gestures.html).
 
+## Shared player aid
+
+There is **one shared player aid**, not one supply copy per player. Both faces are visible in the Player Aid view without flipping or selecting a front/back tab. Render them side by side on wider screens and stacked in the same scrollable view on phones, keeping text legible. Every player can open this reference independently. The source PDF contains repeated print copies; these do not imply extra game components.
+
 ## Proposed desktop shortcuts
 
 | Key | Result |
@@ -37,7 +42,8 @@ The single-pointer alternatives follow [W3C guidance on pointer gestures](https:
 | B | Board |
 | T | Techs |
 | E | Event |
-| A | My Board |
+| A | Actions |
+| P | Player Aid |
 | R | Fit/reset board camera |
 | + / − | Zoom board in/out while the board has focus |
 | Arrow keys | Pan while the board has focus |
@@ -48,6 +54,10 @@ Show shortcut hints beside visible controls and provide a Help reference. Charac
 
 Focus-scoped/disableable character shortcuts follow [W3C guidance on character-key shortcuts](https://www.w3.org/WAI/WCAG22/Understanding/character-key-shortcuts.html). Exact bindings remain a prototype review item.
 
+## Commit and Undo
+
+Undo is available only while a move is uncommitted and no hidden information has been revealed during that resolution. Once committed, a move cannot be undone, even if no other player has acted. A hidden reveal, such as flipping an Explore token, also prevents Undo; any reveal step creates an irreversible checkpoint and its required follow-up must be completed. Disable Undo while a commit request is unresolved. A rejected request returns to an editable draft only if no state change or reveal occurred. Navigation and text-field editing are separate from game Undo. See the [confirmed undo policy](PROJECT_BRIEF.md#undo-policy).
+
 ## Idle warnings and recovery
 
 Show a pending decision and any inactivity warning in every destination. Reading Techs must not hide a warning that a required response is outstanding. Provide an explicit I'm still here acknowledgement; camera movement need not be recorded as player activity. A proposed warning appears after four minutes, before the confirmed five-minute removal threshold. Server state decides eligibility; browser timers only display it. See [DROPOUTS.md](DROPOUTS.md).
@@ -56,6 +66,6 @@ On reconnect, restore the interface context after synchronising authoritative ga
 
 ## Prototype acceptance checks
 
-Verify all four views and Reserve/Credits access on phones and desktops. Exercise pinch focus, pan/swipe separation, button alternatives, keyboard focus, text-entry shortcut suppression, readable card text, safe-area layout, preserved camera/drafts, and warnings visible in every view. No navigation or camera action may mutate game state.
+Verify all five views and Reserve/Credits access on phones and desktops. Exercise pinch focus, pan/swipe separation, button alternatives, keyboard focus, text-entry shortcut suppression, readable card text, safe-area layout, preserved camera/drafts, and warnings visible in every view. No navigation or camera action may mutate game state. Both shared-aid faces must be rendered together; committed or reveal-bearing resolutions must reject Undo.
 
 Structured defaults: [interaction-configuration.json](../catalog/interaction-configuration.json). Designer review: [REVIEW_CHECKLIST.md](REVIEW_CHECKLIST.md).

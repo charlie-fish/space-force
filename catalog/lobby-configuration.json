@@ -1,5 +1,5 @@
 {
-  "schema_version": 1,
+  "schema_version": 2,
   "status": "specification_not_implemented",
   "user_requirements_date": "2026-11-15",
   "game_configuration_reference": "game-configuration.json",
@@ -61,14 +61,6 @@
     "waiting_room_host_kick",
     "private_admin_reports"
   ],
-  "tutorial_reminder": {
-    "issue_number": 1,
-    "url": "https://github.com/charlie-fish/space-force/issues/1",
-    "scope": "personal_guidance_during_first_actual_game",
-    "skippable": true,
-    "replayable_from_help": true,
-    "status": "open_reminder_not_implemented"
-  },
   "active_match_dropout": {
     "policy_reference": "dropout-policy.json",
     "confirmed_idle_timeout_seconds": 300,
@@ -76,6 +68,13 @@
     "automatic_kick": false,
     "removed_players_future_turns_skipped": true,
     "sole_remaining_player_wins": true,
-    "integration_details_status": "P01_to_P05_for_designer_review"
+    "integration_details_status": "P02_to_P05_confirmed_P01_review_pending"
+  },
+  "tutorial": {
+    "configuration_reference": "tutorial-configuration.json",
+    "requirement_status": "required",
+    "implementation_status": "not_implemented",
+    "superseded_reminder_issue": 1,
+    "reminder_issue_state": "closed"
   }
 }

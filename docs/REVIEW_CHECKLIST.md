@@ -1,6 +1,6 @@
 # Designer review, reminders, and next steps
 
-Updated 15 November 2026 · Specification v0.5
+Updated 15 November 2026 · Specification v0.6
 
 There is no playable application yet. Review the documents/data now; interaction and browser checks become concrete in the first prototype. These checks do not reopen the already-resolved R01–R08 or the confirmed original-hex versions.
 
@@ -8,14 +8,14 @@ There is no playable application yet. Review the documents/data now; interaction
 
 | Priority | Item | Where to review |
 | --- | --- | --- |
-| 1 | Idle-removal integration: five minutes and majority approval are confirmed. Review P01–P05, particularly keeping an abandoned empire/Techs, completing compulsory choices, handling bids, and reporting forfeit scores. | [Dropout rule](DROPOUTS.md) |
-| 2 | Four destinations, persistent Reserve/Credits counts, phone pinch/pan/swipe separation, and the proposed B/T/E/A shortcuts with camera/help controls. | [Gameplay interface](GAMEPLAY_UI.md) |
+| 1 | Idle-removal integration: five minutes and majority approval are confirmed. Review only P01's exact inactivity/electorate details. P02–P05 are confirmed and should be checked against the implementation rather than reopened. | [Dropout rule](DROPOUTS.md) |
+| 2 | Five destinations, persistent Reserve/Credits counts, phone pinch/pan/swipe separation, and the proposed B/T/E/A/P shortcuts with camera/help controls. | [Gameplay interface](GAMEPLAY_UI.md) |
 | 3 | Confirm the provisional seventh player's orange colour, twin-pod silhouette, and triangular chip rim; check the final six/seven shape-to-colour mapping when STLs arrive. | [Component design](COMPONENT_DESIGN.md), [game configuration](../catalog/game-configuration.json) |
-| 4 | Undo policy: latest reversible action before later actions/reveals; wider rollback with table approval; no undo to replace learned hidden information. | [Project brief: undo](PROJECT_BRIEF.md#undo-proposal) |
+| 4 | Verify the confirmed Undo boundary in the prototype: uncommitted moves only, with no hidden-information reveal. Committed moves cannot be undone. | [Project brief: undo](PROJECT_BRIEF.md#undo-policy) |
 | 5 | Public/private lobby, ready/start behaviour, the 4+ recommendation with host choice, and proposed waiting-room handover/expiry defaults. Those waiting-room timers are separate from confirmed five-minute in-game inactivity. | [Lobby](LOBBY.md), [lobby configuration](../catalog/lobby-configuration.json) |
 | 6 | Verify transcribed planet capacities, features, tile anchors/orientations, and layouts when the board prototype is shown. Current source versions are confirmed; Asimov is six-player centre only and Adams seven-player centre only. | [Asset map](ASSETS.md), [systems catalogue](../catalog/systems.csv), [rules review](RULES_REVIEW.md) |
 | 7 | Admin game/score records, forfeit labels, feedback management, email export and consent wording, data retention, and whether the proposed browser/size targets meet your audience's needs. | [Project brief](PROJECT_BRIEF.md), [platform review](PLATFORM_REVIEW.md) |
-| 8 | First-game tutorial scope: personal contextual guidance, skip/replay, and no forced multiplayer script. | [Tutorial issue #1](https://github.com/charlie-fish/space-force/issues/1) |
+| 8 | Verify the required first-play tutorial: personal contextual guidance, skip/replay, commit/undo limits, five views, and no forced multiplayer script. Both shared-aid faces must be visible. | [Tutorial specification](TUTORIAL.md) |
 
 ## Outstanding from you
 
@@ -25,7 +25,7 @@ There is no playable application yet. Review the documents/data now; interaction
 
 ## Outstanding implementation reminders
 
-- Build first-play teaching tracked in [issue #1](https://github.com/charlie-fish/space-force/issues/1).
+- Build the required first-play teaching in [TUTORIAL.md](TUTORIAL.md). Issue #1 is closed as incorporated into the specification, not as an implementation completion.
 - Prepare optimised component art from the PDFs and approved TTS links, ingest the cover source, and encode Asimov/Adams anchors.
 - Implement seven distinct silhouettes/rim patterns, responsive navigation, public/private rooms, simultaneous play and its recommendation, and reviewed dropout handling.
 - Implement the private admin area, game audit/results, feedback, and optional consented news sign-up/export.
@@ -35,10 +35,10 @@ The live checklist is [REMINDERS.md](REMINDERS.md). TTS review: [TTS_REVIEW.md](
 ## Next development steps
 
 1. Build the deterministic normal-turn rules engine and meaningful setup/action/resource/scoring tests for two to seven players, using the confirmed rules and versioned data.
-2. Build a playable local board with the four views, Reserve/Credits display, safe gestures/shortcuts, and provisional replaceable art. Review it on a phone and desktop.
+2. Build a playable local board with the five views, Reserve/Credits display, safe gestures/shortcuts, and provisional replaceable art. Review it on a phone and desktop.
 3. Add server-authoritative public/private rooms, seven independent clients, secret bids, save/rejoin, undo, and the reviewed five-minute majority-removal policy.
 4. Complete all Techs/Events and combinations; add selectable simultaneous actions, dependency handling, and the four-plus-player recommendation.
 5. Add owner administration, game/result audit, feedback, and optional newsletter consent/export, using real deployment/privacy configuration.
-6. Add the tracked tutorial and finish accessibility, browser/device, load, deployment/recovery, and backup-restore verification before release.
+6. Deliver the required tutorial and finish accessibility, browser/device, load, deployment/recovery, and backup-restore verification before release.
 
 Rules/UI foundation work can proceed while asset handoffs and the explicitly proposed dropout details are reviewed.

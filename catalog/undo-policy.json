@@ -1,0 +1,16 @@
+{
+  "schema_version": 1,
+  "policy_id": "precommit-undo-001",
+  "status": "confirmed_specification_not_implemented",
+  "allowed_only_before_commit": true,
+  "hidden_information_reveal_prevents_undo": true,
+  "committed_moves_undoable": false,
+  "table_vote_can_override": false,
+  "server_commit_is_authoritative": true,
+  "disable_while_commit_pending": true,
+  "rejected_command_returns_to_draft_only_if_no_state_change_or_reveal": true,
+  "hidden_reveal_creates_irreversible_checkpoint": true,
+  "required_follow_up_after_reveal_must_complete": true,
+  "scope": "current_move_or_resolution",
+  "example_irreversible_reveal": "explore_token_flip"
+}

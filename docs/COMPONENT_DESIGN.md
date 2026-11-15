@@ -17,11 +17,11 @@ The provisional seventh-player style is **orange (`#E87522`)**, a **twin-pod roc
 | Rockets | 40 | 280 | Player colour plus that player's distinct rocket shape |
 | Action tokens | 4 | 28 | Poker-chip face in player colour with matching rocket silhouette; distinct rim/side pattern |
 | Player action boards | 1 | 7 | One separate board for each player, each with four receiving indentations |
-| Player aids | 1 | 7 | Reuse the current aid template for every player |
+| Shared player aid | — | 1 | Both faces visible together in the Player Aid view for every player |
 
 Keep all seven identities stable across the board, chips, action boards, player summaries, action history, tooltips, and scoring. The seventh player is part of current scope. Any future increase beyond seven needs further distinct identities and rules. Do not identify a player using colour alone.
 
-The extra player adds 40 rockets, four chips, one board, and one aid. Shared supplies remain 30 Tech cards, 30 Event cards, 16 Explore tokens, four additional feature tokens, and one first-player marker. There are fourteen system designs in the asset catalogue; six/seven-player boards use the original twelve plus exactly one special centre, for thirteen systems in play. See [game-configuration.json](../catalog/game-configuration.json).
+The seventh player adds 40 rockets, four chips, and one action board. There is only **one shared player aid**, with both sides visible to every player: side by side on wide screens and stacked in the same scrollable view on phones. Other shared supplies remain 30 Tech cards, 30 Event cards, 16 Explore tokens, four additional feature tokens, and one first-player marker. There are fourteen system designs in the asset catalogue; six/seven-player boards use the original twelve plus exactly one special centre, for thirteen systems in play. See [game-configuration.json](../catalog/game-configuration.json).
 
 Rockets use the same player's shape in every role. Clearly distinguish Ships, Settlements, Credits, Investments, Reserve, and Tech markers through location and role presentation, without changing their owner's identity.
 

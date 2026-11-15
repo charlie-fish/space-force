@@ -59,7 +59,7 @@ Both designs are on PDF page 1. Their restrictions come from the user's request;
 
 Asimov replaces the former blank-centre placeholder. Adams supplies the seventh home planet. Use the original twelve-tile outer layout plus the appropriate centre, face-up; each six/seven-player board contains **thirteen** systems. Never use both special tiles together, use them at other counts, or add them to the random home/hidden pools. Games with two to five players keep their existing layouts and original tile pools. The five-player diagram still uses the spare asteroid-belt token.
 
-There are now seven action boards and seven player aids, one of each per player. Reuse the existing templates. Each board has four semicircular receiving indentations. Poker-chip action tokens, system suns, and these indentations have matching diameters. The full player supply is 280 rockets and 28 chips; chip colour, rocket silhouette, and rim pattern identify ownership. Details are in [COMPONENT_DESIGN.md](COMPONENT_DESIGN.md).
+There are seven individual action boards and **one shared two-sided player aid**. Reuse the existing action-board design and display both aid faces together in the Player Aid view, side by side or responsively stacked. Repeated print copies in the four-page PDF do not imply extra aid components. Each board has four semicircular receiving indentations. Poker-chip action tokens, system suns, and these indentations have matching diameters. The full player supply is 280 rockets and 28 chips; chip colour, rocket silhouette, and rim pattern identify ownership. Details are in [COMPONENT_DESIGN.md](COMPONENT_DESIGN.md).
 
 ## Complete Explore supply
 

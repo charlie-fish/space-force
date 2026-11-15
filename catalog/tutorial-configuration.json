@@ -1,0 +1,36 @@
+{
+  "schema_version": 1,
+  "feature_id": "first-play-tutorial",
+  "requirement_status": "required_by_designer",
+  "implementation_status": "not_implemented",
+  "specification_reference": "../docs/TUTORIAL.md",
+  "offer_during_first_actual_game": true,
+  "personal_to_each_player": true,
+  "skippable": true,
+  "replayable_from_help": true,
+  "pauses_opponents": false,
+  "changes_game_rules": false,
+  "uses_normal_rules_engine_and_permitted_state": true,
+  "requires_solo_mode_or_bots": false,
+  "teach_topics": [
+    "objective",
+    "five_views",
+    "shared_aid_both_faces",
+    "rocket_roles",
+    "planning_and_stacks",
+    "four_actions_and_invest",
+    "precommit_no_reveal_undo",
+    "economy_and_secret_bids",
+    "tech_events_and_scoring",
+    "idle_presence_and_removal",
+    "simultaneous_lock_reveal_dependencies_when_delivered"
+  ],
+  "progress_storage": "optional_local_with_session_fallback",
+  "requires_account_or_email": false,
+  "superseded_reminder_issue": {
+    "number": 1,
+    "url": "https://github.com/charlie-fish/space-force/issues/1",
+    "state": "closed",
+    "closure_basis": "requirements_incorporated_into_specification_not_implementation_completed"
+  }
+}

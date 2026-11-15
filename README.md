@@ -2,7 +2,7 @@
 
 An online implementation of Charlie Fish's board game, planned for 2–7 players using desktop and mobile browsers.
 
-**Current status: specification v0.5, 15 November 2026.** This repository contains the game plan/catalogues, seven-player extension, lobby and navigation requirements, confirmed five-minute majority-removal rule, and TTS review. Detailed dropout integration proposals are marked for review. A playable application has not been implemented or deployed.
+**Current status: specification v0.6, 15 November 2026.** The specification includes five-view navigation, one shared two-sided aid, pre-commit-only Undo, confirmed dropout rulings P02–P05, and the required first-play tutorial. P01 inactivity/electorate details remain proposed. A playable application has not been implemented or deployed.
 
 ## Project documents
 
@@ -10,6 +10,7 @@ An online implementation of Charlie Fish's board game, planned for 2–7 players
 - [Project brief and delivery stages](docs/PROJECT_BRIEF.md)
 - [In-game views, gestures, and shortcuts](docs/GAMEPLAY_UI.md)
 - [Idle-player removal and continued play](docs/DROPOUTS.md)
+- [Required first-play tutorial](docs/TUTORIAL.md)
 - [Rules review and implementation questions](docs/RULES_REVIEW.md)
 - [Source files and artwork plan](docs/ASSETS.md)
 - [Rocket, chip, and action-board design](docs/COMPONENT_DESIGN.md)
@@ -27,8 +28,10 @@ An online implementation of Charlie Fish's board game, planned for 2–7 players
 - [Systems](catalog/systems.csv): 14 supplied designs. Asimov is the centre only for six players; Adams is the centre only for seven. The original twelve designs are confirmed current.
 - [Game configuration](catalog/game-configuration.json): player limit, component quantities, setup by player count, and provisional orange seventh-player style.
 - [Lobby configuration](catalog/lobby-configuration.json): public/private rooms, readiness, and the four-plus-player recommendation with explicit host mode choice.
-- [Interaction defaults](catalog/interaction-configuration.json): four views, persistent resources, gestures, and scoped shortcuts.
-- [Dropout policy](catalog/dropout-policy.json): confirmed five-minute majority removal and separately marked integration proposals.
+- [Interaction defaults](catalog/interaction-configuration.json): five views, persistent resources, gestures, and scoped shortcuts.
+- [Dropout policy](catalog/dropout-policy.json): confirmed removal and P02–P05 rulings, with P01 details still for review.
+- [Undo policy](catalog/undo-policy.json): uncommitted moves only, with no hidden-information reveal.
+- [Tutorial requirements](catalog/tutorial-configuration.json): first-play teaching incorporated into the specification.
 - [TTS inventory](catalog/tts-inventory.json): received save/preview, deck and model counts, and external asset dependencies.
 - [Explore tokens](catalog/explore-tokens.csv): the complete 16-token distribution, including the three extra copies specified by the designer.
 - [Tech presets](catalog/tech-presets.json): the five presets from rulebook page 24.
@@ -44,9 +47,9 @@ The agreed delivery order is normal turns first, then the simultaneous-actions v
 
 Use the supplied `SPACE FORCE.png` front-cover graphic as the visual reference, the six original rocket silhouettes from rulebook page 2 plus a seventh distinct silhouette, and poker-chip action tokens with individual rim patterns. Token diameter, system suns, and action-board receiving indentations must match.
 
-At seven players the supply is **280 rockets, 28 action chips, seven action boards, and seven player aids**. The original twelve tiles form the outer layout; use Adams as the seventh home system in the centre. At six players, use Asimov in the centre. Each of those setups uses thirteen hexes; the two special centre tiles are never used together.
+At seven players the supply is **280 rockets, 28 action chips, seven action boards, plus one shared two-sided player aid**. The original twelve tiles form the outer layout; use Adams as the seventh home system in the centre. At six players, use Asimov in the centre. Each of those setups uses thirteen hexes; the two special centre tiles are never used together.
 
-The lobby supports creating public games, joining waiting public games, and creating/joining unlisted private rooms. In play, use Board, Techs, Event, and My Board views with visible Reserve/Credits. After five minutes of qualifying inactivity, a majority of the other active players can remove the idle participant; their future turns are skipped and a sole remaining player wins. A skippable first-play teaching mode is tracked in [tutorial issue #1](https://github.com/charlie-fish/space-force/issues/1).
+The lobby supports creating public games, joining waiting public games, and creating/joining unlisted private rooms. In play, use Board, Techs, Event, Actions, and Player Aid views with visible Reserve/Credits. After five minutes of qualifying inactivity, a majority of the other active players can remove the idle participant; their future turns are skipped and a sole remaining player wins. A skippable first-play tutorial is required by [TUTORIAL.md](docs/TUTORIAL.md); its reminder issue #1 is superseded by the specification. Undo is limited to an uncommitted move with no hidden-information reveal.
 
 ## Data and ownership
 

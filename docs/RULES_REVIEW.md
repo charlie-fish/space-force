@@ -10,7 +10,7 @@ This is an implementation outline and question register, not a replacement ruleb
 
 ## Components and state
 
-The current supply is **40 rockets, four poker-chip action tokens, one action board, and one player aid per player, up to seven players**: 280 rockets, 28 action chips, seven boards, and seven aids. The shared supply remains 30 Tech cards, 30 Event cards, 16 Explore tokens, four additional feature tokens, and one first-player marker. The system catalogue contains fourteen designs: the original twelve, confirmed current by the designer, plus Asimov and Adams from `13th hex.pdf`. Use only the count-appropriate centre tile, so six/seven-player boards contain thirteen hexes. See [game-configuration.json](../catalog/game-configuration.json).
+The current supply is **40 rockets, four poker-chip action tokens, and one action board per player, up to seven players**: 280 rockets, 28 action chips, and seven boards, plus **one shared two-sided player aid** visible to all players. The shared supply remains 30 Tech cards, 30 Event cards, 16 Explore tokens, four additional feature tokens, and one first-player marker. The system catalogue contains fourteen designs: the original twelve, confirmed current by the designer, plus Asimov and Adams from `13th hex.pdf`. Use only the count-appropriate centre tile, so six/seven-player boards contain thirteen hexes. See [game-configuration.json](../catalog/game-configuration.json).
 
 A rocket has a role determined by its location: Reserve, Credit, Ship in space, Settlement on a planet, invested rocket, or Tech ownership marker. Model these explicitly and preserve the physical supply limit. Destroyed Ships/Settlements normally become Credits; do not put them back in Reserve. Specific effects such as Famine and Sabotage explicitly use Reserve instead.
 
@@ -86,7 +86,7 @@ Ties use the greatest number of Credits; any remaining tie is a shared win. Reco
 
 ## Online idle-removal adaptation
 
-The designer requested a way to continue without a player who does not return, and confirmed **five minutes** and **a majority of the other active players**. After approved removal, skip that participant's remaining turns; if exactly one non-removed participant remains, that participant automatically wins. The initial board, mode, and round setup stay fixed. [DROPOUTS.md](DROPOUTS.md) covers stack/phase progression and labels the detailed inactivity, abandoned-piece/Tech, pending-choice/bid, and scoring proposals that still need review. This is an online adaptation alongside the printed rules, separate from the settled R01–R08.
+The designer requested a way to continue without a player who does not return, and confirmed **five minutes** and **a majority of the other active players**. After approved removal, skip that participant's remaining turns; if exactly one non-removed participant remains, that participant automatically wins. The initial board, mode, and round setup stay fixed. [DROPOUTS.md](DROPOUTS.md) records confirmed P02–P05: automatically remove action tokens from board stacks, keep other components, delegate game-critical decisions to the next player on the removed player's behalf, preserve/cancel bids at the agreed reveal boundary, and label forfeit scores. Only P01 inactivity/electorate details remain for review. This is an online adaptation alongside the printed rules, separate from the settled R01–R08.
 
 ## Variants and presets
 
@@ -137,7 +137,7 @@ All eight original questions are answered, and the original hex versions are con
 ## Verification cases to preserve
 
 - Four action slots, actual stack order, skipped turns, and component conservation, including Tech markers and Investments.
-- Seven separate player action boards and player aids; seven rocket silhouettes; 280 rockets and 28 poker chips at maximum player count; distinct chip rim patterns; snapping to suns and matching action-board indentations.
+- Seven separate player action boards and one shared two-sided aid; seven rocket silhouettes; 280 rockets and 28 poker chips at maximum player count; distinct chip rim patterns; snapping to suns and matching action-board indentations.
 - Correct setup pools for every player count, with unused home designs excluded from hidden tiles.
 - Asimov only at the six-player centre; Adams only at the seven-player centre; both excluded from all random pools and never used together. Both boards contain thirteen systems.
 - Adams as the seventh home: capacity six plus four capacity-two planets, normal starting pieces, no setup black-hole loss, and normal loss on later MOVE INTO.
@@ -151,6 +151,6 @@ All eight original questions are answered, and the original hex versions are con
 - Shared Tech ownership, Patents restrictions, Sabotage's undiscounted destruction value with Research Lab, the ban on targeting Sabotage, immediate effects, and one-purchase-per-round limits.
 - Every preset and variant exclusion, with random legal value-2/3 replacements preserving ten distinct cards.
 - Event selection/expiry boundaries, Politics through PLAN cleanup, Ragnarök, last-round Sabotage prohibition, endgame settlement, and shared wins.
-- Simultaneous token/slot secrecy, parameters chosen after reveal, a dependency declaration switching all participants to ordered resolution, stale submissions, disconnects, and approved undo checkpoints.
+- Simultaneous token/slot secrecy, parameters chosen after reveal, a dependency declaration switching all participants to ordered resolution, stale submissions, disconnects, and the confirmed pre-commit/no-reveal Undo boundary.
 
 Include the reviewed idle-removal scenarios for every phase, majority thresholds, hidden choices, token-stack unblocking, preservation of the starting setup, and last-player completion. No rules-engine tests have been run at this planning stage; the engine does not yet exist.

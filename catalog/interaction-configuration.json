@@ -1,23 +1,16 @@
 {
-  "schema_version": 1,
+  "schema_version": 2,
   "status": "specification_not_implemented",
   "view_ids": [
     "board",
     "techs",
     "event",
-    "my_board"
+    "actions",
+    "player_aid"
   ],
   "persistent_resource_counts": [
     "reserve",
     "credits"
-  ],
-  "my_board_contents": [
-    "move_into_slot",
-    "settle_slot",
-    "produce_slot",
-    "attack_slot",
-    "reserve_supply",
-    "credits_supply"
   ],
   "preserve_on_view_change": [
     "camera",
@@ -43,13 +36,14 @@
     "B": "board",
     "T": "techs",
     "E": "event",
-    "A": "my_board",
+    "A": "actions",
     "R": "fit_board",
     "+": "zoom_in",
     "-": "zoom_out",
     "ArrowKeys": "pan_board",
     "Escape": "close_overlay_restore_focus",
-    "?": "shortcut_help"
+    "?": "shortcut_help",
+    "P": "player_aid"
   },
   "keyboard_safeguards": {
     "focus_scope": "game_interface",
@@ -65,5 +59,30 @@
   },
   "exact_bindings_status": "proposed_for_prototype_review",
   "idle_warning_visible_in_all_views": true,
-  "dropout_policy_reference": "dropout-policy.json"
+  "dropout_policy_reference": "dropout-policy.json",
+  "view_labels": {
+    "board": "Board",
+    "techs": "Techs",
+    "event": "Event",
+    "actions": "Actions",
+    "player_aid": "Player Aid"
+  },
+  "actions_view_contents": [
+    "move_into_slot",
+    "settle_slot",
+    "produce_slot",
+    "attack_slot",
+    "reserve_supply",
+    "credits_supply"
+  ],
+  "shared_player_aid": {
+    "quantity": 1,
+    "side_count": 2,
+    "both_sides_rendered_together": true,
+    "wide_layout": "side_by_side",
+    "narrow_layout": "stacked_same_scroll_view",
+    "front_back_toggle_required": false
+  },
+  "undo_policy_reference": "undo-policy.json",
+  "tutorial_configuration_reference": "tutorial-configuration.json"
 }

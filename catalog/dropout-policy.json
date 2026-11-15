@@ -1,6 +1,6 @@
 {
-  "schema_version": 1,
-  "policy_id": "online-idle-removal-001",
+  "schema_version": 2,
+  "policy_id": "online-idle-removal-002",
   "status": "specification_not_implemented",
   "core_status": "confirmed_by_designer_2026-11-15",
   "confirmed_core": {
@@ -44,33 +44,43 @@
       "agreed_pause_freezes_clock": true,
       "electorate": "other_non_removed_players_not_themselves_idle_eligible",
       "disconnected_within_grace_still_counts_in_electorate": true
-    },
+    }
+  },
+  "no_remaining_players_result": "abandoned_no_winner",
+  "designer_review_reference": "../docs/DROPOUTS.md",
+  "supersedes": "online-idle-removal-001",
+  "confirmed_details": {
     "P02": {
-      "status": "designer_review_required",
+      "status": "confirmed_by_designer",
       "keep_existing_ships_settlements_techs_and_recorded_resources": true,
       "applicable_passive_tech_effects_continue": true,
-      "removed_players_can_win": false
+      "removed_players_can_win": false,
+      "automatically_remove_action_tokens_from_board_stacks": true,
+      "other_components_stay_in_place": true
     },
     "P03": {
-      "status": "designer_review_required",
-      "optional_choices": "decline",
-      "mandatory_public_choices": "next_non_removed_player_in_existing_player_order",
-      "reroll_revealed_outcomes": false
+      "status": "confirmed_by_designer",
+      "reroll_revealed_outcomes": false,
+      "delegate_if_ignoring_would_break_or_stall_game": true,
+      "delegate": "next_non_removed_player_in_existing_player_order",
+      "acts_on_behalf_of": "removed_player",
+      "resolution_actor": "removed_player",
+      "delegate_uses_own_resources": false,
+      "minimum_decision_information_only": true,
+      "safe_to_ignore_choices": "decline_or_skip"
     },
     "P04": {
-      "status": "designer_review_required",
+      "status": "confirmed_by_designer",
       "unrevealed_bid": "cancel_without_revealing_and_release_reservation",
       "revealed_resolved_bid_and_payment": "preserve",
       "removed_event_selector": "use_P03"
     },
     "P05": {
-      "status": "designer_review_required",
+      "status": "confirmed_by_designer",
       "last_player_finish_reason": "last_player_remaining",
       "score_basis": "position_points_snapshot_at_forfeit_end",
       "normal_endgame_scoring_completed": false,
       "position_points_determine_forfeit_winner": false
     }
-  },
-  "no_remaining_players_result": "abandoned_no_winner",
-  "designer_review_reference": "../docs/DROPOUTS.md"
+  }
 }

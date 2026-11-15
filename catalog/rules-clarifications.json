@@ -1,6 +1,6 @@
 {
   "schema_version": 2,
-  "clarification_id": "designer-clarifications-002",
+  "clarification_id": "designer-clarifications-003",
   "date": "2026-11-13",
   "authority": "Designer follow-up messages in the project conversation, including the seven-player extension",
   "printed_rules_version": "1.80",
@@ -17,7 +17,7 @@
     "latest_supplied_system_hex_version_confirmed": true,
     "minimum_players": 2,
     "maximum_players": 7,
-    "player_aid_count": 7,
+    "player_aid_count": 1,
     "full_supply_rocket_tokens": 280,
     "full_supply_action_tokens": 28,
     "special_centre_system_ids": {
@@ -26,7 +26,9 @@
     },
     "special_centres_allowed_in_random_pools": false,
     "special_centres_allowed_together": false,
-    "adams_is_seventh_home_system": true
+    "adams_is_seventh_home_system": true,
+    "player_aid_scope": "shared",
+    "player_aid_sides": 2
   },
   "rulings": {
     "R01": {
@@ -133,6 +135,6 @@
       "edge_isolation_allowed_if_warps_keep_board_connected": true
     }
   },
-  "supersedes": "designer-clarifications-001",
+  "supersedes": "designer-clarifications-002",
   "configuration_reference": "game-configuration.json"
 }

@@ -1,6 +1,6 @@
 # Space Force: project brief
 
-Version 0.5 · 15 November 2026 · Planning baseline with gameplay navigation and confirmed idle-removal core
+Version 0.6 · 15 November 2026 · Planning baseline with gameplay navigation and confirmed idle-removal core
 
 ## Intended result
 
@@ -19,15 +19,15 @@ The user's message defines the software requirements. Attached documents supply 
 | Rules | Enforce legal actions, action-token stacks, limited rocket supply, sealed auctions, Tech/Event effects, end conditions, scoring, and ties. |
 | Multiplayer | Synchronise accepted actions and phase changes; preserve hidden information; reject duplicate, stale, out-of-turn, or unauthorised commands. |
 | Recovery | Save games durably and protect seat resumption. After five minutes of qualifying inactivity, a majority of the other active players can approve removal; skip all remaining turns of that participant and award a win if only one non-removed player remains. See the reviewed/proposed details in [DROPOUTS.md](DROPOUTS.md). |
-| Navigation | Reach Board, Techs, Event, and My Board through visible controls; keep Reserve/Credits accessible. Support phone pinch/pan/swipe and safe desktop shortcuts with non-gesture alternatives. |
-| Undo | Let players correct mistakes, with clear limits around information reveals and actions taken by other players. Keep an audit record. |
-| Guidance | Highlight legal choices, explain unavailable actions/current effects, preview consequences, and provide contextual Help. Track a skippable first-play tutorial in issue #1. |
+| Navigation | Reach Board, Techs, Event, Actions, and Player Aid through visible controls; keep Reserve/Credits accessible. Support phone pinch/pan/swipe and safe desktop shortcuts with non-gesture alternatives. |
+| Undo | Allow correction only before a move is committed and only if no hidden information has been revealed. No post-commit Undo or table-vote override. |
+| Guidance | Highlight legal choices, explain unavailable actions/current effects, preview consequences, and provide Help plus the required skippable first-play tutorial in [TUTORIAL.md](TUTORIAL.md). |
 | Feedback | Allow feedback during or after play, with an optional game reference and optional reply address. Store and manage submissions privately. |
 | News | Offer a separate, optional publication-news sign-up with affirmative consent and an accessible privacy notice. |
 
 Normal turns and the simultaneous-actions variant are distinct settings. Both allow up to seven people to be connected concurrently. The designer has confirmed **normal turns first, then the selectable variant**. Once available, recommend simultaneous play for four or more actual seated players, without silently changing the host's choice. In the variant, only token/slot choices are secret; after reveal, any player can declare a dependency and switch all participants to ordered resolution. See [DECISIONS.md](DECISIONS.md).
 
-The seven-player supply is 280 rockets, 28 action chips, seven individual action boards, and seven player aids. Existing shared card/token supplies remain unchanged. Reuse the twelve-tile outer layout for six/seven players, adding Asimov or Adams respectively at the centre. Adams supplies the seventh home planet. The designer has confirmed that the original system artwork is current. [game-configuration.json](../catalog/game-configuration.json) records quantities and count-specific setup.
+The seven-player supply is 280 rockets, 28 action chips, seven individual action boards, plus one shared two-sided player aid. Existing shared card/token supplies remain unchanged. Reuse the twelve-tile outer layout for six/seven players, adding Asimov or Adams respectively at the centre. Adams supplies the seventh home planet. The designer has confirmed that the original system artwork is current. [game-configuration.json](../catalog/game-configuration.json) records quantities and count-specific setup.
 
 The designer has answered R01–R08 and supplied additional setup, Prophecy, and asteroid/warp clarifications. Treat [RULES_REVIEW.md](RULES_REVIEW.md) and [rules-clarifications.json](../catalog/rules-clarifications.json) as the recorded rulings alongside the printed sources. Rapid Advance follows the almanac rather than the card.
 
@@ -37,11 +37,11 @@ The designer has answered R01–R08 and supplied additional setup, Prophecy, and
 
 [PLATFORM_REVIEW.md](PLATFORM_REVIEW.md) adds proposed checks for secure realtime sessions, public-room abuse, mobile sleep/recovery, accessible controls, network fallbacks, loading metrics, safe releases, and operations. [TTS_REVIEW.md](TTS_REVIEW.md) records the received save and what still needs conversion. These engineering recommendations supplement the confirmed feature requirements.
 
-[Issue #1](https://github.com/charlie-fish/space-force/issues/1) is the persistent reminder to teach first-time players during their first actual game. Guidance is personal, skippable, and replayable, uses the same rules and permitted information, and does not pause opponents. It remains a tracked feature to schedule with onboarding.
+The first-play tutorial is a required feature specified in [TUTORIAL.md](TUTORIAL.md). Guidance is personal, skippable, and replayable, uses the same rules/permitted information, and does not pause opponents. Reminder issue #1 is superseded by the specification and closed at the designer's request; implementation remains outstanding.
 
 ## Interface and accessibility
 
-Use the four persistent destinations in [GAMEPLAY_UI.md](GAMEPLAY_UI.md): Board, Techs, Event, and My Board. Keep phase/turn/waiting status, Reserve, and Credits accessible throughout. My Board includes all four action slots and the two labelled resource areas. On phones, use labelled navigation and detail panels with pinch zoom, background pan, and carefully scoped swipes; on desktop, use the proposed B/T/E/A view shortcuts and camera controls. Preserve camera/draft context and provide Fit board and button alternatives.
+Use the five persistent destinations in [GAMEPLAY_UI.md](GAMEPLAY_UI.md): Board, Techs, Event, Actions, and Player Aid. Keep phase/turn/waiting status, Reserve, and Credits accessible throughout. Actions includes all four action slots and the two labelled resource areas. Player Aid renders both faces of the single shared aid together, side by side or responsively stacked. On phones, use labelled navigation and detail panels with pinch zoom, background pan, and carefully scoped swipes; on desktop, use the proposed B/T/E/A/P view shortcuts and camera controls. Preserve camera/draft context and provide Fit board and button alternatives.
 
 All essential interactions must work by tapping or clicking; dragging can be an additional convenience. Tooltips must also open on tap and keyboard focus. Pair player colours with names and distinct rocket shapes, keep text legible, and provide keyboard controls and a text view of important board state.
 
@@ -66,13 +66,15 @@ Keep seeds, unrevealed deck order, hidden system identities, private Foresight v
 
 Each game stays pinned to its engine/content/clarification versions. Old games need an explicit compatibility policy before releases change their rules. Player counts, resources, card pools, layouts, and effects must use data/configuration rather than arrays or conditionals fixed to a particular number of colours. Enforce the configured current limit of seven.
 
-## Undo proposal
+<a name="undo-proposal"></a>
 
-Draft choices can be edited before confirmation. After confirmation, allow the latest reversible action to be undone while no subsequent player action has occurred and no new hidden information has been revealed. If later actions depend on it, use a table-approved rollback to a named checkpoint.
+## Undo policy
 
-Information cannot be unlearned. Do not permit a reveal to be undone to fish for another system, Explore token, Event, or random outcome. Preserve the original random sequence. The precise approval rule for wider rollbacks is a designer decision.
+**Confirmed:** Undo is possible only before a player's move has been committed and only if no hidden information has been revealed during that resolution. An accepted committed move cannot be undone, even before the next player acts. There is no table-approved exception or gameplay rollback.
 
-The server validates undo requests and restores all affected state together. Broadcast the rollback to every player, invalidate stale commands, and append an audit entry instead of deleting the original history. If an authorised correction changes a finished result, retain the superseded result and recompute the current summary consistently.
+Treat pre-commit edits as a draft. Disable Undo while a commit request is pending; if rejected without a state change or reveal, the draft can be edited again. A successful server acceptance locks the move. Any hidden-information reveal, such as flipping an Explore token, creates an irreversible checkpoint and locks Undo for that resolution even if further choices remain. Complete the required follow-up; do not reroll or back out of the reveal.
+
+The server enforces the commit/reveal boundary; hiding the button is insufficient. Draft previews must not leak unrevealed information. Preserve accepted transitions and their audit history. Operational recovery or an authorised record correction is separate from this player-facing feature. Structured policy: [undo-policy.json](../catalog/undo-policy.json).
 
 ## Private administration
 
@@ -86,7 +88,7 @@ The server validates undo requests and restores all affected state together. Bro
 
 For every game, record an ID, creation/start/end/last-activity timestamps, status and end reason, player count and seat order, room visibility and selected mode, engine/content/clarification/schema versions, application release/commit, chosen settings, selected Tech/Event pools, board layout, initial systems/orientations, server-private random setup, and the accepted action history.
 
-For completed games, store per-player settled-planet points, ship-system points, Tech points, total score, tie-break Credits, and all winner IDs. For a last-player victory, record the winner by `last_player_remaining`, removal/approval history, forfeited flags, and the reviewed scoring basis; a position-points snapshot must not imply that the points leader won. For unfinished games, store an explicitly labelled provisional score if useful; never present it as an official final result. Distinguish temporary disconnect, approved idle removal, voluntary resignation, normal completion, and abandonment. The five-minute majority-removal core is confirmed; [DROPOUTS.md](DROPOUTS.md) identifies remaining integration proposals. Retention remains a launch input.
+For completed games, store per-player settled-planet points, ship-system points, Tech points, total score, tie-break Credits, and all winner IDs. For a last-player victory, record the winner by `last_player_remaining`, removal/approval history, forfeited flags, and the reviewed scoring basis; a position-points snapshot must not imply that the points leader won. For unfinished games, store an explicitly labelled provisional score if useful; never present it as an official final result. Distinguish temporary disconnect, approved idle removal, voluntary resignation, normal completion, and abandonment. The five-minute majority-removal core is confirmed; [DROPOUTS.md](DROPOUTS.md) records confirmed P02–P05; only P01 inactivity/electorate details remain proposed. Retention remains a launch input.
 
 Newsletter addresses and optional feedback contact details are separate from gameplay identities. Collect only the personal data needed for the chosen features, and keep it out of public source control and public game views.
 
@@ -117,6 +119,6 @@ Run multiplayer integration tests with seven independent browser contexts, inclu
 | 2 — Remote play | Public/private lobby, protected seats, ready checks, seven connected clients, sealed auctions, save/resume, and undo. | Seven-client game, private listing isolation, final-seat/start races, disconnect/restart/retry, and reviewed majority-removal/last-player-win scenarios pass. |
 | 3 — Full base content and second mode | All 30 Techs/30 Events and presets; add the selectable simultaneous variant after normal-turn play works, with its 4+ player recommendation. | Card scenarios, rulings, interactions, and recommendation/host-choice checks pass; designer playtest agrees with intended rules. |
 | 4 — Private beta | Owner login, game history, change log, feedback management, and optional consented news sign-up/export. | Authorisation and persistence checked; privacy details and real service configuration supplied. |
-| 5 — Release | Responsive polish, onboarding, animations, browser checks, deployment, monitoring, and backups. | A complete external playtest on phones/desktops; measured performance; successful backup restore. |
+| 5 — Release | Required first-play tutorial, responsive polish, animations, browser checks, deployment, monitoring, and backups. | A complete external playtest on phones/desktops; measured performance; successful backup restore. |
 
 Show and playtest each milestone. Keep the full feature list visible throughout; intermediate prototypes are not the completed implementation. Future expansions follow the stable base release.

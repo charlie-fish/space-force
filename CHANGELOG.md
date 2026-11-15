@@ -1,5 +1,16 @@
 # Change log
 
+## 0.6.0 — 2026-11-15
+
+- Confirmed dropout P02–P05: automatically remove action tokens from board stacks; retain other components and passive effects; delegate game-critical decisions to the next player on behalf of the removed player; use the agreed bid handling and forfeit-score snapshots. Only P01 eligibility details remain proposed.
+- Replaced the prior post-commit/table-rollback proposal with confirmed pre-commit-only Undo. Any hidden-information reveal locks that resolution, including an Explore flip.
+- Renamed My Board to Actions and added a fifth easy-to-reach Player Aid view, with proposed shortcut P.
+- Corrected the supply to one shared two-sided player aid. Both faces are rendered together; seven individual action boards remain.
+- Incorporated the first-play tutorial as a required feature in TUTORIAL.md and structured configuration. Its reminder issue #1 is superseded and closed at the designer's request; tutorial implementation is still outstanding.
+- Updated review/reminder lists and cross-file policies. Rocket STLs remain outstanding.
+
+This is a specification/catalogue release, not a playable implementation.
+
 ## 0.5.0 — 2026-11-15
 
 - Specified Board, Techs, Event, and My Board views, with persistent Reserve/Credits totals and full action-board/supply details.
