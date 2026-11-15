@@ -1,8 +1,10 @@
 # First-play tutorial
 
-Version 0.6 · 15 November 2026 · Required feature; implementation not built
+Version 0.8 · 15 November 2026 · Required feature; initial local guidance implemented
 
 The tutorial is part of the main specification. The designer requested that its reminder issue be closed after incorporation; [issue #1](https://github.com/charlie-fish/space-force/issues/1) is retained as the historical reminder, not as evidence that the feature has been implemented.
+
+The local prototype includes skippable phase/pending-choice guidance and replay from Help, with a saved device preference and session fallback. This is the first teaching layer. Per-player progress, independent multiplayer guidance, auctions, presence warnings and simultaneous-mode teaching still need implementation and verification.
 
 ## Experience
 

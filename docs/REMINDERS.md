@@ -13,16 +13,21 @@ Review priorities and next steps: [REVIEW_CHECKLIST.md](REVIEW_CHECKLIST.md).
 
 ## Project work to retain
 
-- [ ] Build Board/Techs/Event/Actions/Player Aid navigation with persistent Reserve/Credits, safe phone gestures, and desktop shortcuts.
+- [x] Build local Board/Techs/Event/Actions/Player Aid navigation with persistent Reserve/Credits, touch camera/view gestures, and desktop shortcuts.
+- [ ] Complete visual desktop/phone and accessibility playtests of the local prototype; see [PROTOTYPE.md](PROTOTYPE.md#validation).
 - [ ] Implement the confirmed five-minute majority-removal core with reviewed phase handling, skipped turns, audit records, and automatic last-player victory.
 
-- [ ] Implement the required first-play tutorial in [TUTORIAL.md](TUTORIAL.md). Reminder issue #1 is superseded by that specification and closed; this checkbox tracks implementation, which is still outstanding.
+- [ ] Complete the personal first-play tutorial in [TUTORIAL.md](TUTORIAL.md). An initial skippable/replayable local phase guide is implemented. Reminder issue #1 stays closed; per-seat progress and later multiplayer teaching remain outstanding.
 - [ ] Build the public/private lobby and the 4+ player simultaneous-mode recommendation, with explicit host choice, readiness, and fair reconnect handling.
 - [ ] Prepare approved component images/models from the TTS references, verify their versions against the PDFs/rulings, and create optimised self-hosted web assets. The ZIP contains a preview, not the full linked art/model files.
 
-- [ ] Prepare web assets and centre anchors from `13th hex.pdf`: **Asimov only for six players, Adams only for seven**. The supplied Asimov artwork replaces the old blank-hex task.
+- [x] Prepare web assets and centre anchors from `13th hex.pdf`: **Asimov only for six players, Adams only for seven**. The supplied Asimov artwork replaces the old blank-hex task.
 - [ ] Archive the original `SPACE FORCE.png` binary and prepare an optimised web copy when it is available to the asset pipeline. Its supplied appearance is already recorded as the cover reference.
-- [ ] Build seven distinct rocket silhouettes and matching poker-chip faces/rim patterns; match chip, sun, and action-board indentation diameters. Orange, a twin-pod silhouette, and a triangular rim pattern are provisional for player seven.
+- [x] Build seven provisional rocket silhouettes and matching chip faces/rim motifs, anchored to printed suns and matching receiving cutouts. Orange, a twin-pod silhouette, and a triangular rim pattern are provisional for player seven.
+- [ ] Validate silhouette/colour mapping and final chip/board proportions against the forthcoming STLs and device playtests.
+
+- [x] Implement and test complete local normal-turn Family/simpler-Events games, including all ten Family Techs, scoring, draft Undo, autosave/resume and deterministic record export.
+- [x] Prepare 80 optimised self-hosted PDF assets, including both aid faces and a matching rulebook cover illustration. Archive of the original inline PNG remains outstanding.
 
 ## Recorded and settled
 

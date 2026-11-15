@@ -1,5 +1,14 @@
 # Change log
 
+## 0.8.0 — 2026-11-15
+
+- Implemented the first local 2–7-player normal-turn prototype using the official Family Tech preset and simpler Events variant. Includes setup, chip stacks, four actions, Investments, all ten Family Techs, Economy, scoring and ties.
+- Added the five views, visible public supplies, seven provisional silhouettes with distinct chip rims, sun snap anchors, touch camera/navigation, keyboard/focus controls, both shared-aid faces and an initial skippable phase guide.
+- Added pre-commit draft Undo, locked reveal follow-ups, optional autosave/resume and exportable game records with deterministic command replay.
+- Prepared 80 optimised self-hosted assets and source anchors; corrected Le Guin's planet count/capacities and Lem's two asteroid edges in the catalogue. Supplied original versions remain confirmed current.
+- Added rules/DOM/asset tests, 72 seeded complete-game checks across all player counts, a build-size budget and GitHub Actions build artifacts. Visual browser/device testing remains pending.
+- Remote rooms, the full card set/auctions, simultaneous play, dropout handling, private administration/feedback/newsletter, and the complete personal tutorial remain later milestones; see [prototype scope](docs/PROTOTYPE.md).
+
 ## 0.7.0 — 2026-11-15
 
 - Confirmed P01 inactivity, warning, acknowledgement/pause, and voting-electorate details. All P01–P05 dropout rulings are now settled.

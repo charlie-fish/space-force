@@ -1,0 +1,18 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "module": "NodeNext",
+    "moduleResolution": "NodeNext",
+    "noEmit": false,
+    "outDir": "work/compiled",
+    "rootDir": "src"
+  },
+  "include": [
+    "src/types.ts",
+    "src/content.ts",
+    "src/engine.ts",
+    "src/ui.ts",
+    "src/**/*.json"
+  ],
+  "exclude": ["src/main.ts"]
+}

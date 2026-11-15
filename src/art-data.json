@@ -1,0 +1,2057 @@
+{
+  "schemaVersion": 1,
+  "coordinates": {
+    "x": "fraction_of_image_width",
+    "y": "fraction_of_image_height",
+    "rotationOrigin": {
+      "x": 0.5,
+      "y": 0.5
+    },
+    "pointyHexAspectRatio": 0.8658008658008658
+  },
+  "systems": {
+    "system.banks": {
+      "id": "system.banks",
+      "name": "Banks",
+      "image": "/art/systems/banks.webp",
+      "width": 400,
+      "height": 462,
+      "bytes": 32168,
+      "sun": {
+        "x": 0.415606,
+        "y": 0.484022,
+        "radiusX": 0.156499,
+        "radiusY": 0.135428
+      },
+      "planets": [
+        {
+          "capacity": 6,
+          "x": 0.77912,
+          "y": 0.580656,
+          "radiusX": 0.193148,
+          "radiusY": 0.168206,
+          "home": true,
+          "index": 0,
+          "id": "system.banks.planet.0"
+        },
+        {
+          "capacity": 3,
+          "x": 0.435416,
+          "y": 0.210507,
+          "radiusX": 0.136689,
+          "radiusY": 0.119038,
+          "home": false,
+          "index": 1,
+          "id": "system.banks.planet.1"
+        },
+        {
+          "capacity": 3,
+          "x": 0.736529,
+          "y": 0.282989,
+          "radiusX": 0.136689,
+          "radiusY": 0.119038,
+          "home": false,
+          "index": 2,
+          "id": "system.banks.planet.2"
+        },
+        {
+          "capacity": 3,
+          "x": 0.468103,
+          "y": 0.769637,
+          "radiusX": 0.13768,
+          "radiusY": 0.119038,
+          "home": false,
+          "index": 3,
+          "id": "system.banks.planet.3"
+        },
+        {
+          "capacity": 2,
+          "x": 0.175904,
+          "y": 0.358059,
+          "radiusX": 0.11886,
+          "radiusY": 0.102649,
+          "home": false,
+          "index": 4,
+          "id": "system.banks.planet.4"
+        }
+      ],
+      "homePlanetIndex": 0,
+      "fixedBlackHoles": [],
+      "fixedWarps": [],
+      "blockedEdges": [],
+      "source": {
+        "filename": "Space Force A4 Cardboard 1.40.pdf",
+        "page": 1,
+        "position": "left",
+        "crop": [
+          29.436,
+          18.9,
+          392.888,
+          436.245
+        ]
+      }
+    },
+    "system.attwood": {
+      "id": "system.attwood",
+      "name": "Attwood",
+      "image": "/art/systems/attwood.webp",
+      "width": 400,
+      "height": 462,
+      "bytes": 32396,
+      "sun": {
+        "x": 0.481383,
+        "y": 0.380486,
+        "radiusX": 0.156499,
+        "radiusY": 0.135428
+      },
+      "planets": [
+        {
+          "capacity": 6,
+          "x": 0.743866,
+          "y": 0.616885,
+          "radiusX": 0.193148,
+          "radiusY": 0.168206,
+          "home": true,
+          "index": 0,
+          "id": "system.attwood.planet.0"
+        },
+        {
+          "capacity": 2,
+          "x": 0.766647,
+          "y": 0.311455,
+          "radiusX": 0.11886,
+          "radiusY": 0.102649,
+          "home": false,
+          "index": 1,
+          "id": "system.attwood.planet.1"
+        },
+        {
+          "capacity": 2,
+          "x": 0.180271,
+          "y": 0.433991,
+          "radiusX": 0.11886,
+          "radiusY": 0.102649,
+          "home": false,
+          "index": 2,
+          "id": "system.attwood.planet.2"
+        },
+        {
+          "capacity": 2,
+          "x": 0.364504,
+          "y": 0.6592,
+          "radiusX": 0.11886,
+          "radiusY": 0.103511,
+          "home": false,
+          "index": 3,
+          "id": "system.attwood.planet.3"
+        }
+      ],
+      "homePlanetIndex": 0,
+      "fixedBlackHoles": [],
+      "fixedWarps": [],
+      "blockedEdges": [],
+      "source": {
+        "filename": "Space Force A4 Cardboard 1.40.pdf",
+        "page": 1,
+        "position": "right",
+        "crop": [
+          392.889,
+          18.9,
+          756.342,
+          436.245
+        ]
+      }
+    },
+    "system.butler": {
+      "id": "system.butler",
+      "name": "Butler",
+      "image": "/art/systems/butler.webp",
+      "width": 400,
+      "height": 462,
+      "bytes": 32966,
+      "sun": {
+        "x": 0.403696,
+        "y": 0.428205,
+        "radiusX": 0.156499,
+        "radiusY": 0.13629
+      },
+      "planets": [
+        {
+          "capacity": 6,
+          "x": 0.676083,
+          "y": 0.66549,
+          "radiusX": 0.193148,
+          "radiusY": 0.168206,
+          "home": true,
+          "index": 0,
+          "id": "system.butler.planet.0"
+        },
+        {
+          "capacity": 3,
+          "x": 0.715703,
+          "y": 0.300516,
+          "radiusX": 0.13768,
+          "radiusY": 0.119038,
+          "home": false,
+          "index": 1,
+          "id": "system.butler.planet.1"
+        },
+        {
+          "capacity": 2,
+          "x": 0.23531,
+          "y": 0.686217,
+          "radiusX": 0.11886,
+          "radiusY": 0.102649,
+          "home": false,
+          "index": 2,
+          "id": "system.butler.planet.2"
+        },
+        {
+          "capacity": 1,
+          "x": 0.198662,
+          "y": 0.29364,
+          "radiusX": 0.076269,
+          "radiusY": 0.067282,
+          "home": false,
+          "index": 3,
+          "id": "system.butler.planet.3"
+        }
+      ],
+      "homePlanetIndex": 0,
+      "fixedBlackHoles": [],
+      "fixedWarps": [],
+      "blockedEdges": [],
+      "source": {
+        "filename": "Space Force A4 Cardboard 1.40.pdf",
+        "page": 2,
+        "position": "left",
+        "crop": [
+          24.636,
+          18.9,
+          388.088,
+          436.245
+        ]
+      }
+    },
+    "system.bujold": {
+      "id": "system.bujold",
+      "name": "Bujold",
+      "image": "/art/systems/bujold.webp",
+      "width": 400,
+      "height": 462,
+      "bytes": 33028,
+      "sun": {
+        "x": 0.463529,
+        "y": 0.35486,
+        "radiusX": 0.156499,
+        "radiusY": 0.135428
+      },
+      "planets": [
+        {
+          "capacity": 6,
+          "x": 0.704221,
+          "y": 0.611123,
+          "radiusX": 0.193148,
+          "radiusY": 0.169069,
+          "home": true,
+          "index": 0,
+          "id": "system.bujold.planet.0"
+        },
+        {
+          "capacity": 3,
+          "x": 0.342688,
+          "y": 0.699156,
+          "radiusX": 0.136689,
+          "radiusY": 0.119038,
+          "home": false,
+          "index": 1,
+          "id": "system.bujold.planet.1"
+        },
+        {
+          "capacity": 1,
+          "x": 0.732946,
+          "y": 0.247898,
+          "radiusX": 0.077259,
+          "radiusY": 0.06642,
+          "home": false,
+          "index": 2,
+          "id": "system.bujold.planet.2"
+        },
+        {
+          "capacity": 1,
+          "x": 0.211942,
+          "y": 0.516237,
+          "radiusX": 0.077259,
+          "radiusY": 0.067282,
+          "home": false,
+          "index": 3,
+          "id": "system.bujold.planet.3"
+        }
+      ],
+      "homePlanetIndex": 0,
+      "fixedBlackHoles": [],
+      "fixedWarps": [],
+      "blockedEdges": [],
+      "source": {
+        "filename": "Space Force A4 Cardboard 1.40.pdf",
+        "page": 2,
+        "position": "right",
+        "crop": [
+          388.089,
+          18.9,
+          751.542,
+          436.245
+        ]
+      }
+    },
+    "system.clarke": {
+      "id": "system.clarke",
+      "name": "Clarke",
+      "image": "/art/systems/clarke.webp",
+      "width": 400,
+      "height": 462,
+      "bytes": 31170,
+      "sun": {
+        "x": 0.511354,
+        "y": 0.427771,
+        "radiusX": 0.156499,
+        "radiusY": 0.135428
+      },
+      "planets": [
+        {
+          "capacity": 6,
+          "x": 0.599508,
+          "y": 0.742714,
+          "radiusX": 0.193148,
+          "radiusY": 0.169069,
+          "home": true,
+          "index": 0,
+          "id": "system.clarke.planet.0"
+        },
+        {
+          "capacity": 3,
+          "x": 0.292453,
+          "y": 0.250028,
+          "radiusX": 0.13768,
+          "radiusY": 0.118176,
+          "home": false,
+          "index": 1,
+          "id": "system.clarke.planet.1"
+        },
+        {
+          "capacity": 3,
+          "x": 0.177555,
+          "y": 0.477825,
+          "radiusX": 0.13768,
+          "radiusY": 0.118176,
+          "home": false,
+          "index": 2,
+          "id": "system.clarke.planet.2"
+        },
+        {
+          "capacity": 3,
+          "x": 0.827324,
+          "y": 0.525292,
+          "radiusX": 0.13768,
+          "radiusY": 0.119038,
+          "home": false,
+          "index": 3,
+          "id": "system.clarke.planet.3"
+        },
+        {
+          "capacity": 3,
+          "x": 0.2459,
+          "y": 0.721149,
+          "radiusX": 0.136689,
+          "radiusY": 0.118176,
+          "home": false,
+          "index": 4,
+          "id": "system.clarke.planet.4"
+        }
+      ],
+      "homePlanetIndex": 0,
+      "fixedBlackHoles": [
+        {
+          "x": 0.687168,
+          "y": 0.233414,
+          "radiusX": 0.249001,
+          "radiusY": 0.14137
+        }
+      ],
+      "fixedWarps": [],
+      "blockedEdges": [],
+      "source": {
+        "filename": "Space Force A4 Cardboard 1.40.pdf",
+        "page": 3,
+        "position": "left",
+        "crop": [
+          26.427,
+          20.242,
+          389.88,
+          437.587
+        ]
+      }
+    },
+    "system.simak": {
+      "id": "system.simak",
+      "name": "Simak",
+      "image": "/art/systems/simak.webp",
+      "width": 400,
+      "height": 462,
+      "bytes": 32676,
+      "sun": {
+        "x": 0.458272,
+        "y": 0.394992,
+        "radiusX": 0.156499,
+        "radiusY": 0.135428
+      },
+      "planets": [
+        {
+          "capacity": 6,
+          "x": 0.768298,
+          "y": 0.607239,
+          "radiusX": 0.193148,
+          "radiusY": 0.168206,
+          "home": true,
+          "index": 0,
+          "id": "system.simak.planet.0"
+        },
+        {
+          "capacity": 2,
+          "x": 0.73165,
+          "y": 0.292319,
+          "radiusX": 0.11886,
+          "radiusY": 0.103512,
+          "home": false,
+          "index": 1,
+          "id": "system.simak.planet.1"
+        },
+        {
+          "capacity": 2,
+          "x": 0.174988,
+          "y": 0.480413,
+          "radiusX": 0.11886,
+          "radiusY": 0.103511,
+          "home": false,
+          "index": 2,
+          "id": "system.simak.planet.2"
+        },
+        {
+          "capacity": 2,
+          "x": 0.355259,
+          "y": 0.73325,
+          "radiusX": 0.11886,
+          "radiusY": 0.102649,
+          "home": false,
+          "index": 3,
+          "id": "system.simak.planet.3"
+        }
+      ],
+      "homePlanetIndex": 0,
+      "fixedBlackHoles": [],
+      "fixedWarps": [],
+      "blockedEdges": [],
+      "source": {
+        "filename": "Space Force A4 Cardboard 1.40.pdf",
+        "page": 3,
+        "position": "right",
+        "crop": [
+          389.88,
+          20.242,
+          753.333,
+          437.587
+        ]
+      }
+    },
+    "system.heinlein": {
+      "id": "system.heinlein",
+      "name": "Heinlein",
+      "image": "/art/systems/heinlein.webp",
+      "width": 400,
+      "height": 462,
+      "bytes": 33264,
+      "sun": {
+        "x": 0.448952,
+        "y": 0.479527,
+        "radiusX": 0.156499,
+        "radiusY": 0.13629
+      },
+      "planets": [
+        {
+          "capacity": 2,
+          "x": 0.777799,
+          "y": 0.269868,
+          "radiusX": 0.11886,
+          "radiusY": 0.102649,
+          "home": false,
+          "index": 0,
+          "id": "system.heinlein.planet.0"
+        },
+        {
+          "capacity": 2,
+          "x": 0.752046,
+          "y": 0.533894,
+          "radiusX": 0.11886,
+          "radiusY": 0.102649,
+          "home": false,
+          "index": 1,
+          "id": "system.heinlein.planet.1"
+        },
+        {
+          "capacity": 2,
+          "x": 0.234014,
+          "y": 0.685759,
+          "radiusX": 0.11787,
+          "radiusY": 0.102649,
+          "home": false,
+          "index": 2,
+          "id": "system.heinlein.planet.2"
+        },
+        {
+          "capacity": 1,
+          "x": 0.211232,
+          "y": 0.353564,
+          "radiusX": 0.077259,
+          "radiusY": 0.067282,
+          "home": false,
+          "index": 3,
+          "id": "system.heinlein.planet.3"
+        },
+        {
+          "capacity": 1,
+          "x": 0.516306,
+          "y": 0.695271,
+          "radiusX": 0.077259,
+          "radiusY": 0.067282,
+          "home": false,
+          "index": 4,
+          "id": "system.heinlein.planet.4"
+        },
+        {
+          "capacity": 1,
+          "x": 0.716388,
+          "y": 0.755653,
+          "radiusX": 0.077259,
+          "radiusY": 0.067282,
+          "home": false,
+          "index": 5,
+          "id": "system.heinlein.planet.5"
+        }
+      ],
+      "homePlanetIndex": null,
+      "fixedBlackHoles": [],
+      "fixedWarps": [
+        {
+          "x": 0.472504,
+          "y": 0.184687,
+          "radiusX": 0.160956,
+          "radiusY": 0.112617
+        }
+      ],
+      "blockedEdges": [
+        3
+      ],
+      "source": {
+        "filename": "Space Force A4 Cardboard 1.40.pdf",
+        "page": 4,
+        "position": "left",
+        "crop": [
+          29.427,
+          20.242,
+          392.88,
+          437.587
+        ]
+      }
+    },
+    "system.harrison": {
+      "id": "system.harrison",
+      "name": "Harrison",
+      "image": "/art/systems/harrison.webp",
+      "width": 400,
+      "height": 462,
+      "bytes": 32628,
+      "sun": {
+        "x": 0.522654,
+        "y": 0.494191,
+        "radiusX": 0.156499,
+        "radiusY": 0.135428
+      },
+      "planets": [
+        {
+          "capacity": 2,
+          "x": 0.685096,
+          "y": 0.261242,
+          "radiusX": 0.11886,
+          "radiusY": 0.102649,
+          "home": false,
+          "index": 0,
+          "id": "system.harrison.planet.0"
+        },
+        {
+          "capacity": 2,
+          "x": 0.263143,
+          "y": 0.311272,
+          "radiusX": 0.11886,
+          "radiusY": 0.102649,
+          "home": false,
+          "index": 1,
+          "id": "system.harrison.planet.1"
+        },
+        {
+          "capacity": 2,
+          "x": 0.809899,
+          "y": 0.609827,
+          "radiusX": 0.11886,
+          "radiusY": 0.102649,
+          "home": false,
+          "index": 2,
+          "id": "system.harrison.planet.2"
+        },
+        {
+          "capacity": 2,
+          "x": 0.280972,
+          "y": 0.704736,
+          "radiusX": 0.11886,
+          "radiusY": 0.102649,
+          "home": false,
+          "index": 3,
+          "id": "system.harrison.planet.3"
+        }
+      ],
+      "homePlanetIndex": null,
+      "fixedBlackHoles": [],
+      "fixedWarps": [],
+      "blockedEdges": [
+        3
+      ],
+      "source": {
+        "filename": "Space Force A4 Cardboard 1.40.pdf",
+        "page": 4,
+        "position": "right",
+        "crop": [
+          392.88,
+          20.242,
+          756.333,
+          437.587
+        ]
+      }
+    },
+    "system.jemisin": {
+      "id": "system.jemisin",
+      "name": "Jemisin",
+      "image": "/art/systems/jemisin.webp",
+      "width": 400,
+      "height": 462,
+      "bytes": 32816,
+      "sun": {
+        "x": 0.477677,
+        "y": 0.486427,
+        "radiusX": 0.156499,
+        "radiusY": 0.13629
+      },
+      "planets": [
+        {
+          "capacity": 3,
+          "x": 0.651014,
+          "y": 0.251729,
+          "radiusX": 0.13768,
+          "radiusY": 0.119038,
+          "home": false,
+          "index": 0,
+          "id": "system.jemisin.planet.0"
+        },
+        {
+          "capacity": 2,
+          "x": 0.794637,
+          "y": 0.571872,
+          "radiusX": 0.11886,
+          "radiusY": 0.102649,
+          "home": false,
+          "index": 1,
+          "id": "system.jemisin.planet.1"
+        },
+        {
+          "capacity": 2,
+          "x": 0.307311,
+          "y": 0.69956,
+          "radiusX": 0.11886,
+          "radiusY": 0.102649,
+          "home": false,
+          "index": 2,
+          "id": "system.jemisin.planet.2"
+        },
+        {
+          "capacity": 1,
+          "x": 0.204299,
+          "y": 0.392404,
+          "radiusX": 0.077259,
+          "radiusY": 0.06642,
+          "home": false,
+          "index": 3,
+          "id": "system.jemisin.planet.3"
+        }
+      ],
+      "homePlanetIndex": null,
+      "fixedBlackHoles": [],
+      "fixedWarps": [],
+      "blockedEdges": [
+        3
+      ],
+      "source": {
+        "filename": "Space Force A4 Cardboard 1.40.pdf",
+        "page": 5,
+        "position": "left",
+        "crop": [
+          29.427,
+          20.242,
+          392.88,
+          437.587
+        ]
+      }
+    },
+    "system.willis": {
+      "id": "system.willis",
+      "name": "Willis",
+      "image": "/art/systems/willis.webp",
+      "width": 400,
+      "height": 462,
+      "bytes": 33406,
+      "sun": {
+        "x": 0.462234,
+        "y": 0.433785,
+        "radiusX": 0.156499,
+        "radiusY": 0.135428
+      },
+      "planets": [
+        {
+          "capacity": 3,
+          "x": 0.782165,
+          "y": 0.377716,
+          "radiusX": 0.13768,
+          "radiusY": 0.119038,
+          "home": false,
+          "index": 0,
+          "id": "system.willis.planet.0"
+        },
+        {
+          "capacity": 3,
+          "x": 0.565246,
+          "y": 0.709912,
+          "radiusX": 0.136689,
+          "radiusY": 0.118176,
+          "home": false,
+          "index": 1,
+          "id": "system.willis.planet.1"
+        },
+        {
+          "capacity": 1,
+          "x": 0.483034,
+          "y": 0.14563,
+          "radiusX": 0.076269,
+          "radiusY": 0.06642,
+          "home": false,
+          "index": 2,
+          "id": "system.willis.planet.2"
+        },
+        {
+          "capacity": 1,
+          "x": 0.201732,
+          "y": 0.579636,
+          "radiusX": 0.076269,
+          "radiusY": 0.067282,
+          "home": false,
+          "index": 3,
+          "id": "system.willis.planet.3"
+        }
+      ],
+      "homePlanetIndex": null,
+      "fixedBlackHoles": [],
+      "fixedWarps": [],
+      "blockedEdges": [
+        3
+      ],
+      "source": {
+        "filename": "Space Force A4 Cardboard 1.40.pdf",
+        "page": 5,
+        "position": "right",
+        "crop": [
+          392.88,
+          20.242,
+          756.333,
+          437.587
+        ]
+      }
+    },
+    "system.le-guin": {
+      "id": "system.le-guin",
+      "name": "Le Guin",
+      "image": "/art/systems/le-guin.webp",
+      "width": 400,
+      "height": 462,
+      "bytes": 32626,
+      "sun": {
+        "x": 0.469423,
+        "y": 0.475477,
+        "radiusX": 0.156499,
+        "radiusY": 0.135428
+      },
+      "planets": [
+        {
+          "capacity": 2,
+          "x": 0.744782,
+          "y": 0.314148,
+          "radiusX": 0.11886,
+          "radiusY": 0.103512,
+          "home": false,
+          "index": 0,
+          "id": "system.le-guin.planet.0"
+        },
+        {
+          "capacity": 2,
+          "x": 0.815107,
+          "y": 0.651519,
+          "radiusX": 0.11787,
+          "radiusY": 0.102649,
+          "home": false,
+          "index": 1,
+          "id": "system.le-guin.planet.1"
+        },
+        {
+          "capacity": 1,
+          "x": 0.258446,
+          "y": 0.293446,
+          "radiusX": 0.076269,
+          "radiusY": 0.067282,
+          "home": false,
+          "index": 2,
+          "id": "system.le-guin.planet.2"
+        },
+        {
+          "capacity": 1,
+          "x": 0.253494,
+          "y": 0.666207,
+          "radiusX": 0.077259,
+          "radiusY": 0.067282,
+          "home": false,
+          "index": 3,
+          "id": "system.le-guin.planet.3"
+        }
+      ],
+      "homePlanetIndex": null,
+      "fixedBlackHoles": [],
+      "fixedWarps": [],
+      "blockedEdges": [
+        3
+      ],
+      "source": {
+        "filename": "Space Force A4 Cardboard 1.40.pdf",
+        "page": 6,
+        "position": "left",
+        "crop": [
+          29.427,
+          20.242,
+          392.88,
+          437.587
+        ]
+      }
+    },
+    "system.lem": {
+      "id": "system.lem",
+      "name": "Lem",
+      "image": "/art/systems/lem.webp",
+      "width": 400,
+      "height": 462,
+      "bytes": 32106,
+      "sun": {
+        "x": 0.5352,
+        "y": 0.473752,
+        "radiusX": 0.156499,
+        "radiusY": 0.135428
+      },
+      "planets": [
+        {
+          "capacity": 2,
+          "x": 0.247955,
+          "y": 0.41337,
+          "radiusX": 0.11886,
+          "radiusY": 0.102649,
+          "home": false,
+          "index": 0,
+          "id": "system.lem.planet.0"
+        },
+        {
+          "capacity": 2,
+          "x": 0.749149,
+          "y": 0.629954,
+          "radiusX": 0.11886,
+          "radiusY": 0.103511,
+          "home": false,
+          "index": 1,
+          "id": "system.lem.planet.1"
+        },
+        {
+          "capacity": 1,
+          "x": 0.259841,
+          "y": 0.210612,
+          "radiusX": 0.077259,
+          "radiusY": 0.067282,
+          "home": false,
+          "index": 2,
+          "id": "system.lem.planet.2"
+        },
+        {
+          "capacity": 1,
+          "x": 0.242012,
+          "y": 0.629954,
+          "radiusX": 0.077259,
+          "radiusY": 0.067282,
+          "home": false,
+          "index": 3,
+          "id": "system.lem.planet.3"
+        },
+        {
+          "capacity": 1,
+          "x": 0.290547,
+          "y": 0.79907,
+          "radiusX": 0.076269,
+          "radiusY": 0.067282,
+          "home": false,
+          "index": 4,
+          "id": "system.lem.planet.4"
+        }
+      ],
+      "homePlanetIndex": null,
+      "fixedBlackHoles": [
+        {
+          "x": 0.609515,
+          "y": 0.230847,
+          "radiusX": 0.255879,
+          "radiusY": 0.116211
+        }
+      ],
+      "fixedWarps": [
+        {
+          "x": 0.535393,
+          "y": 0.786203,
+          "radiusX": 0.160956,
+          "radiusY": 0.112617
+        }
+      ],
+      "blockedEdges": [
+        0,
+        3
+      ],
+      "source": {
+        "filename": "Space Force A4 Cardboard 1.40.pdf",
+        "page": 6,
+        "position": "right",
+        "crop": [
+          392.88,
+          20.242,
+          756.333,
+          437.587
+        ]
+      }
+    },
+    "system.adams": {
+      "id": "system.adams",
+      "name": "Adams",
+      "image": "/art/systems/adams.webp",
+      "width": 400,
+      "height": 462,
+      "bytes": 34376,
+      "sun": {
+        "x": 0.39802,
+        "y": 0.439751,
+        "radiusX": 0.156436,
+        "radiusY": 0.136207
+      },
+      "planets": [
+        {
+          "capacity": 6,
+          "x": 0.670297,
+          "y": 0.67603,
+          "radiusX": 0.193069,
+          "radiusY": 0.168966,
+          "home": true,
+          "index": 0,
+          "id": "system.adams.planet.0"
+        },
+        {
+          "capacity": 2,
+          "x": 0.134653,
+          "y": 0.32852,
+          "radiusX": 0.118812,
+          "radiusY": 0.102586,
+          "home": false,
+          "index": 1,
+          "id": "system.adams.planet.1"
+        },
+        {
+          "capacity": 2,
+          "x": 0.859406,
+          "y": 0.435441,
+          "radiusX": 0.118812,
+          "radiusY": 0.102586,
+          "home": false,
+          "index": 2,
+          "id": "system.adams.planet.2"
+        },
+        {
+          "capacity": 2,
+          "x": 0.144554,
+          "y": 0.619133,
+          "radiusX": 0.118812,
+          "radiusY": 0.103448,
+          "home": false,
+          "index": 3,
+          "id": "system.adams.planet.3"
+        },
+        {
+          "capacity": 2,
+          "x": 0.349505,
+          "y": 0.761399,
+          "radiusX": 0.117822,
+          "radiusY": 0.102586,
+          "home": false,
+          "index": 4,
+          "id": "system.adams.planet.4"
+        }
+      ],
+      "homePlanetIndex": 0,
+      "fixedBlackHoles": [
+        {
+          "x": 0.570164,
+          "y": 0.222393,
+          "radiusX": 0.28023,
+          "radiusY": 0.168706
+        }
+      ],
+      "fixedWarps": [],
+      "blockedEdges": [],
+      "source": {
+        "filename": "13th hex.pdf",
+        "page": 1,
+        "position": "left",
+        "crop": [
+          18.0,
+          0.72,
+          381.6,
+          418.32
+        ]
+      }
+    },
+    "system.asimov": {
+      "id": "system.asimov",
+      "name": "Asimov",
+      "image": "/art/systems/asimov.webp",
+      "width": 400,
+      "height": 462,
+      "bytes": 39322,
+      "sun": {
+        "x": 0.540594,
+        "y": 0.475958,
+        "radiusX": 0.156436,
+        "radiusY": 0.136207
+      },
+      "planets": [],
+      "homePlanetIndex": null,
+      "fixedBlackHoles": [],
+      "fixedWarps": [],
+      "blockedEdges": [],
+      "source": {
+        "filename": "13th hex.pdf",
+        "page": 1,
+        "position": "right",
+        "crop": [
+          380.16,
+          0.72,
+          743.76,
+          418.32
+        ]
+      }
+    }
+  },
+  "cards": {
+    "tech.assembly-line": {
+      "id": "tech.assembly-line",
+      "name": "Assembly Line",
+      "kind": "tech",
+      "cost": 4,
+      "text": "During Reinforce, you may add 4 Ships instead of 3.",
+      "image": "/art/tech/assembly-line.webp",
+      "width": 240,
+      "height": 388,
+      "bytes": 10864,
+      "source": {
+        "filename": "SpaceForce Cards v1.80.pdf",
+        "page": 3
+      }
+    },
+    "tech.rapid-advance": {
+      "id": "tech.rapid-advance",
+      "name": "Rapid Advance",
+      "kind": "tech",
+      "cost": 5,
+      "text": "After MOVE INTO, you may convert 1 of your Ships in the active system into a Settlement. This is a direct conversion, not a SETTLE action.",
+      "image": "/art/tech/rapid-advance.webp",
+      "width": 240,
+      "height": 388,
+      "bytes": 10606,
+      "source": {
+        "filename": "SpaceForce Cards v1.80.pdf",
+        "page": 4
+      },
+      "rulesOverride": "Use the almanac/direct-conversion wording; the printed card uses SETTLE."
+    },
+    "tech.frontier-pioneer": {
+      "id": "tech.frontier-pioneer",
+      "name": "Frontier Pioneer",
+      "kind": "tech",
+      "cost": 6,
+      "text": "Before SETTLE, add 1 Ship from your Reserve into the active system.",
+      "image": "/art/tech/frontier-pioneer.webp",
+      "width": 240,
+      "height": 388,
+      "bytes": 10796,
+      "source": {
+        "filename": "SpaceForce Cards v1.80.pdf",
+        "page": 5
+      }
+    },
+    "tech.genesis": {
+      "id": "tech.genesis",
+      "name": "Genesis",
+      "kind": "tech",
+      "cost": 6,
+      "text": "Immediately when acquired, add 1 Settlement from your Reserve onto any empty planet on the board. If no planet is empty, there is no effect.",
+      "image": "/art/tech/genesis.webp",
+      "width": 240,
+      "height": 388,
+      "bytes": 14056,
+      "source": {
+        "filename": "SpaceForce Cards v1.80.pdf",
+        "page": 6
+      }
+    },
+    "tech.population-explosion": {
+      "id": "tech.population-explosion",
+      "name": "Population Explosion",
+      "kind": "tech",
+      "cost": 4,
+      "text": "After PRODUCE, do a free SETTLE action in the active system.",
+      "image": "/art/tech/population-explosion.webp",
+      "width": 240,
+      "height": 388,
+      "bytes": 11108,
+      "source": {
+        "filename": "SpaceForce Cards v1.80.pdf",
+        "page": 7
+      }
+    },
+    "tech.soylent-green": {
+      "id": "tech.soylent-green",
+      "name": "Soylent Green",
+      "kind": "tech",
+      "cost": 10,
+      "text": "During SETTLE, if all planets in the active system are full, you may replace opponents’ Settlements with your own. Removed Settlements become their owners’ Credits.",
+      "image": "/art/tech/soylent-green.webp",
+      "width": 240,
+      "height": 388,
+      "bytes": 15544,
+      "source": {
+        "filename": "SpaceForce Cards v1.80.pdf",
+        "page": 8
+      }
+    },
+    "tech.planet-killer": {
+      "id": "tech.planet-killer",
+      "name": "Planet Killer",
+      "kind": "tech",
+      "cost": 6,
+      "text": "Immediately, if the additional black-hole token is not on the board, you may place it over a non-home planet. Return its Settlements as Credits and block that planet.",
+      "image": "/art/tech/planet-killer.webp",
+      "width": 240,
+      "height": 388,
+      "bytes": 11886,
+      "source": {
+        "filename": "SpaceForce Cards v1.80.pdf",
+        "page": 9
+      }
+    },
+    "tech.artificial-warp": {
+      "id": "tech.artificial-warp",
+      "name": "Artificial Warp",
+      "kind": "tech",
+      "cost": 3,
+      "text": "Immediately, if the additional warp token is not on the board, you may place it in any face-up system.",
+      "image": "/art/tech/artificial-warp.webp",
+      "width": 240,
+      "height": 388,
+      "bytes": 11364,
+      "source": {
+        "filename": "SpaceForce Cards v1.80.pdf",
+        "page": 10
+      }
+    },
+    "tech.arcologies": {
+      "id": "tech.arcologies",
+      "name": "Arcologies",
+      "kind": "tech",
+      "cost": 5,
+      "text": "You may SETTLE one extra space above a planet’s printed capacity. The extra space is shared across Arcologies owners. The planet is full at printed capacity or one above it.",
+      "image": "/art/tech/arcologies.webp",
+      "width": 240,
+      "height": 388,
+      "bytes": 13306,
+      "source": {
+        "filename": "SpaceForce Cards v1.80.pdf",
+        "page": 11
+      }
+    },
+    "tech.kessler-syndrome": {
+      "id": "tech.kessler-syndrome",
+      "name": "Kessler Syndrome",
+      "kind": "tech",
+      "cost": 5,
+      "text": "Immediately, if the additional asteroid-belt token is not on the board, you may place it along an edge of a face-up system, keeping the board connected including warp links.",
+      "image": "/art/tech/kessler-syndrome.webp",
+      "width": 240,
+      "height": 388,
+      "bytes": 14368,
+      "source": {
+        "filename": "SpaceForce Cards v1.80.pdf",
+        "page": 12
+      }
+    },
+    "tech.planet-nine": {
+      "id": "tech.planet-nine",
+      "name": "Planet Nine",
+      "kind": "tech",
+      "cost": 4,
+      "text": "Immediately, if the additional planet token is not on the board, you may place it in any face-up system.",
+      "image": "/art/tech/planet-nine.webp",
+      "width": 240,
+      "height": 388,
+      "bytes": 9688,
+      "source": {
+        "filename": "SpaceForce Cards v1.80.pdf",
+        "page": 13
+      }
+    },
+    "tech.mercenaries": {
+      "id": "tech.mercenaries",
+      "name": "Mercenaries",
+      "kind": "tech",
+      "cost": 9,
+      "text": "After MOVE INTO, convert up to 3 Credits into Ships in the active system.",
+      "image": "/art/tech/mercenaries.webp",
+      "width": 240,
+      "height": 388,
+      "bytes": 10732,
+      "source": {
+        "filename": "SpaceForce Cards v1.80.pdf",
+        "page": 14
+      }
+    },
+    "tech.banking": {
+      "id": "tech.banking",
+      "name": "Banking",
+      "kind": "tech",
+      "cost": 7,
+      "text": "Whenever you do an action, you may also Invest it.",
+      "image": "/art/tech/banking.webp",
+      "width": 240,
+      "height": 388,
+      "bytes": 8112,
+      "source": {
+        "filename": "SpaceForce Cards v1.80.pdf",
+        "page": 15
+      }
+    },
+    "tech.spice": {
+      "id": "tech.spice",
+      "name": "Spice",
+      "kind": "tech",
+      "cost": 12,
+      "text": "After PRODUCE, do a free PRODUCE action in the active system. That bonus activates other applicable Techs but does not trigger Spice again.",
+      "image": "/art/tech/spice.webp",
+      "width": 240,
+      "height": 388,
+      "bytes": 9554,
+      "source": {
+        "filename": "SpaceForce Cards v1.80.pdf",
+        "page": 16
+      }
+    },
+    "tech.agility": {
+      "id": "tech.agility",
+      "name": "Agility",
+      "kind": "tech",
+      "cost": 4,
+      "text": "Your Ships can move through asteroid belts.",
+      "image": "/art/tech/agility.webp",
+      "width": 240,
+      "height": 388,
+      "bytes": 7720,
+      "source": {
+        "filename": "SpaceForce Cards v1.80.pdf",
+        "page": 17
+      }
+    },
+    "tech.gravity-drive": {
+      "id": "tech.gravity-drive",
+      "name": "Gravity Drive",
+      "kind": "tech",
+      "cost": 6,
+      "text": "During MOVE INTO, each of your Ships can carry an opponent Ship. A carried Ship may be destroyed instead of your own Ship when entering a black hole.",
+      "image": "/art/tech/gravity-drive.webp",
+      "width": 240,
+      "height": 388,
+      "bytes": 15662,
+      "source": {
+        "filename": "SpaceForce Cards v1.80.pdf",
+        "page": 18
+      }
+    },
+    "tech.foresight": {
+      "id": "tech.foresight",
+      "name": "Foresight",
+      "kind": "tech",
+      "cost": 2,
+      "text": "You may always privately peek at the top 2 face-down Event cards.",
+      "image": "/art/tech/foresight.webp",
+      "width": 240,
+      "height": 388,
+      "bytes": 9236,
+      "source": {
+        "filename": "SpaceForce Cards v1.80.pdf",
+        "page": 19
+      }
+    },
+    "tech.patents": {
+      "id": "tech.patents",
+      "name": "Patents",
+      "kind": "tech",
+      "cost": 3,
+      "text": "Other players cannot acquire a Tech you already own.",
+      "image": "/art/tech/patents.webp",
+      "width": 240,
+      "height": 388,
+      "bytes": 7798,
+      "source": {
+        "filename": "SpaceForce Cards v1.80.pdf",
+        "page": 20
+      }
+    },
+    "tech.research-lab": {
+      "id": "tech.research-lab",
+      "name": "Research Lab",
+      "kind": "tech",
+      "cost": 5,
+      "text": "You may buy Techs at half price, rounded down, or voluntarily pay full price.",
+      "image": "/art/tech/research-lab.webp",
+      "width": 240,
+      "height": 388,
+      "bytes": 11478,
+      "source": {
+        "filename": "SpaceForce Cards v1.80.pdf",
+        "page": 21
+      }
+    },
+    "tech.death-sun": {
+      "id": "tech.death-sun",
+      "name": "Death Sun",
+      "kind": "tech",
+      "cost": 11,
+      "text": "During ATTACK, each Ship you sacrifice may remove 1 extra opposing Ship or Settlement.",
+      "image": "/art/tech/death-sun.webp",
+      "width": 240,
+      "height": 388,
+      "bytes": 11924,
+      "source": {
+        "filename": "SpaceForce Cards v1.80.pdf",
+        "page": 22
+      }
+    },
+    "tech.cloaking": {
+      "id": "tech.cloaking",
+      "name": "Cloaking",
+      "kind": "tech",
+      "cost": 8,
+      "text": "Before ATTACK, add 1 Ship from your Reserve into the active system.",
+      "image": "/art/tech/cloaking.webp",
+      "width": 240,
+      "height": 388,
+      "bytes": 10098,
+      "source": {
+        "filename": "SpaceForce Cards v1.80.pdf",
+        "page": 23
+      }
+    },
+    "tech.strategic-stall": {
+      "id": "tech.strategic-stall",
+      "name": "Strategic Stall",
+      "kind": "tech",
+      "cost": 5,
+      "text": "Once per round during PLAN, you may pass instead of placing an action token.",
+      "image": "/art/tech/strategic-stall.webp",
+      "width": 240,
+      "height": 388,
+      "bytes": 10910,
+      "source": {
+        "filename": "SpaceForce Cards v1.80.pdf",
+        "page": 24
+      }
+    },
+    "tech.filibuster": {
+      "id": "tech.filibuster",
+      "name": "Filibuster",
+      "kind": "tech",
+      "cost": 6,
+      "text": "At the end of PLAN, in player order, you may move 1 of your action tokens to the top of its current stack.",
+      "image": "/art/tech/filibuster.webp",
+      "width": 240,
+      "height": 388,
+      "bytes": 12524,
+      "source": {
+        "filename": "SpaceForce Cards v1.80.pdf",
+        "page": 25
+      }
+    },
+    "tech.patrol": {
+      "id": "tech.patrol",
+      "name": "Patrol",
+      "kind": "tech",
+      "cost": 6,
+      "text": "Opponents cannot ATTACK your Settlements until they have eliminated your Ships in that system.",
+      "image": "/art/tech/patrol.webp",
+      "width": 240,
+      "height": 388,
+      "bytes": 11086,
+      "source": {
+        "filename": "SpaceForce Cards v1.80.pdf",
+        "page": 26
+      }
+    },
+    "tech.insurance": {
+      "id": "tech.insurance",
+      "name": "Insurance",
+      "kind": "tech",
+      "cost": 3,
+      "text": "During ACTIONS, whenever you are skipped because none of your action tokens is on top of a stack, gain 1 Credit or 1 Ship in a system where you have a Settlement.",
+      "image": "/art/tech/insurance.webp",
+      "width": 240,
+      "height": 388,
+      "bytes": 13764,
+      "source": {
+        "filename": "SpaceForce Cards v1.80.pdf",
+        "page": 27
+      }
+    },
+    "tech.eminent-domain": {
+      "id": "tech.eminent-domain",
+      "name": "Eminent Domain",
+      "kind": "tech",
+      "cost": 3,
+      "text": "Before normal endgame scoring, you may do a free SETTLE action in your home system.",
+      "image": "/art/tech/eminent-domain.webp",
+      "width": 240,
+      "height": 388,
+      "bytes": 11068,
+      "source": {
+        "filename": "SpaceForce Cards v1.80.pdf",
+        "page": 28
+      }
+    },
+    "tech.disruptor": {
+      "id": "tech.disruptor",
+      "name": "Disruptor",
+      "kind": "tech",
+      "cost": 7,
+      "text": "Immediately choose a system. Opponents cannot place action tokens there next round. Multiple buyers in the same round choose distinct systems in player order.",
+      "image": "/art/tech/disruptor.webp",
+      "width": 240,
+      "height": 388,
+      "bytes": 14834,
+      "source": {
+        "filename": "SpaceForce Cards v1.80.pdf",
+        "page": 29
+      }
+    },
+    "tech.sabotage": {
+      "id": "tech.sabotage",
+      "name": "Sabotage",
+      "kind": "tech",
+      "cost": "X",
+      "text": "Choose an undiscounted value X and buy this Tech. Remove another player’s Tech worth up to X, returning its marker to Reserve. Cannot target Sabotage or be bought in the final round. Research Lab discounts payment without reducing destruction value.",
+      "image": "/art/tech/sabotage.webp",
+      "width": 240,
+      "height": 388,
+      "bytes": 14822,
+      "source": {
+        "filename": "SpaceForce Cards v1.80.pdf",
+        "page": 30
+      }
+    },
+    "tech.flexible-economy": {
+      "id": "tech.flexible-economy",
+      "name": "Flexible Economy",
+      "kind": "tech",
+      "cost": 2,
+      "text": "You may always move Credits back to your Reserve.",
+      "image": "/art/tech/flexible-economy.webp",
+      "width": 240,
+      "height": 388,
+      "bytes": 9158,
+      "source": {
+        "filename": "SpaceForce Cards v1.80.pdf",
+        "page": 31
+      }
+    },
+    "tech.government-incentives": {
+      "id": "tech.government-incentives",
+      "name": "Government Incentives",
+      "kind": "tech",
+      "cost": 7,
+      "text": "Before SETTLE, do a free MOVE INTO action in the active system.",
+      "image": "/art/tech/government-incentives.webp",
+      "width": 240,
+      "height": 388,
+      "bytes": 11106,
+      "source": {
+        "filename": "SpaceForce Cards v1.80.pdf",
+        "page": 32
+      }
+    },
+    "event.cyber-attack": {
+      "id": "event.cyber-attack",
+      "name": "Cyber Attack",
+      "kind": "event",
+      "cost": null,
+      "text": "During ACTIONS this round, players may resolve any player’s action token on top of a stack, placing it on their own board and acting or Investing as their own.",
+      "image": "/art/events/cyber-attack.webp",
+      "width": 240,
+      "height": 388,
+      "bytes": 16990,
+      "source": {
+        "filename": "SpaceForce Cards v1.80.pdf",
+        "page": 35
+      }
+    },
+    "event.ceasefire": {
+      "id": "event.ceasefire",
+      "name": "Ceasefire",
+      "kind": "event",
+      "cost": null,
+      "text": "This round, all players must Invest their ATTACK action.",
+      "image": "/art/events/ceasefire.webp",
+      "width": 240,
+      "height": 388,
+      "bytes": 9722,
+      "source": {
+        "filename": "SpaceForce Cards v1.80.pdf",
+        "page": 36
+      }
+    },
+    "event.communist-decree": {
+      "id": "event.communist-decree",
+      "name": "Communist Decree",
+      "kind": "event",
+      "cost": null,
+      "text": "Immediately, all players return Credits to Reserve, then gain up to 3 Credits from Reserve.",
+      "image": "/art/events/communist-decree.webp",
+      "width": 240,
+      "height": 388,
+      "bytes": 13688,
+      "source": {
+        "filename": "SpaceForce Cards v1.80.pdf",
+        "page": 37
+      }
+    },
+    "event.ragnarok": {
+      "id": "event.ragnarok",
+      "name": "Ragnarök",
+      "kind": "event",
+      "cost": null,
+      "text": "Immediately repeat the Event step: discard the Events, draw 2 more, and hold another auction. If the Event deck is empty, there is no effect.",
+      "image": "/art/events/ragnarok.webp",
+      "width": 240,
+      "height": 388,
+      "bytes": 16648,
+      "source": {
+        "filename": "SpaceForce Cards v1.80.pdf",
+        "page": 38
+      }
+    },
+    "event.stealth-invasion": {
+      "id": "event.stealth-invasion",
+      "name": "Stealth Invasion",
+      "kind": "event",
+      "cost": null,
+      "text": "Immediately, the selecting player may add up to 3 Ships from Reserve into any face-up system or systems.",
+      "image": "/art/events/stealth-invasion.webp",
+      "width": 240,
+      "height": 388,
+      "bytes": 14492,
+      "source": {
+        "filename": "SpaceForce Cards v1.80.pdf",
+        "page": 39
+      }
+    },
+    "event.scrambler": {
+      "id": "event.scrambler",
+      "name": "Scrambler",
+      "kind": "event",
+      "cost": null,
+      "text": "At the end of PLAN this round, the selecting player may turn one entire action-token stack upside down.",
+      "image": "/art/events/scrambler.webp",
+      "width": 240,
+      "height": 388,
+      "bytes": 15002,
+      "source": {
+        "filename": "SpaceForce Cards v1.80.pdf",
+        "page": 40
+      }
+    },
+    "event.economic-boom": {
+      "id": "event.economic-boom",
+      "name": "Economic Boom",
+      "kind": "event",
+      "cost": null,
+      "text": "This round, Investments receive 2 rockets instead of 1.",
+      "image": "/art/events/economic-boom.webp",
+      "width": 240,
+      "height": 388,
+      "bytes": 12094,
+      "source": {
+        "filename": "SpaceForce Cards v1.80.pdf",
+        "page": 41
+      }
+    },
+    "event.luddite-decree": {
+      "id": "event.luddite-decree",
+      "name": "Luddite Decree",
+      "kind": "event",
+      "cost": null,
+      "text": "All Techs have no effect while this Event is active.",
+      "image": "/art/events/luddite-decree.webp",
+      "width": 240,
+      "height": 388,
+      "bytes": 9242,
+      "source": {
+        "filename": "SpaceForce Cards v1.80.pdf",
+        "page": 42
+      }
+    },
+    "event.all-your-base": {
+      "id": "event.all-your-base",
+      "name": "All Your Base",
+      "kind": "event",
+      "cost": null,
+      "text": "Immediately, the selecting player may do a free MOVE INTO action in a system of their choice.",
+      "image": "/art/events/all-your-base.webp",
+      "width": 240,
+      "height": 388,
+      "bytes": 12796,
+      "source": {
+        "filename": "SpaceForce Cards v1.80.pdf",
+        "page": 43
+      }
+    },
+    "event.technological-singularity": {
+      "id": "event.technological-singularity",
+      "name": "Technological Singularity",
+      "kind": "event",
+      "cost": null,
+      "text": "Immediately add 4 more Techs to the display.",
+      "image": "/art/events/technological-singularity.webp",
+      "width": 240,
+      "height": 388,
+      "bytes": 10242,
+      "source": {
+        "filename": "SpaceForce Cards v1.80.pdf",
+        "page": 44
+      }
+    },
+    "event.flexibility": {
+      "id": "event.flexibility",
+      "name": "Flexibility",
+      "kind": "event",
+      "cost": null,
+      "text": "This round, the selecting player may perform any one of the four actions regardless of the action-board slot used.",
+      "image": "/art/events/flexibility.webp",
+      "width": 240,
+      "height": 388,
+      "bytes": 15138,
+      "source": {
+        "filename": "SpaceForce Cards v1.80.pdf",
+        "page": 45
+      }
+    },
+    "event.multicultural-tension": {
+      "id": "event.multicultural-tension",
+      "name": "Multicultural Tension",
+      "kind": "event",
+      "cost": null,
+      "text": "Immediately, the selecting player may add 1 Settlement from Reserve onto the home planet of the player to their left, if there is capacity.",
+      "image": "/art/events/multicultural-tension.webp",
+      "width": 240,
+      "height": 388,
+      "bytes": 15852,
+      "source": {
+        "filename": "SpaceForce Cards v1.80.pdf",
+        "page": 46
+      }
+    },
+    "event.consolidation": {
+      "id": "event.consolidation",
+      "name": "Consolidation",
+      "kind": "event",
+      "cost": null,
+      "text": "Immediately, the selecting player may do a free SETTLE action in a system of their choice.",
+      "image": "/art/events/consolidation.webp",
+      "width": 240,
+      "height": 388,
+      "bytes": 12616,
+      "source": {
+        "filename": "SpaceForce Cards v1.80.pdf",
+        "page": 47
+      }
+    },
+    "event.spacetime-rip": {
+      "id": "event.spacetime-rip",
+      "name": "Spacetime Rip",
+      "kind": "event",
+      "cost": null,
+      "text": "This round, all systems are adjacent for the selecting player’s MOVE INTO actions.",
+      "image": "/art/events/spacetime-rip.webp",
+      "width": 240,
+      "height": 388,
+      "bytes": 14386,
+      "source": {
+        "filename": "SpaceForce Cards v1.80.pdf",
+        "page": 48
+      }
+    },
+    "event.politics": {
+      "id": "event.politics",
+      "name": "Politics",
+      "kind": "event",
+      "cost": null,
+      "text": "Immediately, in player order, every player chooses an action they will not use this round and places an action token in that slot.",
+      "image": "/art/events/politics.webp",
+      "width": 240,
+      "height": 388,
+      "bytes": 14606,
+      "source": {
+        "filename": "SpaceForce Cards v1.80.pdf",
+        "page": 49
+      }
+    },
+    "event.vorsprung": {
+      "id": "event.vorsprung",
+      "name": "Vorsprung",
+      "kind": "event",
+      "cost": null,
+      "text": "Immediately, the selecting player may claim an available Tech of printed value up to 6 for free, using a Reserve rocket. Cannot claim Sabotage.",
+      "image": "/art/events/vorsprung.webp",
+      "width": 240,
+      "height": 388,
+      "bytes": 15400,
+      "source": {
+        "filename": "SpaceForce Cards v1.80.pdf",
+        "page": 50
+      }
+    },
+    "event.turtling": {
+      "id": "event.turtling",
+      "name": "Turtling",
+      "kind": "event",
+      "cost": null,
+      "text": "Immediately, all players return Credits to Reserve, then add up to 3 Ships from Reserve into their home system.",
+      "image": "/art/events/turtling.webp",
+      "width": 240,
+      "height": 388,
+      "bytes": 13952,
+      "source": {
+        "filename": "SpaceForce Cards v1.80.pdf",
+        "page": 51
+      }
+    },
+    "event.gravitational-lensing": {
+      "id": "event.gravitational-lensing",
+      "name": "Gravitational Lensing",
+      "kind": "event",
+      "cost": null,
+      "text": "This round, all players can MOVE INTO through asteroid belts and cannot use warps.",
+      "image": "/art/events/gravitational-lensing.webp",
+      "width": 240,
+      "height": 388,
+      "bytes": 12946,
+      "source": {
+        "filename": "SpaceForce Cards v1.80.pdf",
+        "page": 52
+      }
+    },
+    "event.migration": {
+      "id": "event.migration",
+      "name": "Migration",
+      "kind": "event",
+      "cost": null,
+      "text": "Immediately, the selecting player may redistribute all Settlements within one chosen system.",
+      "image": "/art/events/migration.webp",
+      "width": 240,
+      "height": 388,
+      "bytes": 13940,
+      "source": {
+        "filename": "SpaceForce Cards v1.80.pdf",
+        "page": 53
+      }
+    },
+    "event.recession": {
+      "id": "event.recession",
+      "name": "Recession",
+      "kind": "event",
+      "cost": null,
+      "text": "This round, all players must Invest their PRODUCE action.",
+      "image": "/art/events/recession.webp",
+      "width": 240,
+      "height": 388,
+      "bytes": 9908,
+      "source": {
+        "filename": "SpaceForce Cards v1.80.pdf",
+        "page": 54
+      }
+    },
+    "event.hive-mind": {
+      "id": "event.hive-mind",
+      "name": "Hive Mind",
+      "kind": "event",
+      "cost": null,
+      "text": "Immediately, the selecting player may produce 1 Ship from every planet across the board where they and another player both have Settlements.",
+      "image": "/art/events/hive-mind.webp",
+      "width": 240,
+      "height": 388,
+      "bytes": 16228,
+      "source": {
+        "filename": "SpaceForce Cards v1.80.pdf",
+        "page": 55
+      }
+    },
+    "event.ammo-shortage": {
+      "id": "event.ammo-shortage",
+      "name": "Ammo Shortage",
+      "kind": "event",
+      "cost": null,
+      "text": "This round, each sacrificed attacking Ship destroys only 1 opponent Ship instead of 2.",
+      "image": "/art/events/ammo-shortage.webp",
+      "width": 240,
+      "height": 388,
+      "bytes": 14094,
+      "source": {
+        "filename": "SpaceForce Cards v1.80.pdf",
+        "page": 56
+      }
+    },
+    "event.famine": {
+      "id": "event.famine",
+      "name": "Famine",
+      "kind": "event",
+      "cost": null,
+      "text": "Immediately, each player returns half their Settlements in their home system, rounded up, to Reserve, choosing which planets lose them.",
+      "image": "/art/events/famine.webp",
+      "width": 240,
+      "height": 388,
+      "bytes": 14448,
+      "source": {
+        "filename": "SpaceForce Cards v1.80.pdf",
+        "page": 57
+      }
+    },
+    "event.el-mayarah": {
+      "id": "event.el-mayarah",
+      "name": "El Mayarah",
+      "kind": "event",
+      "cost": null,
+      "text": "This round, the selecting player produces double from shared planets: 2 Ships/Credits, or 4 if full.",
+      "image": "/art/events/el-mayarah.webp",
+      "width": 240,
+      "height": 388,
+      "bytes": 16754,
+      "source": {
+        "filename": "SpaceForce Cards v1.80.pdf",
+        "page": 58
+      }
+    },
+    "event.capital-injection": {
+      "id": "event.capital-injection",
+      "name": "Capital Injection",
+      "kind": "event",
+      "cost": null,
+      "text": "Immediately, the selecting player may gain up to 10 Credits from Reserve.",
+      "image": "/art/events/capital-injection.webp",
+      "width": 240,
+      "height": 388,
+      "bytes": 12190,
+      "source": {
+        "filename": "SpaceForce Cards v1.80.pdf",
+        "page": 59
+      }
+    },
+    "event.galactic-summit": {
+      "id": "event.galactic-summit",
+      "name": "Galactic Summit",
+      "kind": "event",
+      "cost": null,
+      "text": "Immediately, the selecting player chooses a non-home system. Move all Ships on the board to it.",
+      "image": "/art/events/galactic-summit.webp",
+      "width": 240,
+      "height": 388,
+      "bytes": 14014,
+      "source": {
+        "filename": "SpaceForce Cards v1.80.pdf",
+        "page": 60
+      }
+    },
+    "event.black-cloud": {
+      "id": "event.black-cloud",
+      "name": "Black Cloud",
+      "kind": "event",
+      "cost": null,
+      "text": "This round, only Settlements can be attacked, not Ships.",
+      "image": "/art/events/black-cloud.webp",
+      "width": 240,
+      "height": 388,
+      "bytes": 12606,
+      "source": {
+        "filename": "SpaceForce Cards v1.80.pdf",
+        "page": 61
+      }
+    },
+    "event.earth-first": {
+      "id": "event.earth-first",
+      "name": "Earth First",
+      "kind": "event",
+      "cost": null,
+      "text": "This round, every player’s first PLAN token must be placed in their home system.",
+      "image": "/art/events/earth-first.webp",
+      "width": 240,
+      "height": 388,
+      "bytes": 12050,
+      "source": {
+        "filename": "SpaceForce Cards v1.80.pdf",
+        "page": 62
+      }
+    },
+    "event.prophecy": {
+      "id": "event.prophecy",
+      "name": "Prophecy",
+      "kind": "event",
+      "cost": null,
+      "text": "Immediately, the selecting player may add up to 3 available Explore tokens to empty planets in distinct systems, then reveal all Explore tokens on the board.",
+      "image": "/art/events/prophecy.webp",
+      "width": 240,
+      "height": 388,
+      "bytes": 16170,
+      "source": {
+        "filename": "SpaceForce Cards v1.80.pdf",
+        "page": 63
+      }
+    },
+    "event.alliance": {
+      "id": "event.alliance",
+      "name": "Alliance",
+      "kind": "event",
+      "cost": null,
+      "text": "Immediately, the selecting player chooses another player who cannot ATTACK them while this Event is active.",
+      "image": "/art/events/alliance.webp",
+      "width": 240,
+      "height": 388,
+      "bytes": 13062,
+      "source": {
+        "filename": "SpaceForce Cards v1.80.pdf",
+        "page": 64
+      }
+    }
+  },
+  "aids": {
+    "actions": {
+      "image": "/art/aids/actions.webp",
+      "width": 530,
+      "height": 810,
+      "bytes": 54630,
+      "source": {
+        "filename": "SpaceForce Player aid v1.50.pdf",
+        "page": 3,
+        "crop": [
+          20,
+          0,
+          285,
+          405
+        ]
+      }
+    },
+    "sequence": {
+      "image": "/art/aids/sequence.webp",
+      "width": 530,
+      "height": 810,
+      "bytes": 55368,
+      "source": {
+        "filename": "SpaceForce Player aid v1.50.pdf",
+        "page": 4,
+        "crop": [
+          20,
+          0,
+          285,
+          405
+        ]
+      }
+    }
+  },
+  "backs": {
+    "tech": {
+      "image": "/art/tech-back.webp",
+      "width": 240,
+      "height": 388,
+      "bytes": 11716
+    },
+    "event": {
+      "image": "/art/event-back.webp",
+      "width": 240,
+      "height": 388,
+      "bytes": 18032
+    },
+    "system": {
+      "image": "/art/system-back.webp",
+      "width": 400,
+      "height": 462,
+      "bytes": 29590,
+      "source": {
+        "filename": "Space Force A4 Cardboard 1.40.pdf",
+        "page": 1,
+        "description": "Embedded starfield background, masked to remove print crop marks."
+      }
+    }
+  },
+  "notes": [
+    "All centres/radii are derived from source PDF image bounding boxes, not inferred from the raster at runtime.",
+    "Suns are deliberately anchored at their printed positions, which differ from geometric hex centres.",
+    "Lem has TWO printed asteroid belts, at edges 0 and 3; the systems.csv transcription has been corrected to include both.",
+    "Le Guin has FOUR planets, capacities 2;2;1;1. The catalogue transcription has been corrected to exclude the central sun.",
+    "Card artwork remains the supplied original; semantic text applies designer clarifications, including Rapid Advance direct conversion and Spice non-recursion.",
+    "Cover extracted from rulebook page 1; the separately supplied inline PNG binary was not available in the execution workspace.",
+    "Source sheets include duplicated player aids; exactly two faces are extracted for one shared double-sided aid."
+  ],
+  "cover": {
+    "image": "/art/cover.webp",
+    "width": 562,
+    "height": 768,
+    "bytes": 53630,
+    "source": {
+      "filename": "Space Force rules v1.80.pdf",
+      "page": 1,
+      "description": "Embedded cover illustration; matching designer branding, includes by Charlie Fish credit."
+    }
+  }
+}

@@ -37,7 +37,7 @@ The designer has answered R01–R08 and supplied additional setup, Prophecy, and
 
 [PLATFORM_REVIEW.md](PLATFORM_REVIEW.md) adds proposed checks for secure realtime sessions, public-room abuse, mobile sleep/recovery, accessible controls, network fallbacks, loading metrics, safe releases, and operations. [TTS_REVIEW.md](TTS_REVIEW.md) records the received save and what still needs conversion. These engineering recommendations supplement the confirmed feature requirements.
 
-The first-play tutorial is a required feature specified in [TUTORIAL.md](TUTORIAL.md). Guidance is personal, skippable, and replayable, uses the same rules/permitted information, and does not pause opponents. Reminder issue #1 is superseded by the specification and closed at the designer's request; implementation remains outstanding.
+The first-play tutorial is a required feature specified in [TUTORIAL.md](TUTORIAL.md). Guidance is personal, skippable, and replayable, uses the same rules/permitted information, and does not pause opponents. Reminder issue #1 is superseded by the specification and closed at the designer's request; an initial local phase guide is implemented, while the complete personal tutorial remains outstanding.
 
 ## Interface and accessibility
 
@@ -88,7 +88,7 @@ The server enforces the commit/reveal boundary; hiding the button is insufficien
 
 For every game, record an ID, creation/start/end/last-activity timestamps, status and end reason, player count and seat order, room visibility and selected mode, engine/content/clarification/schema versions, application release/commit, chosen settings, selected Tech/Event pools, board layout, initial systems/orientations, server-private random setup, and the accepted action history.
 
-For completed games, store per-player settled-planet points, ship-system points, Tech points, total score, tie-break Credits, and all winner IDs. For a last-player victory, record the winner by `last_player_remaining`, removal/approval history, forfeited flags, and the reviewed scoring basis; a position-points snapshot must not imply that the points leader won. For unfinished games, store an explicitly labelled provisional score if useful; never present it as an official final result. Distinguish temporary disconnect, approved idle removal, voluntary resignation, normal completion, and abandonment. The five-minute majority-removal core is confirmed; [DROPOUTS.md](DROPOUTS.md) records confirmed P02–P05; only All dropout details P01–P05 are confirmed. Retention remains a launch input.
+For completed games, store per-player settled-planet points, ship-system points, Tech points, total score, tie-break Credits, and all winner IDs. For a last-player victory, record the winner by `last_player_remaining`, removal/approval history, forfeited flags, and the reviewed scoring basis; a position-points snapshot must not imply that the points leader won. For unfinished games, store an explicitly labelled provisional score if useful; never present it as an official final result. Distinguish temporary disconnect, approved idle removal, voluntary resignation, normal completion, and abandonment. The five-minute majority-removal core and P01–P05 are confirmed in [DROPOUTS.md](DROPOUTS.md). Retention remains a launch input.
 
 Newsletter addresses and optional feedback contact details are separate from gameplay identities. Collect only the personal data needed for the chosen features, and keep it out of public source control and public game views.
 
@@ -109,6 +109,10 @@ Proposed budgets: no more than 200 KB compressed initial JavaScript and 1 MB ini
 Verify the engine with meaningful scenarios for setup, stack order, limited components, all base cards, auction ties, effects and interactions, undo, final scoring, and both modes when included. Cover the designer's five-Tech PRODUCE sequence, Event expiry, empty-action triggers, shared Arcologies allowance/fullness, the Prophecy capacity-one case, warp connectivity, Sabotage valuation, and preset replacements. Check the invariant that each player's 40 rockets are accounted for across Reserve, Credits, Ships, Settlements, investments, and Tech ownership.
 
 Run multiplayer integration tests with seven independent browser contexts, including concurrent submissions, hidden-information checks, reconnection, stale/duplicate commands, and server restarts. Cover every supported player count and enforce the exclusive Asimov/Adams centre rules. Test phones/tablets and keyboard use. Verify backend authorisation, consent withdrawal/export, feedback management, and persistence. Agree the expected number of simultaneous rooms before setting a load-test target.
+
+## Current implementation
+
+Prototype 0.8 provides a local normal-turn game for two to seven people on one device, using the official Family Tech preset and simpler Events variant. The five views, draft Undo, pending-choice autosave/resume, all ten Family Techs, complete Economy/scoring and command-record replay are implemented and tested. All 60 card faces/reference texts are prepared; the other card effects are not selectable. Visual browser/device QA remains pending. This implements the first rules/UI slice without claiming the server, full card content, or production features. See [PROTOTYPE.md](PROTOTYPE.md) for exact scope and validation.
 
 ## Delivery stages
 

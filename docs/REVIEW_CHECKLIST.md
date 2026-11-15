@@ -1,14 +1,14 @@
 # Designer review, reminders, and next steps
 
-Updated 15 November 2026 · Specification v0.7
+Updated 15 November 2026 · Local prototype v0.8
 
-There is no playable application yet. Review the documents/data now; interaction and browser checks become concrete in the first prototype. These checks do not reopen the already-resolved R01–R08 or the confirmed original-hex versions.
+The [local prototype](PROTOTYPE.md) implements normal turns, the Family Tech preset and simpler Events for two to seven people sharing a device. Review a complete game on desktop and phone. Remote play and full card coverage remain later milestones. These checks do not reopen resolved R01–R08 or the confirmed original-hex versions.
 
 ## Check next
 
 | Priority | Item | Where to review |
 | --- | --- | --- |
-| 1 | P01–P05 are confirmed, including inactivity, warnings, voting eligibility, stack cleanup, delegation, bids, and forfeit results. Verify these behaviours in the prototype. | [Dropout rule](DROPOUTS.md) |
+| 1 | P01–P05 are confirmed, including inactivity, warnings, voting eligibility, stack cleanup, delegation, bids, and forfeit results. Verify these behaviours when the remote-play milestone is implemented. | [Dropout rule](DROPOUTS.md) |
 | 2 | Five destinations, persistent Reserve/Credits counts, phone pinch/pan/swipe separation, and the proposed B/T/E/A/P shortcuts with camera/help controls. | [Gameplay interface](GAMEPLAY_UI.md) |
 | 3 | Confirm the provisional seventh player's orange colour, twin-pod silhouette, and triangular chip rim; check the final six/seven shape-to-colour mapping when STLs arrive. | [Component design](COMPONENT_DESIGN.md), [game configuration](../catalog/game-configuration.json) |
 | 4 | Verify the confirmed Undo boundary in the prototype: uncommitted moves only, with no hidden-information reveal. Committed moves cannot be undone. | [Project brief: undo](PROJECT_BRIEF.md#undo-policy) |
@@ -25,20 +25,20 @@ There is no playable application yet. Review the documents/data now; interaction
 
 ## Outstanding implementation reminders
 
-- Build the required first-play teaching in [TUTORIAL.md](TUTORIAL.md). Issue #1 is closed as incorporated into the specification, not as an implementation completion.
-- Prepare optimised component art from the PDFs and approved TTS links, ingest the cover source, and encode Asimov/Adams anchors.
-- Implement seven distinct silhouettes/rim patterns, responsive navigation, public/private rooms, simultaneous play and its recommendation, and reviewed dropout handling.
+- Extend the implemented skippable phase guide into the complete personal first-play teaching in [TUTORIAL.md](TUTORIAL.md). Issue #1 stays closed as incorporated into the specification.
+- Review the optimised PDF artwork and encoded source anchors in the prototype. Archive the original inline PNG and ingest final rocket STLs when available.
+- Review the implemented seven provisional silhouettes/rim motifs and responsive navigation. Implement public/private rooms, simultaneous play and its recommendation, and reviewed dropout handling.
 - Implement the private admin area, game audit/results, feedback, and optional consented news sign-up/export.
 
 The live checklist is [REMINDERS.md](REMINDERS.md). TTS review: [TTS_REVIEW.md](TTS_REVIEW.md). Original-hex confirmation and TTS-save receipt are completed items.
 
 ## Next development steps
 
-1. Build the deterministic normal-turn rules engine and meaningful setup/action/resource/scoring tests for two to seven players, using the confirmed rules and versioned data.
-2. Build a playable local board with the five views, Reserve/Credits display, safe gestures/shortcuts, and provisional replaceable art. Review it on a phone and desktop.
+1. Playtest the implemented deterministic normal-turn Family/simpler-Events game. Automated tests cover 72 seeded full games, all player counts, rocket conservation and command replay.
+2. Review the implemented five-view board, supplies, gestures/shortcuts, draft Undo, autosave/resume, both aid faces and provisional replaceable art on a phone and desktop. Visual browser/device QA is pending.
 3. Add server-authoritative public/private rooms, seven independent clients, secret bids, save/rejoin, undo, and the reviewed five-minute majority-removal policy.
 4. Complete all Techs/Events and combinations; add selectable simultaneous actions, dependency handling, and the four-plus-player recommendation.
 5. Add owner administration, game/result audit, feedback, and optional newsletter consent/export, using real deployment/privacy configuration.
 6. Deliver the required tutorial and finish accessibility, browser/device, load, deployment/recovery, and backup-restore verification before release.
 
-All known rule clarifications are settled. Start the normal-turn rules/UI prototype with provisional replaceable art; asset handoffs and visual refinement can continue alongside development.
+All known rule clarifications are settled. The first local prototype is implemented; asset handoffs and visual refinement can continue alongside the remaining development milestones.

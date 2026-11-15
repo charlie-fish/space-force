@@ -1,0 +1,1086 @@
+{
+  "schemaVersion": 1,
+  "contentVersion": "base-1.80+designer-clarifications-003",
+  "sources": [
+    "Space Force rules v1.80.pdf",
+    "SpaceForce Cards v1.80.pdf",
+    "catalog/rules-clarifications.json",
+    "catalog/dropout-policy.json"
+  ],
+  "techs": [
+    {
+      "id": "tech.assembly-line",
+      "title": "Assembly Line",
+      "type": "tech",
+      "cost": 4,
+      "text": "During the Reinforce step of the ECONOMY phase, you may add 4 Ships instead of 3.",
+      "timing": "reinforce",
+      "restrictions": [],
+      "simultaneousAllowed": true,
+      "source": {
+        "cardsPdfPage": 3,
+        "rulebookPdfPage": 15
+      }
+    },
+    {
+      "id": "tech.rapid-advance",
+      "title": "Rapid Advance",
+      "type": "tech",
+      "cost": 5,
+      "text": "After you do a MOVE INTO action, you may convert 1 of your Ships in the active system into a Settlement. This is a direct conversion, not a SETTLE action.",
+      "timing": "after_move_into",
+      "restrictions": [
+        "Use the rulebook almanac over the printed card. This is not a SETTLE action and does not activate before/after SETTLE hooks."
+      ],
+      "simultaneousAllowed": true,
+      "source": {
+        "cardsPdfPage": 4,
+        "rulebookPdfPage": 18
+      },
+      "ruleNotes": [
+        "R01: almanac overrides card; direct conversion of one Ship, not a SETTLE action and no SETTLE hooks."
+      ]
+    },
+    {
+      "id": "tech.frontier-pioneer",
+      "title": "Frontier Pioneer",
+      "type": "tech",
+      "cost": 6,
+      "text": "Before you do a SETTLE action, add 1 Ship from your Reserve into the active system.",
+      "timing": "before_settle",
+      "restrictions": [],
+      "simultaneousAllowed": true,
+      "source": {
+        "cardsPdfPage": 5,
+        "rulebookPdfPage": 16
+      }
+    },
+    {
+      "id": "tech.genesis",
+      "title": "Genesis",
+      "type": "tech",
+      "cost": 6,
+      "text": "Immediately when you buy this Tech, add 1 Settlement from your Reserve onto any empty planet on the board. If there are no empty planets, this Tech has no effect.",
+      "timing": "on_acquisition",
+      "restrictions": [
+        "The target planet must be empty. If none is empty, there is no effect."
+      ],
+      "simultaneousAllowed": true,
+      "source": {
+        "cardsPdfPage": 6,
+        "rulebookPdfPage": 16
+      }
+    },
+    {
+      "id": "tech.population-explosion",
+      "title": "Population Explosion",
+      "type": "tech",
+      "cost": 4,
+      "text": "After you do a PRODUCE action, do a free SETTLE action in the active system.",
+      "timing": "after_produce",
+      "restrictions": [],
+      "simultaneousAllowed": true,
+      "source": {
+        "cardsPdfPage": 7,
+        "rulebookPdfPage": 18
+      }
+    },
+    {
+      "id": "tech.soylent-green",
+      "title": "Soylent Green",
+      "type": "tech",
+      "cost": 10,
+      "text": "When you do a SETTLE action, if all planets in the active system are fully settled, you may replace opponents’ Settlements with your own. Return removed Settlements to their owners as Credits.",
+      "timing": "during_settle",
+      "restrictions": [
+        "Every planet in the active system must be full; full means at least printed capacity, including Arcologies overflow."
+      ],
+      "simultaneousAllowed": true,
+      "source": {
+        "cardsPdfPage": 8,
+        "rulebookPdfPage": 19
+      },
+      "ruleNotes": [
+        "R05: planets at capacity or capacity plus one are full; ordinary all-planets-full prerequisite still applies."
+      ]
+    },
+    {
+      "id": "tech.planet-killer",
+      "title": "Planet Killer",
+      "type": "tech",
+      "cost": 6,
+      "text": "Immediately, if the black hole token is not on the board, you may place it over a non-home planet. Return all Settlements there to their owners as Credits and block that planet.",
+      "timing": "on_acquisition",
+      "restrictions": [
+        "The additional black hole token must not already be on the board. A home planet cannot be targeted."
+      ],
+      "simultaneousAllowed": true,
+      "source": {
+        "cardsPdfPage": 9,
+        "rulebookPdfPage": 18
+      }
+    },
+    {
+      "id": "tech.artificial-warp",
+      "title": "Artificial Warp",
+      "type": "tech",
+      "cost": 3,
+      "text": "Immediately, if the warp token is not on the board, you may place it in any face-up system.",
+      "timing": "on_acquisition",
+      "restrictions": [
+        "The additional warp token must not already be on the board. The system must be face-up."
+      ],
+      "simultaneousAllowed": true,
+      "source": {
+        "cardsPdfPage": 10,
+        "rulebookPdfPage": 15
+      }
+    },
+    {
+      "id": "tech.arcologies",
+      "title": "Arcologies",
+      "type": "tech",
+      "cost": 5,
+      "text": "You may settle planets with 1 extra Settlement above printed capacity. This is one shared extra space per planet, not an extra space per Arcologies owner. A planet at printed capacity or capacity plus one is full for PRODUCE and Soylent Green.",
+      "timing": "during_settle",
+      "restrictions": [
+        "Only one extra space is available in total per planet, even with multiple Arcologies owners. Printed-capacity fullness remains unchanged."
+      ],
+      "simultaneousAllowed": true,
+      "source": {
+        "cardsPdfPage": 11,
+        "rulebookPdfPage": 15
+      },
+      "ruleNotes": [
+        "R05: one shared extra space per planet; full at printed capacity and capacity plus one for PRODUCE and Soylent Green."
+      ]
+    },
+    {
+      "id": "tech.kessler-syndrome",
+      "title": "Kessler Syndrome",
+      "type": "tech",
+      "cost": 5,
+      "text": "Immediately, if the asteroid belt token is not on the board, you may place it along the edge of any face-up system. You must not disconnect part of the board; warp connections count when checking connectivity.",
+      "timing": "on_acquisition",
+      "restrictions": [
+        "The additional asteroid token must not already be on the board; the five-player setup uses this same token.",
+        "The target system must be face-up. Warp links count in connectivity checks."
+      ],
+      "simultaneousAllowed": true,
+      "source": {
+        "cardsPdfPage": 12,
+        "rulebookPdfPage": 17
+      }
+    },
+    {
+      "id": "tech.planet-nine",
+      "title": "Planet Nine",
+      "type": "tech",
+      "cost": 4,
+      "text": "Immediately, if the planet token is not on the board, you may place it in any face-up system.",
+      "timing": "on_acquisition",
+      "restrictions": [
+        "The additional planet token must not already be on the board. The system must be face-up."
+      ],
+      "simultaneousAllowed": true,
+      "source": {
+        "cardsPdfPage": 13,
+        "rulebookPdfPage": 18
+      }
+    },
+    {
+      "id": "tech.mercenaries",
+      "title": "Mercenaries",
+      "type": "tech",
+      "cost": 9,
+      "text": "After you do a MOVE INTO action, convert up to 3 Credits into Ships in the active system.",
+      "timing": "after_move_into",
+      "restrictions": [
+        "Convert at most 3 existing Credits."
+      ],
+      "simultaneousAllowed": true,
+      "source": {
+        "cardsPdfPage": 14,
+        "rulebookPdfPage": 17
+      }
+    },
+    {
+      "id": "tech.banking",
+      "title": "Banking",
+      "type": "tech",
+      "cost": 7,
+      "text": "Whenever you do an action, you may also Invest it.",
+      "timing": "during_actions",
+      "restrictions": [],
+      "simultaneousAllowed": true,
+      "source": {
+        "cardsPdfPage": 15,
+        "rulebookPdfPage": 15
+      }
+    },
+    {
+      "id": "tech.spice",
+      "title": "Spice",
+      "type": "tech",
+      "cost": 12,
+      "text": "After you do a PRODUCE action, do a free PRODUCE action in the active system. Finish the first PRODUCE and its other Tech effects before the bonus PRODUCE. The bonus activates other applicable Techs but does not trigger Spice again.",
+      "timing": "after_produce",
+      "restrictions": [
+        "The Spice-granted PRODUCE cannot trigger Spice, but its other applicable Tech chains resolve normally."
+      ],
+      "simultaneousAllowed": true,
+      "source": {
+        "cardsPdfPage": 16,
+        "rulebookPdfPage": 19
+      },
+      "ruleNotes": [
+        "R01: bonus PRODUCE repeats other applicable Tech chains but does not trigger Spice again; finish the first chain before the bonus."
+      ]
+    },
+    {
+      "id": "tech.agility",
+      "title": "Agility",
+      "type": "tech",
+      "cost": 4,
+      "text": "Your Ships can move through asteroid belts.",
+      "timing": "during_move_into",
+      "restrictions": [],
+      "simultaneousAllowed": true,
+      "source": {
+        "cardsPdfPage": 17,
+        "rulebookPdfPage": 15
+      }
+    },
+    {
+      "id": "tech.gravity-drive",
+      "title": "Gravity Drive",
+      "type": "tech",
+      "cost": 6,
+      "text": "When you do a MOVE INTO action, each of your Ships can carry an opponent Ship. If the active system contains a black hole, you can destroy a Ship you are carrying instead of one of your own.",
+      "timing": "during_move_into",
+      "restrictions": [
+        "Excluded from the simultaneous-actions variant."
+      ],
+      "simultaneousAllowed": false,
+      "source": {
+        "cardsPdfPage": 18,
+        "rulebookPdfPage": 17
+      }
+    },
+    {
+      "id": "tech.foresight",
+      "title": "Foresight",
+      "type": "tech",
+      "cost": 2,
+      "text": "You can always peek at the top 2 face-down cards of the Event deck.",
+      "timing": "ongoing_private_information",
+      "restrictions": [
+        "Private information for this Tech owner only. Excluded when Events are used only as a round tracker."
+      ],
+      "simultaneousAllowed": true,
+      "source": {
+        "cardsPdfPage": 19,
+        "rulebookPdfPage": 16
+      },
+      "ruleNotes": [
+        "Excluded with simplified Events"
+      ]
+    },
+    {
+      "id": "tech.patents",
+      "title": "Patents",
+      "type": "tech",
+      "cost": 3,
+      "text": "From now on, no other player can acquire a Tech that you already own.",
+      "timing": "ongoing",
+      "restrictions": [
+        "Restriction concerns acquiring a Tech after Patents applies; existing ownership is not retroactively removed."
+      ],
+      "simultaneousAllowed": true,
+      "source": {
+        "cardsPdfPage": 20,
+        "rulebookPdfPage": 17
+      }
+    },
+    {
+      "id": "tech.research-lab",
+      "title": "Research Lab",
+      "type": "tech",
+      "cost": 5,
+      "text": "You may buy Techs at half price, rounded down. You may still buy them at full price if you choose.",
+      "timing": "tech_purchase",
+      "restrictions": [
+        "Round discounted cost down. Full-price payment remains optional. Sabotage destruction uses its undiscounted value."
+      ],
+      "simultaneousAllowed": true,
+      "source": {
+        "cardsPdfPage": 21,
+        "rulebookPdfPage": 18
+      },
+      "ruleNotes": [
+        "R07: keep nominal value separate from actual payment for Sabotage destruction value."
+      ]
+    },
+    {
+      "id": "tech.death-sun",
+      "title": "Death Sun",
+      "type": "tech",
+      "cost": 11,
+      "text": "When you do an ATTACK action, for each Ship of yours you remove, you may remove 1 extra opponent Ship or Settlement.",
+      "timing": "during_attack",
+      "restrictions": [],
+      "simultaneousAllowed": true,
+      "source": {
+        "cardsPdfPage": 22,
+        "rulebookPdfPage": 15
+      }
+    },
+    {
+      "id": "tech.cloaking",
+      "title": "Cloaking",
+      "type": "tech",
+      "cost": 8,
+      "text": "Before you do an ATTACK action, add 1 Ship from your Reserve into the active system.",
+      "timing": "before_attack",
+      "restrictions": [],
+      "simultaneousAllowed": true,
+      "source": {
+        "cardsPdfPage": 23,
+        "rulebookPdfPage": 15
+      }
+    },
+    {
+      "id": "tech.strategic-stall",
+      "title": "Strategic Stall",
+      "type": "tech",
+      "cost": 5,
+      "text": "During the PLAN phase, once per round, you may pass instead of placing an action token.",
+      "timing": "during_plan",
+      "restrictions": [
+        "At most one pass per PLAN phase."
+      ],
+      "simultaneousAllowed": true,
+      "source": {
+        "cardsPdfPage": 24,
+        "rulebookPdfPage": 19
+      }
+    },
+    {
+      "id": "tech.filibuster",
+      "title": "Filibuster",
+      "type": "tech",
+      "cost": 6,
+      "text": "At the end of the PLAN phase, in player order, you may remove 1 of your action tokens from any stack and put it on top of that stack.",
+      "timing": "after_plan",
+      "restrictions": [
+        "Resolve owners in player order after PLAN."
+      ],
+      "simultaneousAllowed": true,
+      "source": {
+        "cardsPdfPage": 25,
+        "rulebookPdfPage": 16
+      }
+    },
+    {
+      "id": "tech.patrol",
+      "title": "Patrol",
+      "type": "tech",
+      "cost": 6,
+      "text": "Your opponents cannot ATTACK your Settlements until they have eliminated any of your Ships in the active system.",
+      "timing": "ongoing_attack_restriction",
+      "restrictions": [
+        "Applies to the defended player’s Ships and Settlements in the active system."
+      ],
+      "simultaneousAllowed": true,
+      "source": {
+        "cardsPdfPage": 26,
+        "rulebookPdfPage": 18
+      }
+    },
+    {
+      "id": "tech.insurance",
+      "title": "Insurance",
+      "type": "tech",
+      "cost": 3,
+      "text": "During the ACTIONS phase, each time your turn is skipped because none of your action tokens were on top of a stack, gain 1 Credit or 1 Ship. Place a gained Ship anywhere you have a Settlement.",
+      "timing": "skipped_actions_turn",
+      "restrictions": [
+        "A gained Ship must be placed in a system containing one of your Settlements. Forfeit skips do not trigger Insurance."
+      ],
+      "simultaneousAllowed": true,
+      "source": {
+        "cardsPdfPage": 27,
+        "rulebookPdfPage": 17
+      }
+    },
+    {
+      "id": "tech.eminent-domain",
+      "title": "Eminent Domain",
+      "type": "tech",
+      "cost": 3,
+      "text": "At the end of the game, you may do a free SETTLE action in your home system before scoring.",
+      "timing": "before_endgame_scoring",
+      "restrictions": [],
+      "simultaneousAllowed": true,
+      "source": {
+        "cardsPdfPage": 28,
+        "rulebookPdfPage": 16
+      }
+    },
+    {
+      "id": "tech.disruptor",
+      "title": "Disruptor",
+      "type": "tech",
+      "cost": 7,
+      "text": "Immediately, choose a system. No opponent can place action tokens in that system for the next round only. If more than one player buys this Tech in the same round, choose a unique system in player order.",
+      "timing": "on_acquisition_next_round_restriction",
+      "restrictions": [
+        "Only the next round is restricted. Same-round purchasers must choose unique systems, in player order."
+      ],
+      "simultaneousAllowed": true,
+      "source": {
+        "cardsPdfPage": 29,
+        "rulebookPdfPage": 16
+      }
+    },
+    {
+      "id": "tech.sabotage",
+      "title": "Sabotage",
+      "type": "tech",
+      "cost": "X",
+      "text": "Choose an undiscounted Credit value to buy this Tech. Immediately remove another player’s Tech up to that value, returning its ownership rocket to that player’s Reserve. Research Lab can discount payment but does not reduce the destruction value. Sabotage cannot target Sabotage and cannot be bought in the last round.",
+      "timing": "on_acquisition",
+      "restrictions": [
+        "Cannot be bought in the last round.",
+        "Cannot target Sabotage.",
+        "Use undiscounted value for destruction with Research Lab; return the removed ownership marker to Reserve."
+      ],
+      "simultaneousAllowed": true,
+      "source": {
+        "cardsPdfPage": 30,
+        "rulebookPdfPage": 19
+      },
+      "ruleNotes": [
+        "R07: destruction value with Research Lab is undiscounted value; cannot target Sabotage."
+      ]
+    },
+    {
+      "id": "tech.flexible-economy",
+      "title": "Flexible Economy",
+      "type": "tech",
+      "cost": 2,
+      "text": "You can always move Credits back to your Reserve.",
+      "timing": "ongoing",
+      "restrictions": [],
+      "simultaneousAllowed": true,
+      "source": {
+        "cardsPdfPage": 31,
+        "rulebookPdfPage": 16
+      }
+    },
+    {
+      "id": "tech.government-incentives",
+      "title": "Government Incentives",
+      "type": "tech",
+      "cost": 7,
+      "text": "Before you do a SETTLE action, do a free MOVE INTO action in the active system.",
+      "timing": "before_settle",
+      "restrictions": [],
+      "simultaneousAllowed": true,
+      "source": {
+        "cardsPdfPage": 32,
+        "rulebookPdfPage": 17
+      }
+    }
+  ],
+  "events": [
+    {
+      "id": "event.cyber-attack",
+      "title": "Cyber Attack",
+      "type": "event",
+      "cost": null,
+      "text": "During this round, in the ACTIONS phase, all players may Resolve any player’s action token on top of a stack. You may take another player’s token onto your action board and either do the action or Invest it as if it were your own.",
+      "timing": "round_actions",
+      "restrictions": [
+        "Excluded from the simultaneous-actions variant."
+      ],
+      "simultaneousAllowed": false,
+      "source": {
+        "cardsPdfPage": 35,
+        "rulebookPdfPage": 20
+      },
+      "duration": "until_next_economy_event_discard"
+    },
+    {
+      "id": "event.ceasefire",
+      "title": "Ceasefire",
+      "type": "event",
+      "cost": null,
+      "text": "During this round, all players must Invest their ATTACK action.",
+      "timing": "round_attack_restriction",
+      "restrictions": [],
+      "simultaneousAllowed": true,
+      "source": {
+        "cardsPdfPage": 36,
+        "rulebookPdfPage": 20
+      },
+      "duration": "until_next_economy_event_discard"
+    },
+    {
+      "id": "event.communist-decree",
+      "title": "Communist Decree",
+      "type": "event",
+      "cost": null,
+      "text": "Immediately, all players return all Credits to their Reserve, then gain 3 Credits from their Reserve if available.",
+      "timing": "immediate_all_players",
+      "restrictions": [],
+      "simultaneousAllowed": true,
+      "source": {
+        "cardsPdfPage": 37,
+        "rulebookPdfPage": 20
+      },
+      "duration": "immediate"
+    },
+    {
+      "id": "event.ragnarok",
+      "title": "Ragnarök",
+      "type": "event",
+      "cost": null,
+      "text": "Immediately carry out the Event step of the ECONOMY phase again: discard the Event cards, draw 2 more Event cards, and carry out another sealed auction. If the Event deck is empty, this has no effect.",
+      "timing": "immediate_repeat_event_step",
+      "restrictions": [
+        "No effect if the Event deck is empty. Consuming the final pair does not end play immediately; use the later no-cards-to-draw end boundary."
+      ],
+      "simultaneousAllowed": true,
+      "source": {
+        "cardsPdfPage": 38,
+        "rulebookPdfPage": 22
+      },
+      "duration": "immediate",
+      "ruleNotes": [
+        "Canonical name follows rulebook"
+      ]
+    },
+    {
+      "id": "event.stealth-invasion",
+      "title": "Stealth Invasion",
+      "type": "event",
+      "cost": null,
+      "text": "Immediately, the player who selected this Event may add up to 3 Ships from their Reserve into any face-up systems on the board.",
+      "timing": "immediate_selector",
+      "restrictions": [
+        "Place only in face-up systems and respect Reserve supply."
+      ],
+      "simultaneousAllowed": true,
+      "source": {
+        "cardsPdfPage": 39,
+        "rulebookPdfPage": 23
+      },
+      "duration": "immediate"
+    },
+    {
+      "id": "event.scrambler",
+      "title": "Scrambler",
+      "type": "event",
+      "cost": null,
+      "text": "During this round, at the end of the PLAN phase, the player who selected this Event may choose a stack of action tokens and flip the entire stack upside-down.",
+      "timing": "round_after_plan_selector",
+      "restrictions": [],
+      "simultaneousAllowed": true,
+      "source": {
+        "cardsPdfPage": 40,
+        "rulebookPdfPage": 22
+      },
+      "duration": "until_next_economy_event_discard"
+    },
+    {
+      "id": "event.economic-boom",
+      "title": "Economic Boom",
+      "type": "event",
+      "cost": null,
+      "text": "During this round, all Invested action tokens get 2 rocket tokens rather than 1.",
+      "timing": "round_investments",
+      "restrictions": [],
+      "simultaneousAllowed": true,
+      "source": {
+        "cardsPdfPage": 41,
+        "rulebookPdfPage": 21
+      },
+      "duration": "until_next_economy_event_discard"
+    },
+    {
+      "id": "event.luddite-decree",
+      "title": "Luddite Decree",
+      "type": "event",
+      "cost": null,
+      "text": "During this round, all Techs have no effect.",
+      "timing": "round_tech_suppression",
+      "restrictions": [],
+      "simultaneousAllowed": true,
+      "source": {
+        "cardsPdfPage": 42,
+        "rulebookPdfPage": 22
+      },
+      "duration": "until_next_economy_event_discard"
+    },
+    {
+      "id": "event.all-your-base",
+      "title": "All Your Base",
+      "type": "event",
+      "cost": null,
+      "text": "Immediately, the player who selected this Event may do a free MOVE INTO action in a system of their choice.",
+      "timing": "immediate_selector_free_move",
+      "restrictions": [],
+      "simultaneousAllowed": true,
+      "source": {
+        "cardsPdfPage": 43,
+        "rulebookPdfPage": 20
+      },
+      "duration": "immediate"
+    },
+    {
+      "id": "event.technological-singularity",
+      "title": "Technological Singularity",
+      "type": "event",
+      "cost": null,
+      "text": "Immediately add 4 more Tech cards to the display.",
+      "timing": "immediate_shared_market",
+      "restrictions": [
+        "Add cards from the unused Tech supply."
+      ],
+      "simultaneousAllowed": true,
+      "source": {
+        "cardsPdfPage": 44,
+        "rulebookPdfPage": 23
+      },
+      "duration": "immediate"
+    },
+    {
+      "id": "event.flexibility",
+      "title": "Flexibility",
+      "type": "event",
+      "cost": null,
+      "text": "During this round, the player who selected this Event may do any 1 of the four actions—MOVE INTO, SETTLE, PRODUCE, or ATTACK—regardless of which action-board slot they put their action token into.",
+      "timing": "round_actions_selector",
+      "restrictions": [],
+      "simultaneousAllowed": true,
+      "source": {
+        "cardsPdfPage": 45,
+        "rulebookPdfPage": 21
+      },
+      "duration": "until_next_economy_event_discard",
+      "ruleNotes": [
+        "Canonical name follows rulebook"
+      ]
+    },
+    {
+      "id": "event.multicultural-tension",
+      "title": "Multicultural Tension",
+      "type": "event",
+      "cost": null,
+      "text": "Immediately, the player who selected this Event may add 1 Settlement from their Reserve onto the home planet of the player to their left, if there is capacity.",
+      "timing": "immediate_selector",
+      "restrictions": [],
+      "simultaneousAllowed": true,
+      "source": {
+        "cardsPdfPage": 46,
+        "rulebookPdfPage": 22
+      },
+      "duration": "immediate"
+    },
+    {
+      "id": "event.consolidation",
+      "title": "Consolidation",
+      "type": "event",
+      "cost": null,
+      "text": "Immediately, the player who selected this Event may do a free SETTLE action in a system of their choice.",
+      "timing": "immediate_selector_free_settle",
+      "restrictions": [],
+      "simultaneousAllowed": true,
+      "source": {
+        "cardsPdfPage": 47,
+        "rulebookPdfPage": 20
+      },
+      "duration": "immediate"
+    },
+    {
+      "id": "event.spacetime-rip",
+      "title": "Spacetime Rip",
+      "type": "event",
+      "cost": null,
+      "text": "During this round, for the player who selected this Event, all systems are adjacent for MOVE INTO actions.",
+      "timing": "round_movement_selector",
+      "restrictions": [],
+      "simultaneousAllowed": true,
+      "source": {
+        "cardsPdfPage": 48,
+        "rulebookPdfPage": 22
+      },
+      "duration": "until_next_economy_event_discard"
+    },
+    {
+      "id": "event.politics",
+      "title": "Politics",
+      "type": "event",
+      "cost": null,
+      "text": "Immediately, in player order, each player chooses an action they will not use during this round and puts an action token in that slot on their action board.",
+      "timing": "immediate_all_players_next_actions",
+      "restrictions": [
+        "The selected action restriction must survive the next PLAN cleanup for the affected round."
+      ],
+      "simultaneousAllowed": true,
+      "source": {
+        "cardsPdfPage": 49,
+        "rulebookPdfPage": 22
+      },
+      "duration": "immediate",
+      "ruleNotes": [
+        "R02: active restriction persists through PLAN cleanup; Event lasts until subsequent Economy discard-previous-Event step."
+      ]
+    },
+    {
+      "id": "event.vorsprung",
+      "title": "Vorsprung",
+      "type": "event",
+      "cost": null,
+      "text": "Immediately, the player who selected this Event may claim a Tech worth up to 6 for free by putting a rocket from their Reserve on that Tech. Sabotage cannot be claimed.",
+      "timing": "immediate_selector",
+      "restrictions": [
+        "The Tech value must be at most 6. Sabotage cannot be claimed. Normal acquisition restrictions such as Patents still apply."
+      ],
+      "simultaneousAllowed": true,
+      "source": {
+        "cardsPdfPage": 50,
+        "rulebookPdfPage": 23
+      },
+      "duration": "immediate"
+    },
+    {
+      "id": "event.turtling",
+      "title": "Turtling",
+      "type": "event",
+      "cost": null,
+      "text": "Immediately, all players return all Credits to their Reserve, then add up to 3 Ships from their Reserve, if available, into their home system.",
+      "timing": "immediate_all_players",
+      "restrictions": [],
+      "simultaneousAllowed": true,
+      "source": {
+        "cardsPdfPage": 51,
+        "rulebookPdfPage": 23
+      },
+      "duration": "immediate"
+    },
+    {
+      "id": "event.gravitational-lensing",
+      "title": "Gravitational Lensing",
+      "type": "event",
+      "cost": null,
+      "text": "During this round, all players can MOVE INTO through asteroid belts, and players cannot use warps.",
+      "timing": "round_movement",
+      "restrictions": [],
+      "simultaneousAllowed": true,
+      "source": {
+        "cardsPdfPage": 52,
+        "rulebookPdfPage": 21
+      },
+      "duration": "until_next_economy_event_discard"
+    },
+    {
+      "id": "event.migration",
+      "title": "Migration",
+      "type": "event",
+      "cost": null,
+      "text": "Immediately, the player who selected this Event may select a system and redistribute all Settlements however they want within that system.",
+      "timing": "immediate_selector",
+      "restrictions": [
+        "Redistribute within the selected system; the card does not move Settlements between systems."
+      ],
+      "simultaneousAllowed": true,
+      "source": {
+        "cardsPdfPage": 53,
+        "rulebookPdfPage": 22
+      },
+      "duration": "immediate"
+    },
+    {
+      "id": "event.recession",
+      "title": "Recession",
+      "type": "event",
+      "cost": null,
+      "text": "During this round, all players must Invest their PRODUCE action.",
+      "timing": "round_produce_restriction",
+      "restrictions": [],
+      "simultaneousAllowed": true,
+      "source": {
+        "cardsPdfPage": 54,
+        "rulebookPdfPage": 22
+      },
+      "duration": "until_next_economy_event_discard"
+    },
+    {
+      "id": "event.hive-mind",
+      "title": "Hive Mind",
+      "type": "event",
+      "cost": null,
+      "text": "Immediately, the player who selected this Event may PRODUCE 1 Ship from each planet they share with another player, across all systems. A shared planet contains both their own Settlement and another player’s Settlement.",
+      "timing": "immediate_selector",
+      "restrictions": [
+        "Only planets shared by the selecting player and at least one other player qualify."
+      ],
+      "simultaneousAllowed": true,
+      "source": {
+        "cardsPdfPage": 55,
+        "rulebookPdfPage": 21
+      },
+      "duration": "immediate"
+    },
+    {
+      "id": "event.ammo-shortage",
+      "title": "Ammo Shortage",
+      "type": "event",
+      "cost": null,
+      "text": "During this round, for all players, each Ship sacrificed in an ATTACK destroys only 1 opponent Ship rather than 2.",
+      "timing": "round_attack",
+      "restrictions": [],
+      "simultaneousAllowed": true,
+      "source": {
+        "cardsPdfPage": 56,
+        "rulebookPdfPage": 20
+      },
+      "duration": "until_next_economy_event_discard"
+    },
+    {
+      "id": "event.famine",
+      "title": "Famine",
+      "type": "event",
+      "cost": null,
+      "text": "Immediately, all players return half of their own Settlements in their home system, rounded up, to their Reserve. Each player chooses which planets to take them from.",
+      "timing": "immediate_all_players",
+      "restrictions": [
+        "Round the removed amount up; removed Settlements return to Reserve, not Credits."
+      ],
+      "simultaneousAllowed": true,
+      "source": {
+        "cardsPdfPage": 57,
+        "rulebookPdfPage": 21
+      },
+      "duration": "immediate"
+    },
+    {
+      "id": "event.el-mayarah",
+      "title": "El Mayarah",
+      "type": "event",
+      "cost": null,
+      "text": "During this round, for the player who selected this Event, each planet shared by two or more players produces double: 2 Ships or Credits instead of 1, or 4 instead of 2 when full.",
+      "timing": "round_production_selector",
+      "restrictions": [],
+      "simultaneousAllowed": true,
+      "source": {
+        "cardsPdfPage": 58,
+        "rulebookPdfPage": 21
+      },
+      "duration": "until_next_economy_event_discard"
+    },
+    {
+      "id": "event.capital-injection",
+      "title": "Capital Injection",
+      "type": "event",
+      "cost": null,
+      "text": "Immediately, the player who selected this Event may gain up to 10 Credits from their Reserve.",
+      "timing": "immediate_selector",
+      "restrictions": [],
+      "simultaneousAllowed": true,
+      "source": {
+        "cardsPdfPage": 59,
+        "rulebookPdfPage": 20
+      },
+      "duration": "immediate"
+    },
+    {
+      "id": "event.galactic-summit",
+      "title": "Galactic Summit",
+      "type": "event",
+      "cost": null,
+      "text": "Immediately, the player who selected this Event may select a non-home system. Move all Ships on the board to that system.",
+      "timing": "immediate_selector",
+      "restrictions": [
+        "The selected target must be a non-home system. This relocation is not stated as a MOVE INTO action."
+      ],
+      "simultaneousAllowed": true,
+      "source": {
+        "cardsPdfPage": 60,
+        "rulebookPdfPage": 21
+      },
+      "duration": "immediate"
+    },
+    {
+      "id": "event.black-cloud",
+      "title": "Black Cloud",
+      "type": "event",
+      "cost": null,
+      "text": "During this round, all players can ATTACK only Settlements, not Ships.",
+      "timing": "round_attack_restriction",
+      "restrictions": [],
+      "simultaneousAllowed": true,
+      "source": {
+        "cardsPdfPage": 61,
+        "rulebookPdfPage": 20
+      },
+      "duration": "until_next_economy_event_discard"
+    },
+    {
+      "id": "event.earth-first",
+      "title": "Earth First",
+      "type": "event",
+      "cost": null,
+      "text": "During this round, all players must place their first PLAN action token in their home system.",
+      "timing": "round_plan",
+      "restrictions": [],
+      "simultaneousAllowed": true,
+      "source": {
+        "cardsPdfPage": 62,
+        "rulebookPdfPage": 21
+      },
+      "duration": "until_next_economy_event_discard"
+    },
+    {
+      "id": "event.prophecy",
+      "title": "Prophecy",
+      "type": "event",
+      "cost": null,
+      "text": "Immediately, the player who selected this Event may add up to 3 available Explore tokens onto empty planets anywhere on the board, each in a different system, then flip all Explore tokens on the board face-up.",
+      "timing": "immediate_selector_then_public_reveal",
+      "restrictions": [
+        "Use at most 3 available tokens, on empty planets in different systems.",
+        "Resolve a planet’s Explore reward before the acting player’s Settlement; an opponent-Settlement reward can fill a capacity-one planet. The acting player then requires applicable Arcologies or Soylent Green."
+      ],
+      "simultaneousAllowed": true,
+      "source": {
+        "cardsPdfPage": 63,
+        "rulebookPdfPage": 22
+      },
+      "duration": "immediate",
+      "ruleNotes": [
+        "Designer edge case: opponent-Settlement token on a capacity-one planet resolves first; acting player then needs applicable Arcologies or Soylent Green."
+      ]
+    },
+    {
+      "id": "event.alliance",
+      "title": "Alliance",
+      "type": "event",
+      "cost": null,
+      "text": "Immediately, the player who selected this Event may choose another player. That player cannot ATTACK them during this round.",
+      "timing": "immediate_selection_round_restriction",
+      "restrictions": [
+        "The prohibition is one-way: the chosen player cannot ATTACK the Event selector."
+      ],
+      "simultaneousAllowed": true,
+      "source": {
+        "cardsPdfPage": 64,
+        "rulebookPdfPage": 20
+      },
+      "duration": "until_next_economy_event_discard"
+    }
+  ],
+  "presets": {
+    "preset.aggressive": {
+      "title": "Aggressive",
+      "techIds": [
+        "tech.agility",
+        "tech.artificial-warp",
+        "tech.assembly-line",
+        "tech.cloaking",
+        "tech.death-sun",
+        "tech.mercenaries",
+        "tech.planet-killer",
+        "tech.soylent-green",
+        "tech.spice",
+        "tech.strategic-stall"
+      ]
+    },
+    "preset.cunning": {
+      "title": "Cunning",
+      "techIds": [
+        "tech.disruptor",
+        "tech.filibuster",
+        "tech.foresight",
+        "tech.frontier-pioneer",
+        "tech.genesis",
+        "tech.government-incentives",
+        "tech.gravity-drive",
+        "tech.patents",
+        "tech.sabotage",
+        "tech.strategic-stall"
+      ]
+    },
+    "preset.economic": {
+      "title": "Economic",
+      "techIds": [
+        "tech.agility",
+        "tech.arcologies",
+        "tech.artificial-warp",
+        "tech.banking",
+        "tech.flexible-economy",
+        "tech.insurance",
+        "tech.planet-nine",
+        "tech.rapid-advance",
+        "tech.research-lab",
+        "tech.spice"
+      ]
+    },
+    "preset.family": {
+      "title": "Family",
+      "techIds": [
+        "tech.agility",
+        "tech.artificial-warp",
+        "tech.assembly-line",
+        "tech.banking",
+        "tech.disruptor",
+        "tech.genesis",
+        "tech.kessler-syndrome",
+        "tech.patents",
+        "tech.planet-killer",
+        "tech.planet-nine"
+      ]
+    },
+    "preset.peaceful": {
+      "title": "Peaceful",
+      "techIds": [
+        "tech.arcologies",
+        "tech.disruptor",
+        "tech.frontier-pioneer",
+        "tech.genesis",
+        "tech.government-incentives",
+        "tech.gravity-drive",
+        "tech.insurance",
+        "tech.kessler-syndrome",
+        "tech.patrol",
+        "tech.rapid-advance"
+      ]
+    }
+  },
+  "rulesNotes": {
+    "freeActionHooks": "Free actions activate applicable before/after Tech effects. Empty actions may be chosen solely to activate those effects.",
+    "spiceGuard": "A Spice-granted PRODUCE does not trigger Spice again. Complete the first PRODUCE and its effect chain before the bonus PRODUCE.",
+    "rapidAdvance": "Direct one-Ship conversion, not a SETTLE action. Almanac wording overrides the printed Tech card.",
+    "eventDuration": "Round effects begin when selected and expire exactly at Discard the previous Event in the subsequent Economy Event step; they include the selecting Economy’s remaining steps and the next Economy’s Investments.",
+    "endBoundary": "Draw the final Event pair normally and play the following action round. End after Tech in the Economy whose Event step has no cards left to draw. Ragnarök uses the same boundary.",
+    "reserveLimit": "Rockets drawn from Reserve are limited to available supply; each player has 40 across all roles.",
+    "arcologies": "One shared extra space per planet. Full for PRODUCE/Soylent Green at printed capacity or capacity plus one.",
+    "sabotage": "Use undiscounted destruction value with Research Lab. Sabotage cannot target Sabotage and cannot be bought in the final round.",
+    "presetReplacement": {
+      "source_ruling": "R08",
+      "selection": "random",
+      "eligible_printed_costs": [
+        2,
+        3
+      ],
+      "must_be_legal_for_selected_variants": true,
+      "exclude_cards_already_in_display": true,
+      "draw_without_replacement": true,
+      "target_display_size": 10,
+      "record_selected_replacements_in_game_setup": true
+    },
+    "sourcePriority": "Designer rulings override conflicting printed wording. This file describes card content, not a claim of implemented handlers."
+  }
+}

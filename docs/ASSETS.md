@@ -46,7 +46,7 @@ Card IDs, printed titles, canonical titles, costs, timing, and rulebook referenc
 
 Banks, Attwood, Butler, Bujold, Clarke, and Simak are the six original home designs. The six other original tiles are non-home systems. **Designer correction: unused home designs are excluded from the hidden pool.** Choose hidden tiles only from the six original non-home designs. The special centre tiles below are excluded from all random pools.
 
-[systems.csv](../catalog/systems.csv) includes all **fourteen supplied designs**. **The designer has confirmed that the original twelve system hexes are the correct latest versions.** That version check is complete. Their visually transcribed capacities/features and the new hexes still need routine geometry/transcription verification when converted into engine data; tile coordinates, planet anchors, edge indices, and rotations remain to be encoded.
+[systems.csv](../catalog/systems.csv) includes all **fourteen supplied designs**. **The designer has confirmed that the original twelve system hexes are the correct latest versions.** That version check is complete. Tile layouts, planet/sun anchors, edge indices and rotations are now encoded in the [prototype data](PROTOTYPE.md#architecture-and-assets), extracted from PDF bounding boxes and checked against the source. Review their appearance during device playtests. Le Guin has four planets (2/2/1/1), and Lem has both left and right asteroid belts; these correct earlier catalogue transcriptions.
 
 ## Additional centre hexes: 13th hex.pdf
 
@@ -74,6 +74,10 @@ There are seven individual action boards and **one shared two-sided player aid**
 | **Total** | **13** | **3** | **16** |
 
 The extra copies reuse existing art. They are quantities in content data, not three new designs. The large additional black-hole feature is separate from the two round black-hole Explore tokens.
+
+## Implemented prototype assets
+
+The [art manifest](../src/art-data.json) maps stable component IDs to 80 optimised self-hosted WebP assets, dimensions, source pages and normalised anchors. The [extraction script](../scripts/prepare-assets.py) regenerates these from the supplied PDFs. Both aid faces are included once. The matching cover illustration is extracted from rulebook page 1; the separately supplied PNG original remains to be archived. Full card artwork/reference data is available, while only the ten Family Tech effects are playable in this build.
 
 ## Artwork pipeline
 
