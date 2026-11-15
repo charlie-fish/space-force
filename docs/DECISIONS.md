@@ -1,19 +1,22 @@
 # Decisions and information needed
 
-Updated planning baseline: 13 November 2026. Confirmed items record the designer's follow-up. “Proposed” still means a working recommendation for items the designer has not answered.
+Updated planning baseline: 15 November 2026. Confirmed items record the designer's follow-up. “Proposed” still means a working recommendation for items the designer has not answered.
 
 ## Useful next
 
 | ID | Item | Current position |
 | --- | --- | --- |
-| D01 | TTS Workshop link, saved-table JSON, associated images, and any scripts | Awaiting material. Helpful for asset extraction and layout verification; engine planning can continue without it. |
-| D02 | First online play mode | **Confirmed:** normal turns first, then the selectable simultaneous-actions variant. Both now support up to seven connected players. |
+| D01 | TTS save and assets | **Received and inspected:** ZIP containing TS_Save_1560.json and its preview. Deck/model images are external references; embedded Lua is table control. Workshop URL is optional; STL files remain outstanding. See [TTS_REVIEW.md](TTS_REVIEW.md). |
+| D02 | First online play mode | **Confirmed:** normal turns first, then the selectable simultaneous-actions variant. Both support up to seven connected players. Recommend the variant at four or more seated players when available; host choice remains explicit. |
 | D03 | Rules baseline and errata | Written rules/cards v1.80 plus the designer's corrections and seven-player extension. **R01–R08 are resolved.** Rapid Advance follows the almanac rather than its card. The original hex versions are now confirmed current. |
 | D04 | Cover and player identity | **Confirmed:** use `SPACE FORCE.png` as the cover reference; give each colour its own rocket silhouette from rulebook p2; use poker-chip action tokens with matching silhouettes and distinct rim patterns. Await rocket STLs. |
 | D05 | Boards and chip geometry | **Confirmed:** seven action boards, one per player; chips snap to system suns and board indentations, with matching chip/sun/cutout diameters. |
 | D06 | System assets | **Confirmed:** original twelve hexes are current. Supplied Asimov replaces the blank centre only at six players; Adams is the central seventh home only at seven players. Both are excluded from random pools. |
 | D07 | Maximum player count and supply | **Confirmed:** two to seven players; 40 rockets, four chips, one action board, and one player aid per player. At seven: 280 rockets, 28 chips, seven boards, seven aids. |
 | D08 | Seventh-player visual identity | **Provisional design choice:** orange (`#E87522`), a twin-pod rocket silhouette, and a triangular chip-rim pattern. Keep these distinct and replaceable pending design/STL review. |
+| D09 | Lobby | **Confirmed:** join private rooms, browse/join public waiting games, and create public games. Use [LOBBY.md](LOBBY.md) for the proposed ready/host/cleanup policies. |
+| D10 | First-play teaching | **Requested reminder:** skippable tutorial guidance during a first actual game; tracked as [issue #1](https://github.com/charlie-fish/space-force/issues/1). |
+| D11 | Platform practices | **Proposed baseline:** [PLATFORM_REVIEW.md](PLATFORM_REVIEW.md) adds public-room, recovery, security, accessibility, loading, and operational checks. |
 
 The concrete handoff checklist is in [REMINDERS.md](REMINDERS.md).
 
@@ -23,7 +26,7 @@ The [rules review](RULES_REVIEW.md) records the confirmed answers to all eight o
 
 For undo, the proposed default permits corrections before information reveals or subsequent actions, with table approval for a larger rollback. Ask the designer to confirm this policy before remote playtesting.
 
-Proposed player access: invite-only rooms with guest names, a protected seat-resume token, and no compulsory player accounts. Room hosts can manage lobby seats; rules and scoring remain server-enforced. Public matchmaking, chat, competitive ratings, bots, and solo rules are not part of the stated base-game scope.
+Player access now includes public waiting-game discovery and private invitations, with guest names, protected seat-resume credentials, and no compulsory account. Room hosts manage waiting-room seats/settings; rules, scoring, and secret views remain server-enforced. The public lobby is now in scope; ranked matchmaking, global chat, competitive ratings, bots, and solo rules remain future features. Proposed lobby defaults are a 120-second waiting-room host-transfer grace and a 30-minute empty-lobby expiry, both configurable and subject to playtesting.
 
 ## Needed before public deployment or collecting addresses
 
@@ -69,5 +72,8 @@ The seven-player limit, separate rocket silhouettes, chip face/rim identity, sna
 | 2026-11-13 | Designer subsequently increased the limit to seven, adding 40 rockets, four chips, and a board; extend the reusable aid to the seventh player as well. |
 | 2026-11-13 | Designer confirmed the original hexes are current and supplied `13th hex.pdf`: Asimov only at the six-player centre, Adams only at the seven-player centre. This supersedes the earlier blank-hex task. |
 | 2026-11-13 | Planning setup retains the existing twelve-tile outer layout at six/seven players, with Adams as the seventh home when used. Seven-player Events/rounds follow the existing four-plus-player rule. |
+| 2026-11-15 | Designer supplied the TTS ZIP and requested a public/private lobby, a 4+ player simultaneous-mode recommendation, and a tutorial reminder. |
+| 2026-11-15 | ZIP inspected: saved JSON and preview; six-player components and externally linked assets; table-control Lua only. Tutorial task created as issue #1. |
+| 2026-11-15 | Added proposed public-room, mobile recovery, security, accessibility, performance, deployment, and operations acceptance checks. |
 
 No hosting provider, paid service, final privacy text, or application deployment has been selected in this planning stage.

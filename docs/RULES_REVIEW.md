@@ -88,7 +88,7 @@ Ties use the greatest number of Credits; any remaining tie is a shared win. Reco
 
 **Simpler Events, p12:** use Event cards only as a round tracker, ignore their effects, skip the auction, and exclude Foresight from the Tech pool. Treat this as an explicit game setting.
 
-**Delivery order agreed:** implement normal turns first, then add this variant as a selectable game setting. Up to seven players can be connected in either mode.
+**Delivery order agreed:** implement normal turns first, then add this variant as a selectable game setting. Up to seven players can be connected in either mode. **Recommend simultaneous play for four or more seated players once the variant is available.** The host may choose normal turns; this recommendation changes no rules or card exclusions. See [LOBBY.md](LOBBY.md).
 
 **Simultaneous actions, p14:** remove Cyber Attack from Events and Gravity Drive from Techs. PLAN and ECONOMY remain unchanged. During ACTIONS, every eligible player selects a top token, then assigns it secretly to an unused action slot. **Only token/slot choices are secret.** Reveal together, then players carry out their actions simultaneously; action parameters are not separately committed in secret. Any player can declare a dependency, which switches resolution to the disambiguation order **for all participating players**: MOVE INTO before SETTLE before PRODUCE before ATTACK, with player order where needed.
 

@@ -149,5 +149,6 @@
         "player_aids": 1
       }
     }
-  }
+  },
+  "lobby_configuration_reference": "lobby-configuration.json"
 }

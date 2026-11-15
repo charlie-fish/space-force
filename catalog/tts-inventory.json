@@ -1,0 +1,111 @@
+{
+  "schema_version": 1,
+  "review_date": "2026-11-15",
+  "source_id": "tts.mod",
+  "archive_filename": "Re__Space_Force_TTS_changes.zip",
+  "archive_bytes": 121388,
+  "archive_sha256": "02a473590184f7884a7375b978080f93ee01f9365244116d7cbc64085df4e12c",
+  "expanded_bytes": 775293,
+  "members": [
+    {
+      "filename": "TS_Save_1560.json",
+      "bytes": 692331,
+      "sha256": "ab10425507612bec49a55a2acd3d564b0808e6d60880930f1ae9f9e3b39dd6a6"
+    },
+    {
+      "filename": "TS_Save_1560.png",
+      "bytes": 82962,
+      "sha256": "48d2d3207326ff785b944bb3841fe1a17350af30797f28fb992f9a9306baed40"
+    }
+  ],
+  "save_name": "Space Force",
+  "tts_application_version": "v14.2.2",
+  "space_force_content_edition_verified": false,
+  "top_level_object_count": 316,
+  "object_count_including_contained": 404,
+  "object_types": {
+    "HandTrigger": 6,
+    "Custom_Assetbundle": 8,
+    "Chinese_Checkers_Piece": 1,
+    "Custom_Token": 39,
+    "Custom_Tile": 1,
+    "DeckCustom": 1,
+    "CardCustom": 9,
+    "Card": 87,
+    "Custom_PDF": 1,
+    "Custom_Model": 241,
+    "Custom_Tile_Stack": 6,
+    "Deck": 4
+  },
+  "named_decks": [
+    {
+      "name": "Events",
+      "card_count": 30
+    },
+    {
+      "name": "Tech",
+      "card_count": 30
+    },
+    {
+      "name": "Systems",
+      "card_count": 6
+    },
+    {
+      "name": "Home Systems",
+      "card_count": 6
+    },
+    {
+      "name": "Exploration Tokens",
+      "card_count": 16
+    }
+  ],
+  "rocket_models": {
+    "count": 240,
+    "colour_group_sizes": [
+      40,
+      40,
+      40,
+      40,
+      40,
+      40
+    ],
+    "distinct_mesh_url_count": 1,
+    "distinct_shape_requirement_met": false
+  },
+  "player_board_objects": 6,
+  "hand_areas": 6,
+  "top_level_snap_points": 24,
+  "object_attached_snap_points": 29,
+  "preview_dimensions": [
+    256,
+    256
+  ],
+  "embedded_lua": {
+    "substantial_script_count": 1,
+    "object_name": "Flex Table Control",
+    "bytes": 16321,
+    "purpose": "table surface, size, and controls",
+    "space_force_rules_engine_identified": false
+  },
+  "external_assets": {
+    "url_field_references": 497,
+    "unique_urls": 69,
+    "unique_urls_by_host": {
+      "steamusercontent-a.akamaihd.net": 60,
+      "vgmdownloads.com": 8,
+      "upload.wikimedia.org": 1
+    },
+    "count_method": "URL-valued JSON strings; repeated references counted separately; scripts not scanned for additional asset URLs",
+    "source_assets_bundled": false
+  },
+  "standalone_stl_files": 0,
+  "workshop_page_url_found": false,
+  "scripts_executed": false,
+  "external_assets_downloaded": false,
+  "required_adaptations": [
+    "seven-player supply",
+    "Asimov/Adams centre restrictions",
+    "distinct rocket silhouettes and chip rim patterns",
+    "current PDF/ruling compatibility checks"
+  ]
+}

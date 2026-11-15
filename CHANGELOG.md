@@ -1,5 +1,17 @@
 # Change log
 
+## 0.4.0 — 2026-11-15
+
+- Added a lobby for public game creation/discovery/joining and unlisted private rooms, with ready checks, atomic joins/start, and proposed host handover/cleanup policies.
+- Recommend the simultaneous-actions variant at four or more seated players once delivered; the host retains mode choice and normal-turn-first development remains agreed.
+- Created tutorial reminder issue #1 for skippable personal guidance during a first actual game, with replay from Help.
+- Inspected the supplied TTS ZIP: one save JSON and a 256×256 preview, both readable; registered checksums and component/dependency metadata.
+- Confirmed the save contains 30 Techs, 30 Events, two six-system pools, sixteen Explore tokens, and 240 rockets in six colour groups sharing one mesh. It still needs adaptation for seven players and distinct silhouettes.
+- Recorded that linked artwork/models are not bundled; the substantial embedded Lua controls the table. No imported scripts were executed or remote assets downloaded.
+- Added proposed release checks for public-room abuse controls, secure realtime sessions, phone sleep/reconnection, accessibility, browser/network fallback, loading metrics, deployment compatibility, and backup restoration.
+
+This release contains specification and catalogue changes; application behaviour and performance remain to be implemented and tested.
+
 ## 0.3.0 — 2026-11-13
 
 - Increased the planned player limit to seven for normal turns and the subsequent selectable simultaneous-actions variant.

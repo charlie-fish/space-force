@@ -1,6 +1,6 @@
 # Space Force: project brief
 
-Version 0.3 · 13 November 2026 · Planning baseline with confirmed designer rulings and seven-player support
+Version 0.4 · 15 November 2026 · Planning baseline with public/private lobbies, TTS review, and release checks
 
 ## Intended result
 
@@ -14,21 +14,29 @@ The user's message defines the software requirements. Attached documents supply 
 
 | Area | Required behaviour |
 | --- | --- |
-| Joining | Create a room and share a link or short code. Proposed default: guests choose a name and colour without needing a newsletter subscription or permanent account. |
+| Joining | Use a lobby to create public/private rooms, browse and join waiting public games, or enter a private invitation/code. Guests choose a name and colour without needing a newsletter subscription or permanent account. Private rooms remain unlisted. |
 | Setup | Support all player counts from 2 to 7, the correct layouts, random content selection, and documented Tech presets. Exclude unused home designs from hidden tiles. Use Asimov only as the six-player centre and Adams only as the seven-player centre/home; neither enters random pools. Replace variant-excluded preset Techs with random legal value-2/3 Techs. Record the selected variables. |
 | Rules | Enforce legal actions, action-token stacks, limited rocket supply, sealed auctions, Tech/Event effects, end conditions, scoring, and ties. |
 | Multiplayer | Synchronise accepted actions and phase changes; preserve hidden information; reject duplicate, stale, out-of-turn, or unauthorised commands. |
 | Recovery | Save games durably. A returning player resumes the same seat through a protected resume credential. A dropped connection does not immediately end a game. |
 | Undo | Let players correct mistakes, with clear limits around information reveals and actions taken by other players. Keep an audit record. |
-| Guidance | Highlight legal choices, show why an action is unavailable, explain current effects, preview resource changes, and provide contextual rules help. |
+| Guidance | Highlight legal choices, explain unavailable actions/current effects, preview consequences, and provide contextual Help. Track a skippable first-play tutorial in issue #1. |
 | Feedback | Allow feedback during or after play, with an optional game reference and optional reply address. Store and manage submissions privately. |
 | News | Offer a separate, optional publication-news sign-up with affirmative consent and an accessible privacy notice. |
 
-Normal turns and the simultaneous-actions variant are distinct settings. Both allow up to seven people to be connected concurrently. The designer has confirmed **normal turns first, then the selectable variant**. In the variant, only token/slot choices are secret; after reveal, any player can declare a dependency and switch all participants to ordered resolution. See [DECISIONS.md](DECISIONS.md).
+Normal turns and the simultaneous-actions variant are distinct settings. Both allow up to seven people to be connected concurrently. The designer has confirmed **normal turns first, then the selectable variant**. Once available, recommend simultaneous play for four or more actual seated players, without silently changing the host's choice. In the variant, only token/slot choices are secret; after reveal, any player can declare a dependency and switch all participants to ordered resolution. See [DECISIONS.md](DECISIONS.md).
 
 The seven-player supply is 280 rockets, 28 action chips, seven individual action boards, and seven player aids. Existing shared card/token supplies remain unchanged. Reuse the twelve-tile outer layout for six/seven players, adding Asimov or Adams respectively at the centre. Adams supplies the seventh home planet. The designer has confirmed that the original system artwork is current. [game-configuration.json](../catalog/game-configuration.json) records quantities and count-specific setup.
 
 The designer has answered R01–R08 and supplied additional setup, Prophecy, and asteroid/warp clarifications. Treat [RULES_REVIEW.md](RULES_REVIEW.md) and [rules-clarifications.json](../catalog/rules-clarifications.json) as the recorded rulings alongside the printed sources. Rapid Advance follows the almanac rather than the card.
+
+## Lobby and platform review
+
+[LOBBY.md](LOBBY.md) specifies public/private discovery, ready checks, final-seat/start races, mode recommendations, host handover, and proposed stale-room cleanup. Start only with a reviewed roster/settings snapshot; actual starting count determines board setup. Public listings expose only public room metadata, and active seats require their protected resume credential.
+
+[PLATFORM_REVIEW.md](PLATFORM_REVIEW.md) adds proposed checks for secure realtime sessions, public-room abuse, mobile sleep/recovery, accessible controls, network fallbacks, loading metrics, safe releases, and operations. [TTS_REVIEW.md](TTS_REVIEW.md) records the received save and what still needs conversion. These engineering recommendations supplement the confirmed feature requirements.
+
+[Issue #1](https://github.com/charlie-fish/space-force/issues/1) is the persistent reminder to teach first-time players during their first actual game. Guidance is personal, skippable, and replayable, uses the same rules and permitted information, and does not pause opponents. It remains a tracked feature to schedule with onboarding.
 
 ## Interface and accessibility
 
@@ -75,7 +83,7 @@ The server validates undo requests and restores all affected state together. Bro
 | Feedback | Inbox with game/release references, categories, status, and private notes. Support review, resolution, and export. |
 | Administration | Restrict access to the owner or explicitly authorised admins. Audit sensitive actions and exports. |
 
-For every game, record an ID, creation/start/end/last-activity timestamps, status and end reason, player count and seat order, engine/content/schema versions, application release/commit, chosen settings, selected Tech/Event pools, board layout, initial systems/orientations, server-private random setup, and the accepted action history.
+For every game, record an ID, creation/start/end/last-activity timestamps, status and end reason, player count and seat order, room visibility and selected mode, engine/content/clarification/schema versions, application release/commit, chosen settings, selected Tech/Event pools, board layout, initial systems/orientations, server-private random setup, and the accepted action history.
 
 For completed games, store per-player settled-planet points, ship-system points, Tech points, total score, tie-break Credits, and all winner IDs. For unfinished games, store an explicitly labelled provisional score if useful; never present it as an official final result. Distinguish a disconnected player from an abandoned game. Define inactivity and retention policies before launch.
 
@@ -93,7 +101,7 @@ Reference: [ICO guidance on consent and electronic-mail marketing](https://ico.o
 
 ## Performance and verification
 
-Proposed budgets: no more than 200 KB compressed initial JavaScript and 1 MB initial lobby transfer, excluding assets fetched only when joining a game. Compress/cache artwork, use suitably sized images with broad-format fallbacks, avoid large animation/game frameworks, and load detailed card art on demand. Measure the budgets on the built release; these are targets, not results already achieved.
+Proposed budgets: no more than 200 KB compressed initial JavaScript and 1 MB initial lobby transfer, excluding assets fetched only when joining a game. Compress/cache artwork, use suitably sized images with broad-format fallbacks, avoid large animation/game frameworks, and load detailed card art on demand. Measure the budgets on the built release; these are targets, not results already achieved. Also target LCP ≤2.5 seconds, INP ≤200 ms, and CLS ≤0.1 at the 75th percentile, following the referenced measurement guidance in [PLATFORM_REVIEW.md](PLATFORM_REVIEW.md).
 
 Verify the engine with meaningful scenarios for setup, stack order, limited components, all base cards, auction ties, effects and interactions, undo, final scoring, and both modes when included. Cover the designer's five-Tech PRODUCE sequence, Event expiry, empty-action triggers, shared Arcologies allowance/fullness, the Prophecy capacity-one case, warp connectivity, Sabotage valuation, and preset replacements. Check the invariant that each player's 40 rockets are accounted for across Reserve, Credits, Ships, Settlements, investments, and Tech ownership.
 
@@ -105,8 +113,8 @@ Run multiplayer integration tests with seven independent browser contexts, inclu
 | --- | --- | --- |
 | 0 — Organise | This brief, source catalogue, seven-player configuration, confirmed rulings, decision register, component design, and reminder list in GitHub. | Counts and page mappings checked; R01–R08 recorded; original hex versions confirmed; outstanding asset handoffs tracked. |
 | 1 — Rules foundation | Pure engine and an inspectable local board for normal turns, plus mode infrastructure. | Legal setup/actions, conservation, a complete base-flow game, scoring, and deterministic replay pass. |
-| 2 — Remote play | Invite rooms, protected seats, seven connected clients, sealed auctions, save/resume, and undo. | Seven-client game and disconnect/restart/retry scenarios pass. |
-| 3 — Full base content and second mode | All 30 Techs/30 Events and presets; add the selectable simultaneous variant after normal-turn play works. | Card scenarios, confirmed rulings, and important combinations pass; designer playtest agrees with intended rules. |
+| 2 — Remote play | Public/private lobby, protected seats, ready checks, seven connected clients, sealed auctions, save/resume, and undo. | Seven-client game, private listing isolation, final-seat/start races, and disconnect/restart/retry scenarios pass. |
+| 3 — Full base content and second mode | All 30 Techs/30 Events and presets; add the selectable simultaneous variant after normal-turn play works, with its 4+ player recommendation. | Card scenarios, rulings, interactions, and recommendation/host-choice checks pass; designer playtest agrees with intended rules. |
 | 4 — Private beta | Owner login, game history, change log, feedback management, and optional consented news sign-up/export. | Authorisation and persistence checked; privacy details and real service configuration supplied. |
 | 5 — Release | Responsive polish, onboarding, animations, browser checks, deployment, monitoring, and backups. | A complete external playtest on phones/desktops; measured performance; successful backup restore. |
 

@@ -1,6 +1,6 @@
 # Source files and artwork
 
-Inventory checked on 13 November 2026. Page references below are **one-based PDF page numbers**.
+Inventory updated on 15 November 2026. Page references below are **one-based PDF page numbers**.
 
 ## Supplied references
 
@@ -13,7 +13,7 @@ Inventory checked on 13 November 2026. Page references below are **one-based PDF
 | SpaceForce Player aid v1.50.pdf | 4 | Action reference, play sequence, scoring, quick-start layouts, and presets. Includes repeated print copies and more developed branding. |
 | SPACE FORCE.png | — | Front-cover graphic supplied in chat; visual reference for branding, colours, and illustrated style. The original binary has not been archived in this checkout. |
 | [Rules video](https://www.youtube.com/watch?v=b5LjEQc_m4Y) | — | Supplementary explanation. Automated access was throttled during discovery; its contents have not been verified. The rulebook itself warns the video may predate refinements. |
-| Tabletop Simulator mod | — | Not supplied yet; a Workshop link and exported save/assets would help verify layouts and reuse component images. |
+| Re__Space_Force_TTS_changes.zip | — | Received: save JSON and 256×256 preview, with linked artwork/models and embedded table-control Lua. See [TTS_REVIEW.md](TTS_REVIEW.md). |
 | Rocket STL files | — | Awaiting the designer's files; use to verify the six original shapes, with a seventh distinct shape now also required. |
 
 The [source register](../catalog/sources.csv) records sizes and SHA-256 checksums for the PDFs so later replacements can be recognised precisely. Checksums identify files; they do not make the catalogue an approved production ruleset.
@@ -89,7 +89,7 @@ The cover is available as a visual reference in the conversation, but has no loc
 
 ## Tabletop Simulator handoff
 
-Please provide the Workshop URL and, ideally, a saved table `.json` plus its image/deck sheets and any Lua scripts in a ZIP. I can inspect object data, positions, rotations, card IDs, image links, and scripts. A public Workshop page may help discovery, but direct access to every linked asset is not guaranteed.
+The ZIP has been received and inspected. It supplies `TS_Save_1560.json` and `TS_Save_1560.png`; the image is a preview, while component art/models are referenced by external URLs. Deck counts, transforms, snap points, dependencies, and the table-control script are inventoried in [TTS_REVIEW.md](TTS_REVIEW.md) and [tts-inventory.json](../catalog/tts-inventory.json). No imported Lua was executed. A Workshop URL remains an optional reference, not a prerequisite for using this save.
 
 TTS saves contain setup information and references rather than embedding all image/model files. Exporting the accompanying assets avoids broken or inaccessible links. Running the mod in the Steam application is separate from inspecting and converting its files. See the official [importing guidance](https://kb.tabletopsimulator.com/custom-content/importing-mods/) and [save-file format](https://kb.tabletopsimulator.com/custom-content/save-file-format/).
 

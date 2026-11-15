@@ -52,7 +52,7 @@ Use the sun of **Asimov** as the centre anchor in six-player games, and the sun 
 - Await the original rocket STL files, check colour mapping, and refine the provisional seventh-player silhouette as appropriate.
 - Keep source assets, optimised web art, hit areas, and semantic game data separate so replacements do not change stable piece IDs.
 
-See [REMINDERS.md](REMINDERS.md) for the handoff list and [ASSETS.md](ASSETS.md) for source-file provenance.
+The received TTS save contains 240 rockets in six colour groups sharing one mesh. Preserve the distinct-silhouette requirement from the rulebook/designer rather than adopting that shared mesh as the final player design. See [TTS_REVIEW.md](TTS_REVIEW.md), [REMINDERS.md](REMINDERS.md), and [ASSETS.md](ASSETS.md) for inventory, handoffs, and provenance.
 
 ## Future visual verification
 

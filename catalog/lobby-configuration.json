@@ -1,0 +1,72 @@
+{
+  "schema_version": 1,
+  "status": "specification_not_implemented",
+  "user_requirements_date": "2026-11-15",
+  "game_configuration_reference": "game-configuration.json",
+  "minimum_players": 2,
+  "maximum_players": 7,
+  "visibilities": [
+    "private",
+    "public"
+  ],
+  "generic_create_default_visibility": "private",
+  "explicit_create_public_action": true,
+  "public_directory": {
+    "listed_visibility": "public",
+    "listed_room_state": "waiting",
+    "require_open_seat": true,
+    "require_live_host_or_participant": true,
+    "private_rooms_included": false,
+    "in_progress_random_join_allowed": false
+  },
+  "mode_ids": [
+    "normal_turns",
+    "simultaneous_actions"
+  ],
+  "implementation_order": [
+    "normal_turns",
+    "simultaneous_actions"
+  ],
+  "mode_recommendation": {
+    "minimum_players": 4,
+    "maximum_players": 7,
+    "count_basis": "actual_seated_players",
+    "recommended_mode": "simultaneous_actions",
+    "requires_mode_delivered": true,
+    "host_can_choose_normal_turns": true,
+    "automatic_mode_switch": false
+  },
+  "readiness": {
+    "all_starting_players_connected_and_ready": true,
+    "reset_on_material_settings_or_roster_change": true,
+    "start_against_reviewed_roster_settings_revision": true,
+    "host_may_start_below_capacity_after_review": true
+  },
+  "seat_assignment": {
+    "atomic": true,
+    "resume_credential_distinct_from_invitation": true,
+    "occupied_seats_not_claimable_by_new_join": true
+  },
+  "proposed_lifecycle_defaults": {
+    "waiting_host_transfer_grace_seconds": 120,
+    "empty_waiting_room_expiry_minutes": 30,
+    "defaults_subject_to_playtesting": true,
+    "active_game_has_no_enforced_turn_clock": true,
+    "disconnect_does_not_auto_submit_secret_choices": true,
+    "active_disconnected_seat_not_given_to_stranger": true
+  },
+  "public_abuse_controls": [
+    "room_creation_join_rate_limits",
+    "plain_text_names_and_titles",
+    "waiting_room_host_kick",
+    "private_admin_reports"
+  ],
+  "tutorial_reminder": {
+    "issue_number": 1,
+    "url": "https://github.com/charlie-fish/space-force/issues/1",
+    "scope": "personal_guidance_during_first_actual_game",
+    "skippable": true,
+    "replayable_from_help": true,
+    "status": "open_reminder_not_implemented"
+  }
+}
