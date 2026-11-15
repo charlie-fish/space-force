@@ -1,6 +1,6 @@
 # Idle-player removal and continued play
 
-Version 0.6 · 15 November 2026 · Specification, not implemented
+Version 0.7 · 15 November 2026 · Specification, not implemented
 
 The previous specification covered temporary disconnects, reconnection, waiting-room host handover, and pause/save. It did not define a complete in-match removal-and-skip rule. The designer has now requested that progression rule and confirmed **five minutes** and **approval by a majority of the other active players**.
 
@@ -11,13 +11,13 @@ The previous specification covered temporary disconnects, reconnection, waiting-
 3. Once removed, the player forfeits participation and all remaining turns are skipped.
 4. When exactly one non-removed player remains, that player immediately wins. Being the only connected browser does not by itself establish a winner.
 
-Display the five-minute policy before a match starts. Keep it fixed during that match. The five-minute majority rule and P02–P05 are confirmed. Only P01's exact inactivity/electorate interpretation remains for review.
+Display the five-minute policy before a match starts. Keep it fixed during that match. The five-minute majority rule and all details P01–P05 are confirmed by the designer.
 
-## Eligibility and voting safeguards — proposed detail P01
+## Eligibility and voting safeguards — confirmed P01
 
-Start a server-owned inactivity clock when the player is continuously disconnected, or when a required decision is waiting for their response. A player merely watching another player's turn is not idle for this purpose. A proposed warning at four minutes offers I'm still here; an authenticated acknowledgement/response, or successful reconnect before removal, clears eligibility and cancels pending removal votes. An agreed table pause freezes the clock.
+Start a server-owned inactivity clock when the player is continuously disconnected, or when a required decision is waiting for their response. A player merely watching another player's turn is not idle for this purpose. A warning at four minutes offers I'm still here; an authenticated acknowledgement/response, or successful reconnect before removal, clears eligibility and cancels pending removal votes. An agreed table pause freezes the clock.
 
-For the electorate, include other non-removed players who have not themselves qualified as idle. A disconnected player still within the five-minute grace remains in that electorate; someone already idle beyond the threshold cannot indefinitely block votes about other absent players. This exact electorate definition is proposed, not an additional ruling already supplied by the designer.
+For the electorate, include other non-removed players who have not themselves qualified as idle. A disconnected player still within the five-minute grace remains in that electorate; someone already idle beyond the threshold cannot indefinitely block votes about other absent players. The designer confirmed this electorate definition as part of P01.
 
 Approval needs `floor(eligible other players / 2) + 1` yes votes. For one through six eligible voters the thresholds are 1, 2, 2, 3, 3, and 4. Zero voters cannot remove anyone. Ties fail. Revalidate the clock, target, roster, and approvals atomically before applying removal; invalidate a stale vote when eligibility changes. With two players, the remaining player's approval is the required one vote and the confirmation must explain that removal ends the match.
 
@@ -66,4 +66,4 @@ Privately log eligibility times/reasons, policy version and timeout, warning/ack
 - Exactly one non-removed player wins by the explicit result reason. One connected player among temporarily disconnected participants does not win automatically.
 - No participant loses/gains an unaccounted rocket and no forfeited participant can act through an old tab or resume token.
 
-Policy data: [dropout-policy.json](../catalog/dropout-policy.json). P02–P05 are settled. Only P01 remains proposed in [REVIEW_CHECKLIST.md](REVIEW_CHECKLIST.md). Verify that delegated decisions use the removed player as actor and that stack cleanup leaves other components intact.
+Policy data: [dropout-policy.json](../catalog/dropout-policy.json). All details P01–P05 are settled. [REVIEW_CHECKLIST.md](REVIEW_CHECKLIST.md) now lists prototype checks rather than an outstanding dropout ruling. Verify that delegated decisions use the removed player as actor and that stack cleanup leaves other components intact.

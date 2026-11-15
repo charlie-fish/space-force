@@ -2,7 +2,7 @@
 
 An online implementation of Charlie Fish's board game, planned for 2–7 players using desktop and mobile browsers.
 
-**Current status: specification v0.6, 15 November 2026.** The specification includes five-view navigation, one shared two-sided aid, pre-commit-only Undo, confirmed dropout rulings P02–P05, and the required first-play tutorial. P01 inactivity/electorate details remain proposed. A playable application has not been implemented or deployed.
+**Current status: specification v0.7, 15 November 2026.** The specification includes five-view navigation, one shared two-sided aid, pre-commit-only Undo, confirmed dropout rulings P01–P05, and the required first-play tutorial. All dropout details P01–P05 are confirmed. A playable application has not been implemented or deployed.
 
 ## Project documents
 
@@ -29,7 +29,7 @@ An online implementation of Charlie Fish's board game, planned for 2–7 players
 - [Game configuration](catalog/game-configuration.json): player limit, component quantities, setup by player count, and provisional orange seventh-player style.
 - [Lobby configuration](catalog/lobby-configuration.json): public/private rooms, readiness, and the four-plus-player recommendation with explicit host mode choice.
 - [Interaction defaults](catalog/interaction-configuration.json): five views, persistent resources, gestures, and scoped shortcuts.
-- [Dropout policy](catalog/dropout-policy.json): confirmed removal and P02–P05 rulings, with P01 details still for review.
+- [Dropout policy](catalog/dropout-policy.json): confirmed removal and P01–P05 rulings.
 - [Undo policy](catalog/undo-policy.json): uncommitted moves only, with no hidden-information reveal.
 - [Tutorial requirements](catalog/tutorial-configuration.json): first-play teaching incorporated into the specification.
 - [TTS inventory](catalog/tts-inventory.json): received save/preview, deck and model counts, and external asset dependencies.
@@ -50,6 +50,12 @@ Use the supplied `SPACE FORCE.png` front-cover graphic as the visual reference, 
 At seven players the supply is **280 rockets, 28 action chips, seven action boards, plus one shared two-sided player aid**. The original twelve tiles form the outer layout; use Adams as the seventh home system in the centre. At six players, use Asimov in the centre. Each of those setups uses thirteen hexes; the two special centre tiles are never used together.
 
 The lobby supports creating public games, joining waiting public games, and creating/joining unlisted private rooms. In play, use Board, Techs, Event, Actions, and Player Aid views with visible Reserve/Credits. After five minutes of qualifying inactivity, a majority of the other active players can remove the idle participant; their future turns are skipped and a sole remaining player wins. A skippable first-play tutorial is required by [TUTORIAL.md](docs/TUTORIAL.md); its reminder issue #1 is superseded by the specification. Undo is limited to an uncommitted move with no hidden-information reveal.
+
+## First playable prototype
+
+No further designer decisions or final art files are required to start implementation. The first milestone is a local normal-turn game: rules/state engine, playable board and five views, draft-only Undo, a complete round/game loop, and meaningful rules/device checks. Use the supplied references and provisional silhouettes while the STLs and final art are prepared.
+
+Remote play then adds the authoritative server, protected rooms/seats, synchronisation, save/rejoin, and the confirmed dropout policy. Production hosting/domain, newsletter privacy settings, and final artwork are later launch work. See [next development steps](docs/REVIEW_CHECKLIST.md#next-development-steps).
 
 ## Data and ownership
 

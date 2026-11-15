@@ -86,7 +86,7 @@ Ties use the greatest number of Credits; any remaining tie is a shared win. Reco
 
 ## Online idle-removal adaptation
 
-The designer requested a way to continue without a player who does not return, and confirmed **five minutes** and **a majority of the other active players**. After approved removal, skip that participant's remaining turns; if exactly one non-removed participant remains, that participant automatically wins. The initial board, mode, and round setup stay fixed. [DROPOUTS.md](DROPOUTS.md) records confirmed P02–P05: automatically remove action tokens from board stacks, keep other components, delegate game-critical decisions to the next player on the removed player's behalf, preserve/cancel bids at the agreed reveal boundary, and label forfeit scores. Only P01 inactivity/electorate details remain for review. This is an online adaptation alongside the printed rules, separate from the settled R01–R08.
+The designer requested a way to continue without a player who does not return, and confirmed **five minutes** and **a majority of the other active players**. After approved removal, skip that participant's remaining turns; if exactly one non-removed participant remains, that participant automatically wins. The initial board, mode, and round setup stay fixed. [DROPOUTS.md](DROPOUTS.md) records confirmed P02–P05: automatically remove action tokens from board stacks, keep other components, delegate game-critical decisions to the next player on the removed player's behalf, preserve/cancel bids at the agreed reveal boundary, and label forfeit scores. All details P01–P05 are confirmed. This is an online adaptation alongside the printed rules, separate from the settled R01–R08.
 
 ## Variants and presets
 

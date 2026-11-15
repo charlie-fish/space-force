@@ -1,5 +1,13 @@
 # Change log
 
+## 0.7.0 — 2026-11-15
+
+- Confirmed P01 inactivity, warning, acknowledgement/pause, and voting-electorate details. All P01–P05 dropout rulings are now settled.
+- Removed stale pending-rule reminders and recorded that no further designer decisions or final artwork are prerequisites for starting the first local normal-turn prototype.
+- Clarified implementation milestones: rules/UI and a complete local game first; authoritative rooms/synchronisation/recovery for the remote-play milestone; production administration/hosting and final art later.
+
+This remains specification work; the playable application still needs implementation.
+
 ## 0.6.0 — 2026-11-15
 
 - Confirmed dropout P02–P05: automatically remove action tokens from board stacks; retain other components and passive effects; delegate game-critical decisions to the next player on behalf of the removed player; use the agreed bid handling and forfeit-score snapshots. Only P01 eligibility details remain proposed.

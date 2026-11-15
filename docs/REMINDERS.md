@@ -6,7 +6,7 @@ Review priorities and next steps: [REVIEW_CHECKLIST.md](REVIEW_CHECKLIST.md).
 
 ## From the designer
 
-- [ ] Review only the remaining dropout P01 inactivity/electorate details and the proposed exact interface bindings. P02–P05 and the pre-commit/no-reveal Undo rule are confirmed.
+- [ ] Review exact interface bindings and provisional player styling during the prototype. P01–P05 and the pre-commit/no-reveal Undo rule are confirmed; these reviews do not block implementation.
 
 - [ ] Share the **Tabletop Simulator Workshop URL** if convenient; the save ZIP has been received and parsed, so this is an optional additional reference.
 - [ ] Share the **rocket STL files**, with the colour mapping for the original designs if it is not clear from the filenames. Include a seventh design if available; the current seventh silhouette is provisional.

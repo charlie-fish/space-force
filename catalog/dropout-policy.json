@@ -1,6 +1,6 @@
 {
   "schema_version": 2,
-  "policy_id": "online-idle-removal-002",
+  "policy_id": "online-idle-removal-003",
   "status": "specification_not_implemented",
   "core_status": "confirmed_by_designer_2026-11-15",
   "confirmed_core": {
@@ -30,9 +30,13 @@
     "apply_at_safe_checkpoint": true,
     "audit_removal_and_result_reason": true
   },
-  "proposed_details": {
+  "proposed_details": {},
+  "no_remaining_players_result": "abandoned_no_winner",
+  "designer_review_reference": "../docs/DROPOUTS.md",
+  "supersedes": "online-idle-removal-002",
+  "confirmed_details": {
     "P01": {
-      "status": "designer_review_required",
+      "status": "confirmed_by_designer",
       "clock_triggers": [
         "continuous_disconnect",
         "required_decision_without_response"
@@ -44,12 +48,7 @@
       "agreed_pause_freezes_clock": true,
       "electorate": "other_non_removed_players_not_themselves_idle_eligible",
       "disconnected_within_grace_still_counts_in_electorate": true
-    }
-  },
-  "no_remaining_players_result": "abandoned_no_winner",
-  "designer_review_reference": "../docs/DROPOUTS.md",
-  "supersedes": "online-idle-removal-001",
-  "confirmed_details": {
+    },
     "P02": {
       "status": "confirmed_by_designer",
       "keep_existing_ships_settlements_techs_and_recorded_resources": true,
@@ -82,5 +81,6 @@
       "normal_endgame_scoring_completed": false,
       "position_points_determine_forfeit_winner": false
     }
-  }
+  },
+  "all_details_confirmed": true
 }

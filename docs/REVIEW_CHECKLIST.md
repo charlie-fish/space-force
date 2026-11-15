@@ -1,6 +1,6 @@
 # Designer review, reminders, and next steps
 
-Updated 15 November 2026 · Specification v0.6
+Updated 15 November 2026 · Specification v0.7
 
 There is no playable application yet. Review the documents/data now; interaction and browser checks become concrete in the first prototype. These checks do not reopen the already-resolved R01–R08 or the confirmed original-hex versions.
 
@@ -8,7 +8,7 @@ There is no playable application yet. Review the documents/data now; interaction
 
 | Priority | Item | Where to review |
 | --- | --- | --- |
-| 1 | Idle-removal integration: five minutes and majority approval are confirmed. Review only P01's exact inactivity/electorate details. P02–P05 are confirmed and should be checked against the implementation rather than reopened. | [Dropout rule](DROPOUTS.md) |
+| 1 | P01–P05 are confirmed, including inactivity, warnings, voting eligibility, stack cleanup, delegation, bids, and forfeit results. Verify these behaviours in the prototype. | [Dropout rule](DROPOUTS.md) |
 | 2 | Five destinations, persistent Reserve/Credits counts, phone pinch/pan/swipe separation, and the proposed B/T/E/A/P shortcuts with camera/help controls. | [Gameplay interface](GAMEPLAY_UI.md) |
 | 3 | Confirm the provisional seventh player's orange colour, twin-pod silhouette, and triangular chip rim; check the final six/seven shape-to-colour mapping when STLs arrive. | [Component design](COMPONENT_DESIGN.md), [game configuration](../catalog/game-configuration.json) |
 | 4 | Verify the confirmed Undo boundary in the prototype: uncommitted moves only, with no hidden-information reveal. Committed moves cannot be undone. | [Project brief: undo](PROJECT_BRIEF.md#undo-policy) |
@@ -41,4 +41,4 @@ The live checklist is [REMINDERS.md](REMINDERS.md). TTS review: [TTS_REVIEW.md](
 5. Add owner administration, game/result audit, feedback, and optional newsletter consent/export, using real deployment/privacy configuration.
 6. Deliver the required tutorial and finish accessibility, browser/device, load, deployment/recovery, and backup-restore verification before release.
 
-Rules/UI foundation work can proceed while asset handoffs and the explicitly proposed dropout details are reviewed.
+All known rule clarifications are settled. Start the normal-turn rules/UI prototype with provisional replaceable art; asset handoffs and visual refinement can continue alongside development.

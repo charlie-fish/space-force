@@ -68,7 +68,7 @@
     "automatic_kick": false,
     "removed_players_future_turns_skipped": true,
     "sole_remaining_player_wins": true,
-    "integration_details_status": "P02_to_P05_confirmed_P01_review_pending"
+    "integration_details_status": "P01_to_P05_confirmed"
   },
   "tutorial": {
     "configuration_reference": "tutorial-configuration.json",

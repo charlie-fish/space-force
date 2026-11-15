@@ -19,7 +19,7 @@ Updated planning baseline: 15 November 2026. Confirmed items record the designer
 | D11 | Platform practices | **Proposed baseline:** [PLATFORM_REVIEW.md](PLATFORM_REVIEW.md) adds public-room, recovery, security, accessibility, loading, and operational checks. |
 | D12 | Gameplay controls | **Confirmed scope:** Board, Techs, Event, Actions, and Player Aid with Reserve/Credits; phone gestures and desktop shortcuts. [GAMEPLAY_UI.md](GAMEPLAY_UI.md) proposes exact controls. |
 | D13 | Idle-player progression | **Confirmed:** five-minute idle threshold, majority approval by the other active players, skip removed players' remaining turns, and automatic win for a sole remaining player. |
-| D14 | Dropout integration | **P02–P05 confirmed:** automatic stack-token cleanup, other components remain, critical decisions delegated on behalf of the removed player, agreed bid handling, and forfeit snapshots. Only P01 remains proposed. |
+| D14 | Dropout integration | **P01–P05 confirmed:** automatic stack-token cleanup, other components remain, critical decisions delegated on behalf of the removed player, agreed bid handling, and forfeit snapshots. P01 is also confirmed. |
 | D15 | Undo | **Confirmed:** uncommitted moves only, with no hidden-information reveal. No post-commit or table-vote override. |
 | D16 | Shared player aid | **Confirmed:** one shared aid, both faces visible together in the fifth Player Aid view. Actions replaces the old personal-board view label. |
 
@@ -29,7 +29,7 @@ The designer review hub is [REVIEW_CHECKLIST.md](REVIEW_CHECKLIST.md); the live 
 
 The [rules review](RULES_REVIEW.md) records the confirmed answers to all eight original questions, with page references and the full five-Tech PRODUCE example. [rules-clarifications.json](../catalog/rules-clarifications.json) captures the same decisions for future engine work. Turn these rulings and the Prophecy/warp edge cases into meaningful scenarios as the engine is implemented; they are no longer outstanding questions.
 
-Undo is now confirmed as pre-commit only and forbidden after a hidden-information reveal. P02–P05 are also settled. Only P01 inactivity/electorate details remain proposed; independent foundation work can proceed while those details are reviewed.
+Undo is now confirmed as pre-commit only and forbidden after a hidden-information reveal. P01–P05 are also settled. No further rules decisions are needed to start the normal-turn rules/UI prototype.
 
 Player access now includes public waiting-game discovery and private invitations, with guest names, protected seat-resume credentials, and no compulsory account. Room hosts manage waiting-room seats/settings; rules, scoring, and secret views remain server-enforced. The public lobby is now in scope; ranked matchmaking, global chat, competitive ratings, bots, and solo rules remain future features. Proposed lobby defaults are a 120-second waiting-room host-transfer grace and a 30-minute empty-lobby expiry, both configurable and subject to playtesting.
 
@@ -84,5 +84,6 @@ The seven-player limit, separate rocket silhouettes, chip face/rim identity, sna
 | 2026-11-15 | Added the interface defaults, confirmed removal core, reviewable phase/forfeit proposals, and a linked designer review/next-step checklist. |
 | 2026-11-15 | Designer confirmed P02–P05, clarified delegation on behalf of the removed player, restricted Undo to uncommitted/no-reveal moves, renamed Actions, and added a shared two-sided Player Aid view. |
 | 2026-11-15 | Designer requested that the tutorial become part of the main spec and reminder issue #1 be closed. STL files remain outstanding. |
+| 2026-11-15 | Designer confirmed P01. All known rule clarifications are settled and implementation can start with provisional art. |
 
 No hosting provider, paid service, final privacy text, or application deployment has been selected in this planning stage.

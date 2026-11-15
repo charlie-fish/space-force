@@ -10,7 +10,7 @@ Preserve a seat through refresh, network changes, and phone sleep. Show connecte
 
 The server advances phases and any configured deadlines. Hidden tabs throttle timers and animation callbacks, so client timers cannot decide whose turn ends. Pause decorative work in background tabs and resynchronise when visible. Test locking a phone, switching apps, returning through browser history, and changing between Wi-Fi and mobile data. [MDN: Page Visibility API](https://developer.mozilla.org/en-US/docs/Web/API/Page_Visibility_API).
 
-Do not mark a temporary disconnect as an abandoned match. The new [idle-removal rule](DROPOUTS.md) uses the confirmed five-minute threshold and majority approval, with explicit server-owned eligibility and forfeit results. Apply confirmed P02–P05; P01 eligibility details remain for review. Public rooms also need the ready checks, stale-listing cleanup, and host handover in [LOBBY.md](LOBBY.md). A game must not depend on a particular player's device remaining open.
+Do not mark a temporary disconnect as an abandoned match. The new [idle-removal rule](DROPOUTS.md) uses the confirmed five-minute threshold and majority approval, with explicit server-owned eligibility and forfeit results. Apply confirmed P01–P05. Public rooms also need the ready checks, stale-listing cleanup, and host handover in [LOBBY.md](LOBBY.md). A game must not depend on a particular player's device remaining open.
 
 ## 2. Public-room and realtime security
 
