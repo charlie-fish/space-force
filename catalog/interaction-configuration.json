@@ -1,5 +1,5 @@
 {
-  "schema_version": 5,
+  "schema_version": 6,
   "status": "local_prototype_implemented_remote_controls_pending",
   "view_ids": [
     "board",
@@ -82,7 +82,10 @@
     "both_sides_rendered_together": true,
     "wide_layout": "side_by_side",
     "narrow_layout": "stacked_same_scroll_view",
-    "front_back_toggle_required": false
+    "front_back_toggle_required": false,
+    "heading": "Player aid",
+    "introductory_slogan_and_explanation": false,
+    "undo_definition_in_aid_view": false
   },
   "undo_policy_reference": "undo-policy.json",
   "tutorial_configuration_reference": "tutorial-configuration.json",
@@ -116,7 +119,8 @@
       "every_decision_counts_as_turn": true,
       "default": "collapsed_on_render"
     },
-    "actions_phase_label": "Actions"
+    "actions_phase_label": "Actions",
+    "players_and_supply_order": "current_first_player_then_existing_player_order"
   },
   "plan_placement": {
     "desktop": "translucent_cursor_hover_then_click_to_select_preview",
@@ -149,7 +153,10 @@
     "legal_ring": "opaque_2.5px_behind_every_chip_in_stack",
     "desktop_hover_ring_changes_colour": true,
     "order_numbers_on_board": false,
-    "outer_grey_outline": false
+    "outer_grey_outline": false,
+    "yellow_legal_ring": "slow_blink",
+    "blue_hover_or_focus_ring": "steady",
+    "respect_reduced_motion": true
   },
   "economy_interactions": {
     "investments_default_view": "board",
@@ -182,10 +189,23 @@
       "choose_positive_legal_entry_ships"
     ],
     "nonchoice_explore_outcome_requires_ok": true,
-    "reserve_shortfalls_require_ok": true,
+    "reserve_shortfalls_require_ok": false,
     "confirm_token_tech_with_no_effect": true,
     "loss_wording": "returned_as_credits",
-    "invest_toggle_scrolls_to": "system_status"
+    "invest_toggle_scrolls_to": "system_status",
+    "empty_noninvested_actions_require_confirmation": [
+      "move_into",
+      "settle",
+      "attack"
+    ],
+    "incoming_black_hole_losses_require_confirmation": true,
+    "departure_holes_trigger_loss_confirmation": false,
+    "revealed_move_loss_confirmation": "after_orientation_and_ship_quantities",
+    "reserve_warning_display": "modal",
+    "predictable_reserve_shortfall": "confirm_before_commit_or_go_back",
+    "committed_reserve_checkpoint": "modal_confirm_outcome_no_reveal_undo",
+    "background_controls_blocked_during_modal": true,
+    "stale_confirmation_rejected": true
   },
   "final_state": {
     "all_five_views_available": true,

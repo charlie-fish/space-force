@@ -34,6 +34,11 @@ import {
   WARP_HEIGHT,
 } from "./geometry.js";
 import { restoreGame } from "./persistence.js";
+import {
+  intentWarnings,
+  reserveNotice,
+  revealsHiddenInformation,
+} from "./intent.js";
 import type { Action, Command, Game, System } from "./types.js";
 
 type View = "board" | "techs" | "event" | "actions" | "player_aid";
@@ -130,9 +135,12 @@ export function mountApp(
   let selectedEdge: number | null = null;
   let orientation = 0;
   let confirmation: {
-    message: string;
+    messages: string[];
+    title: string;
     command: Command;
     revision: number;
+    base: Game;
+    reserveAccepted: boolean;
   } | null = null;
   let rosterOpen = false;
   let planTap: {
@@ -234,12 +242,35 @@ export function mountApp(
       preventScroll: true,
     });
   }
-  function perform(command: Command, revision = game?.revision) {
+  function perform(
+    command: Command,
+    revision = game?.revision,
+    accepted?: { intent: boolean; reserve: boolean },
+  ) {
     if (!game) return;
     const old = game;
     confirmation = null;
     try {
-      game = applyCommand(game, game.turn, command, revision);
+      let next = applyCommand(game, game.turn, command, revision);
+      const reserve = reserveNotice(next);
+      const predictable =
+        reserve &&
+        next.turn === old.turn &&
+        !revealsHiddenInformation(old, next);
+      const warnings = accepted?.intent ? [] : intentWarnings(old, command);
+      if (predictable && !accepted?.reserve) warnings.push(...reserve.messages);
+      if (warnings.length) {
+        requestConfirmation(
+          warnings,
+          command,
+          predictable ? reserve.title : "Check this decision",
+          Boolean(predictable),
+        );
+        return;
+      }
+      if (predictable && accepted?.reserve)
+        next = applyCommand(next, next.turn, { type: "acknowledge" });
+      game = next;
       planTap = null;
       snapSystem = command.type === "plan" ? command.system : null;
       if (game.phase === "plan") selected = null;
@@ -275,9 +306,10 @@ export function mountApp(
         draft.sources = { ...game.pending.sources };
       save();
       render();
-      root
-        .querySelector<HTMLElement>(".turn-bar")
-        ?.focus({ preventScroll: true });
+      (
+        root.querySelector<HTMLElement>(".modal button") ??
+        root.querySelector<HTMLElement>(".turn-bar")
+      )?.focus({ preventScroll: true });
     } catch (e) {
       error =
         e instanceof Error ? e.message : "This choice could not be applied.";
@@ -360,7 +392,9 @@ export function mountApp(
   function instruction(g: Game) {
     const pending = g.pending;
     if (pending?.kind === "ack")
-      return "Review the outcome, then press Ok to continue.";
+      return reserveNotice(g)
+        ? "Review the Reserve warning in the pop-up, then confirm the outcome."
+        : "Review the outcome, then press Ok to continue.";
     if (pending?.kind === "redistribute")
       return "Reallocate the displaced Settlements or keep them as Ships. Other commitments stay fixed.";
     if (pending?.kind === "orient")
@@ -409,7 +443,7 @@ export function mountApp(
     return `<aside class="guide" aria-label="Learn as you play"><div><span class="eyebrow">Learn as you play</span><p>${escape(g.pending ? instruction(g) : tips[g.phase])}</p></div>${button("Hide guide", "guide-off", "", false, "quiet")}</aside>`;
   }
   function landing() {
-    return `<main class="landing"><div class="landing-art"><img src="${ART.cover.image}" width="562" height="768" alt="Space Force cover: rocket fleets above a ringed planet"/><span class="cover-credit">A game by Charlie Fish</span></div><section class="landing-copy"><div class="eyebrow">Local pass-and-play · Prototype 0.11</div><h1>Claim your<br/><span>corner of space.</span></h1><p class="lead">Plan your moves. Explore new systems. Settle the galaxy.</p><div class="scope-note"><strong>This build: Family Techs + simpler Events.</strong><span>A complete local game for 2–7 players on one device. Event cards count rounds; their effects and auctions are disabled. Remote rooms and the wider card set follow later.</span></div><form id="setup-form"><fieldset><legend>How many players?</legend><div class="player-counts">${Array.from({ length: 6 }, (_, i) => button(String(i + 2), "count", `data-count="${i + 2}" aria-pressed="${count === i + 2}"`, false, count === i + 2 ? "selected" : "")).join("")}</div></fieldset><div class="name-grid">${names
+    return `<main class="landing"><div class="landing-art"><img src="${ART.cover.image}" width="562" height="768" alt="Space Force cover: rocket fleets above a ringed planet"/><span class="cover-credit">A game by Charlie Fish</span></div><section class="landing-copy"><div class="eyebrow">Local pass-and-play · Prototype 0.12</div><h1>Claim your<br/><span>corner of space.</span></h1><p class="lead">Plan your moves. Explore new systems. Settle the galaxy.</p><div class="scope-note"><strong>This build: Family Techs + simpler Events.</strong><span>A complete local game for 2–7 players on one device. Event cards count rounds; their effects and auctions are disabled. Remote rooms and the wider card set follow later.</span></div><form id="setup-form"><fieldset><legend>How many players?</legend><div class="player-counts">${Array.from({ length: 6 }, (_, i) => button(String(i + 2), "count", `data-count="${i + 2}" aria-pressed="${count === i + 2}"`, false, count === i + 2 ? "selected" : "")).join("")}</div></fieldset><div class="name-grid">${names
       .slice(0, count)
       .map(
         (name, i) =>
@@ -850,6 +884,7 @@ export function mountApp(
     return "";
   }
   function inspector(g: Game) {
+    if (reserveNotice(g)) return "";
     if (g.pending?.kind === "ack")
       return `<section class="console outcome-notice"><h2>${escape(g.pending.title)}</h2>${g.pending.messages.map((m) => `<p>${escape(m)}</p>`).join("")}<p>Review this outcome, then continue.</p>${button("Ok", "acknowledge", "", false, "primary")}</section>`;
     if (g.pending?.kind === "redistribute")
@@ -1086,7 +1121,7 @@ export function mountApp(
     return `<section class="event-view"><div class="section-heading"><span class="eyebrow">Rulebook’s simpler Events variant</span><h2>The galaxy keeps time.</h2><p>Event cards count rounds in this build. Their text has no effect and the sealed auction is skipped. This variant excludes Foresight; the Family preset does not contain it.</p></div><div class="event-status"><strong>${g.events.length}</strong><span>cards remain in the draw pile</span><strong>${g.players.length <= 3 ? 6 : 5}</strong><span>rounds in this game</span></div>${g.revealedEvents.length ? `<h3>Latest round-tracker pair</h3><div class="event-pair">${g.revealedEvents.map((id) => `<button class="event-card" data-action="card" data-card="${id}"><img src="${ART.cards[id].image}" width="240" height="388" loading="lazy" alt="${attrs(CARD_MAP[id].title)}"/><span>${escape(CARD_MAP[id].title)}</span><small>Effect disabled in this variant</small></button>`).join("")}</div>` : '<div class="empty-state">No Event pair has been drawn yet, or the final Tech step is in progress.</div>'}<p class="muted">Drawing the last pair does not immediately end the game. Play continues until a later Economy cannot draw another pair; then complete Tech purchases and score.</p></section>`;
   }
   function aidView() {
-    return `<section class="aid-view"><div class="section-heading"><span class="eyebrow">One shared player aid · both faces</span><h2>Keep the essentials in view.</h2><p>Both faces are below: side by side on wide screens and stacked on phones. This prototype uses normal turns, the Family preset, and simpler Events.</p></div><div class="aid-faces"><article><h3>Actions</h3><img src="${ART.aids.actions.image}" width="530" height="810" loading="lazy" alt="Player aid Actions face"/><dl><dt>Move into</dt><dd>Bring Ships from adjacent systems. Warps connect; asteroid belts block unless you have Agility. Each destination black hole destroys one incoming Ship, returned as a Credit.</dd><dt>Settle</dt><dd>Convert Ships into Settlements within capacity; resolve Explore tokens first.</dd><dt>Produce</dt><dd>One Ship or Credit per planet you settle, plus one for each such planet that is full.</dd><dt>Attack</dt><dd>Each sacrificed Ship destroys up to two opposing Ships or one Settlement. All casualties become Credits. You cannot attack Settlements on a planet you share.</dd></dl></article><article><h3>Play sequence & scoring</h3><img src="${ART.aids.sequence.image}" width="530" height="810" loading="lazy" alt="Player aid play sequence and scoring face"/><dl><dt>Plan</dt><dd>Place all four chips in player order.</dd><dt>Actions</dt><dd>Resolve top chips into unused slots, acting or Investing. Turns without an eligible top chip are skipped.</dd><dt>Economy</dt><dd>Cash Investments, draw Events, buy one Tech, reinforce, and pass first player. This build uses Events only as a round tracker.</dd><dt>Score</dt><dd>One point per settled planet, system with your Ships, and owned Tech. Credits break ties; remaining ties share victory.</dd><dt>Undo</dt><dd>Draft only, before commitment and before any hidden-information reveal.</dd></dl></article></div></section>`;
+    return `<section class="aid-view"><div class="section-heading"><h2>Player aid</h2></div><div class="aid-faces"><article><h3>Actions</h3><img src="${ART.aids.actions.image}" width="530" height="810" loading="lazy" alt="Player aid Actions face"/><dl><dt>Move into</dt><dd>Bring Ships from adjacent systems. Warps connect; asteroid belts block unless you have Agility. Each destination black hole destroys one incoming Ship, returned as a Credit.</dd><dt>Settle</dt><dd>Convert Ships into Settlements within capacity; resolve Explore tokens first.</dd><dt>Produce</dt><dd>One Ship or Credit per planet you settle, plus one for each such planet that is full.</dd><dt>Attack</dt><dd>Each sacrificed Ship destroys up to two opposing Ships or one Settlement. All casualties become Credits. You cannot attack Settlements on a planet you share.</dd></dl></article><article><h3>Play sequence & scoring</h3><img src="${ART.aids.sequence.image}" width="530" height="810" loading="lazy" alt="Player aid play sequence and scoring face"/><dl><dt>Plan</dt><dd>Place all four chips in player order.</dd><dt>Actions</dt><dd>Resolve top chips into unused slots, acting or Investing. Turns without an eligible top chip are skipped.</dd><dt>Economy</dt><dd>Cash Investments, draw Events, buy one Tech, reinforce, and pass first player. This build uses Events only as a round tracker.</dd><dt>Score</dt><dd>One point per settled planet, system with your Ships, and owned Tech. Credits break ties; remaining ties share victory.</dd></dl></article></div></section>`;
   }
   function finalScores(g: Game) {
     return `<section class="final-scores"><div class="eyebrow">Expedition complete</div><h1>${g.winners.map((id) => escape(player(g, id).name)).join(" & ")}<br/><span>${g.winners.length > 1 ? "share the galaxy." : "rules the galaxy."}</span></h1><p>Credits break points ties. A remaining tie is a shared victory.</p><div class="score-table-wrap"><table><thead><tr><th>Players</th><th>Planets Settled</th><th>Systems Patrolled</th><th>Techs Owned</th><th>Total Score</th><th>Credits</th></tr></thead><tbody>${g.scores
@@ -1102,7 +1137,10 @@ export function mountApp(
   }
   function overlay() {
     if (confirmation)
-      return `<div class="modal-scrim"><section class="modal" role="dialog" aria-modal="true" aria-label="Confirm decision"><h2>Check this decision</h2><p>${escape(confirmation.message)}</p><div class="commit-row">${button("Go back", "cancel-confirmation", "", false, "secondary")}${button("Confirm and commit", "confirm-command", "", false, "primary")}</div></section></div>`;
+      return `<div class="modal-scrim"><section class="modal" role="dialog" aria-modal="true" aria-label="${confirmation.reserveAccepted ? escape(confirmation.title) : "Confirm decision"}"><h2>${escape(confirmation.title)}</h2>${confirmation.reserveAccepted ? "<p>This is the expected outcome if you commit:</p>" : ""}${confirmation.messages.map((m) => `<p>${escape(m)}</p>`).join("")}<p>Is this what you intended?</p><div class="commit-row">${button("Go back", "cancel-confirmation", "", false, "secondary")}${button("Confirm and commit", "confirm-command", "", false, "primary")}</div></section></div>`;
+    const reserve = game ? reserveNotice(game) : null;
+    if (reserve)
+      return `<div class="modal-scrim"><section class="modal reserve-notice" role="dialog" aria-modal="true" aria-label="${escape(reserve.title)}"><h2>${escape(reserve.title)}</h2>${reserve.messages.map((m) => `<p>${escape(m)}</p>`).join("")}<p>Is this the outcome you intended? Confirm this committed outcome to continue. Committed moves and hidden reveals cannot be undone.</p>${button("Confirm outcome", "acknowledge", "", false, "primary")}</section></div>`;
     if (activeCard) {
       const card = CARD_MAP[activeCard];
       return `<div class="modal-scrim"><section class="modal card-modal" role="dialog" aria-modal="true" aria-label="${attrs(card.title)}">${button("Close ×", "close-overlay", "", false, "quiet close")}<img src="${ART.cards[activeCard].image}" width="240" height="388" alt="${attrs(card.title)}"/><div><span class="eyebrow">${card.type === "tech" ? `${card.cost} Credits` : "Event reference"}</span><h2>${escape(card.title)}</h2><p>${escape(card.text)}</p>${activeCard === "tech.disruptor" && game && isFinalRound(game) ? '<p class="token-used">Disruptor has no effect in the last round. It still scores 1 point.</p>' : ""}${card.type === "event" ? '<p class="scope-note">Effects are disabled in the simpler Events prototype.</p>' : ""}</div></section></div>`;
@@ -1122,8 +1160,12 @@ export function mountApp(
   function statusBox(g: Game) {
     const p = player(g),
       scores = scoreGame(g),
-      history = sinceLastDecision(g);
-    return `<section id="status-box" class="status-box" tabindex="-1" aria-label="Status Box"><div class="status-overview"><h2 class="status-title"><button data-action="to-status">Status Box<span class="shortcut-hint"> (S)</span></button></h2><div class="eyebrow status-phase">${phaseLabel(g)}</div><div class="turn-bar" tabindex="-1" aria-live="polite">${badge(p.style, p.name)}<span class="turn-instruction">${escape(instruction(g))}</span></div><div class="status-supply resource-pills"><span><small>Reserve</small><strong>${p.reserve}</strong></span><span><small>Credits</small><strong>${p.credits}</strong></span></div><details class="player-roster" ${rosterOpen ? "open" : ""}><summary>Players & supply</summary><ul>${g.players.map((other) => `<li>${badge(other.style, other.name)}<span>${other.reserve} Reserve</span><span>${other.credits} Credits</span><span>${other.techs.length} Techs</span><strong>${scores.find((s) => s.player === other.id)!.total} points${g.phase === "finished" ? "" : " currently"}</strong><span>${other.used.length}/4 slots used</span></li>`).join("")}</ul></details>${economyTracker(g)}</div><div class="status-decision">${error ? `<div class="error" role="alert">${escape(error)}</div>` : ""}<details class="since-last-turn"><summary>Since your last turn</summary>${history.length ? `<ol>${history.map((l) => `<li data-log-revision="${l.revision}"><span>Round ${l.round}</span> ${l.player === null ? "" : `<strong>${escape(player(g, l.player).name)}:</strong> `}${escape(l.text)}</li>`).join("")}</ol>` : "<p>No actions have happened since your previous decision.</p>"}</details>${inspector(g)}</div></section>`;
+      history = sinceLastDecision(g),
+      orderedPlayers = [
+        ...g.players.slice(g.first),
+        ...g.players.slice(0, g.first),
+      ];
+    return `<section id="status-box" class="status-box" tabindex="-1" aria-label="Status Box"><div class="status-overview"><h2 class="status-title"><button data-action="to-status">Status Box<span class="shortcut-hint"> (S)</span></button></h2><div class="eyebrow status-phase">${phaseLabel(g)}</div><div class="turn-bar" tabindex="-1" aria-live="polite">${badge(p.style, p.name)}<span class="turn-instruction">${escape(instruction(g))}</span></div><div class="status-supply resource-pills"><span><small>Reserve</small><strong>${p.reserve}</strong></span><span><small>Credits</small><strong>${p.credits}</strong></span></div><details class="player-roster" ${rosterOpen ? "open" : ""}><summary>Players & supply</summary><ul>${orderedPlayers.map((other) => `<li data-player="${other.id}">${badge(other.style, other.name)}<span>${other.reserve} Reserve</span><span>${other.credits} Credits</span><span>${other.techs.length} Techs</span><strong>${scores.find((s) => s.player === other.id)!.total} points${g.phase === "finished" ? "" : " currently"}</strong><span>${other.used.length}/4 slots used</span></li>`).join("")}</ul></details>${economyTracker(g)}</div><div class="status-decision">${error ? `<div class="error" role="alert">${escape(error)}</div>` : ""}<details class="since-last-turn"><summary>Since your last turn</summary>${history.length ? `<ol>${history.map((l) => `<li data-log-revision="${l.revision}"><span>Round ${l.round}</span> ${l.player === null ? "" : `<strong>${escape(player(g, l.player).name)}:</strong> `}${escape(l.text)}</li>`).join("")}</ol>` : "<p>No actions have happened since your previous decision.</p>"}</details>${inspector(g)}</div></section>`;
   }
 
   function render() {
@@ -1223,6 +1265,11 @@ export function mountApp(
     const options = root.querySelector<HTMLElement>(".feature-options");
     if (options) options.scrollLeft = 0;
     updateBoardTypography();
+    const modal = root.querySelector<HTMLElement>(".modal");
+    if (modal && !modal.contains(root.ownerDocument.activeElement))
+      modal
+        .querySelector<HTMLElement>("button")
+        ?.focus({ preventScroll: true });
   }
 
   function exportGame() {
@@ -1231,7 +1278,7 @@ export function mountApp(
       [
         JSON.stringify(
           {
-            application: "Space Force local prototype 0.11.0",
+            application: "Space Force local prototype 0.12.0",
             exportedAt: new Date().toISOString(),
             game,
           },
@@ -1344,13 +1391,34 @@ export function mountApp(
     section.style.scrollMarginTop = `${(root.querySelector(".game-header")?.getBoundingClientRect().height ?? 80) + 8}px`;
     section.scrollIntoView?.({ block: "start", behavior: "auto" });
   }
-  function requestConfirmation(message: string, command: Command) {
+  function requestConfirmation(
+    message: string | string[],
+    command: Command,
+    title = "Check this decision",
+    reserveAccepted = false,
+  ) {
     if (!game) return;
     overlayReturn = {
-      action: command.type === "buy" ? "buy" : "commit-action",
+      action:
+        command.type === "buy"
+          ? "buy"
+          : command.type === "move"
+            ? "finish-move"
+            : command.type === "allocate"
+              ? "allocate"
+              : command.type === "explore"
+                ? "recipient"
+                : "commit-action",
       tech: command.type === "buy" ? (command.tech ?? undefined) : undefined,
     };
-    confirmation = { message, command, revision: game.revision };
+    confirmation = {
+      messages: Array.isArray(message) ? message : [message],
+      title,
+      command: JSON.parse(JSON.stringify(command)),
+      revision: game.revision,
+      base: game,
+      reserveAccepted,
+    };
     render();
     root.querySelector<HTMLElement>(".modal button")?.focus();
   }
@@ -1375,22 +1443,13 @@ export function mountApp(
         settlements: draft.colonies,
       },
     };
-    if (draft.action === "attack" && !draft.invest) {
-      const totals = attackTotals(),
-        needed = totals.settlements + Math.ceil(totals.ships / 2);
-      if (draft.sacrifice > needed) {
-        requestConfirmation(
-          `You chose to sacrifice ${draft.sacrifice} Ships, but these targets need only ${needed}. The ${draft.sacrifice - needed} extra Ship${draft.sacrifice - needed === 1 ? "" : "s"} will also be destroyed and become your Credits. Are you sure?`,
-          command,
-        );
-        return;
-      }
-    }
     perform(command);
   }
   const click = (event: Event) => {
     const target = event.target as Element;
     if (!target?.closest) return;
+    const modal = root.querySelector(".modal");
+    if (modal && !modal.contains(target)) return;
     if (Date.now() < suppressClickUntil && !target.closest("[data-action]"))
       return;
     const tab = target.closest<HTMLElement>("[data-view]");
@@ -1430,7 +1489,15 @@ export function mountApp(
     else if (action === "confirm-command" && confirmation) {
       const confirmed = confirmation;
       confirmation = null;
-      perform(confirmed.command, confirmed.revision);
+      if (game !== confirmed.base) {
+        error = "The game changed. Review the current decision.";
+        render();
+        return;
+      }
+      perform(confirmed.command, confirmed.revision, {
+        intent: true,
+        reserve: confirmed.reserveAccepted,
+      });
     } else if (action === "guide-off") {
       guide = false;
       write("space-force.guide", "off");
@@ -1579,19 +1646,14 @@ export function mountApp(
               : 0,
           ships: draft.allocation,
         };
-        const allocated = sumOwners(Object.values(draft.allocation)),
-          available = reinforceCount(game);
-        if (game.phase === "reinforce" && allocated < available)
-          requestConfirmation(
-            `You can place ${available} reinforcement Ships, but selected only ${allocated}. Leave ${available - allocated} in Reserve and continue?`,
-            command,
-          );
-        else perform(command);
+        perform(command);
       }
     }
   };
   const input = (event: Event) => {
     const el = event.target as HTMLInputElement;
+    const modal = root.querySelector(".modal");
+    if (modal && !modal.contains(el)) return;
     if (el.dataset.name !== undefined) {
       names[Number(el.dataset.name)] = el.value;
       return;
@@ -1687,12 +1749,13 @@ export function mountApp(
       target !== root.ownerDocument.documentElement
     )
       return;
-    if (event.key === "Escape" && (showHelp || activeCard || confirmation)) {
+    const modal = root.querySelector(".modal");
+    if (event.key === "Escape" && modal) {
       event.preventDefault();
-      closeOverlay();
+      if (showHelp || activeCard || confirmation) closeOverlay();
       return;
     }
-    if (event.key === "Tab" && (showHelp || activeCard || confirmation)) {
+    if (event.key === "Tab" && modal) {
       const items = [
         ...root.querySelectorAll<HTMLElement>(
           ".modal button:not(:disabled), .modal input, .modal a[href]",
@@ -1717,6 +1780,7 @@ export function mountApp(
       event.altKey
     )
       return;
+    if (modal) return;
     if (
       target.closest('[role="tab"]') &&
       ["ArrowLeft", "ArrowRight", "Home", "End"].includes(event.key)
@@ -1801,6 +1865,8 @@ export function mountApp(
   }
   const down = (event: PointerEvent) => {
     const target = event.target as Element;
+    const modal = root.querySelector(".modal");
+    if (modal && !modal.contains(target)) return;
     if (target.closest(".view-tabs") && event.pointerType === "touch") {
       swipe = { id: event.pointerId, x: event.clientX, y: event.clientY };
       return;

@@ -487,6 +487,11 @@ test("home and chip choices commit through the real interface; all five views re
   click('[data-view="player_aid"]');
   assert.equal(root.querySelectorAll(".aid-faces img").length, 2);
   assert.match(root.querySelector(".aid-faces").textContent, /Move into/);
+  assert.equal(root.querySelector(".aid-view h2").textContent, "Player aid");
+  assert.doesNotMatch(
+    root.querySelector(".aid-view").textContent,
+    /Keep the essentials|Both faces are below|Draft only|Undo/,
+  );
   h.close();
 });
 

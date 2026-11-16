@@ -2,7 +2,7 @@
 
 A browser implementation of Charlie Fish's board game, for desktop and mobile.
 
-**Current implementation: prototype 0.11.0, 16 November 2026.** A complete local pass-and-play game for **2–7 players sharing one device**, using normal turns, the official ten-Tech **Family** preset, and the rulebook's **simpler Events** variant. Event cards count rounds; their effects and auctions are disabled. This is the first implementation milestone; remote multiplayer is next.
+**Current implementation: prototype 0.12.0, 16 November 2026.** A complete local pass-and-play game for **2–7 players sharing one device**, using normal turns, the official ten-Tech **Family** preset, and the rulebook's **simpler Events** variant. Event cards count rounds; their effects and auctions are disabled. This is the first implementation milestone; remote multiplayer is next.
 
 ## Run the prototype
 
@@ -27,19 +27,19 @@ For a production static build, run `npm run build`; serve the generated `dist/` 
 
 - Correct layouts, home/hidden pools, and 40 rockets/four chips per player. Six-player games use Asimov; seven-player games use Adams as the central seventh home.
 - Ordered chip stacks, all four actions, Investments, limited supplies, Economy, all ten Family Tech effects, final scoring and tie-breaks.
-- Board, Techs, Event, Actions and Supply, and Player aid views, including after scoring. Both shared-aid faces appear together. Reserve and Credits stay visible; the player summary shows everyone's public supplies and current scores.
+- Board, Techs, Event, Actions and Supply, and Player aid views, including after scoring. Both shared-aid faces appear together. Reserve and Credits stay visible; the player summary shows everyone's public supplies and current scores in order from the current first player.
 - Seven provisional rocket silhouettes and matching poker-chip rim motifs, with chips anchored to the printed suns.
 - A top Status Box with highlighted turn details, a clear prompt, selected system/stack order and a “Since your last turn” history toggle.
 - Selected-only chip previews with button or double-click/double-tap confirmation, compact owner-coloured stacks, clear legal-chip rings, doubled Settlement rockets and circular black-hole artwork, plus the supplied asteroid-belt and warp tokens.
 - Linked vertical production quantities, target-first attacks, editable Settlement allocations, 60-degree orientation previews before exploration movement choices, and selected-first Tech target lists.
 - Map pan/pinch/zoom, grouped pan/zoom/Reset View controls, shortcuts that scroll to their destination (S for Status Box; B/T/E/A/P for views), a 10pt live-text minimum, reduced motion and a skippable contextual guide. Shortcut hints are hidden on phones.
 - Visible Economy stages, an explicit Event review step, Investments/reinforcements on the Board and automatic first-player handover.
-- Explore outcome acknowledgements, locked-commitment Settlement redistribution, Reserve-shortfall warnings and confirmations for excess sacrifices, unused reinforcements or ineffective Tech purchases.
+- Explore outcome acknowledgements, locked-commitment Settlement redistribution, Reserve-shortfall pop-ups and confirmations for empty actions, inbound black-hole losses, excess sacrifices, unused reinforcements or ineffective Tech purchases.
 - Editable action and Settlement drafts, without a redundant Undo button. Committed actions and hidden reveals stay locked. Autosave/resume works through pending reveals and choices, with a session fallback when storage is blocked.
 - Exportable local game records with version, setup seed, command history, final state and scores. Deterministic replay tests cover complete games.
 - Optimised, self-hosted artwork from the supplied PDFs, replaceable through stable IDs and an art manifest. No runtime framework, external fonts, Steam links, or 3D engine.
 
-See [the 0.11 playtest changes](docs/PLAYTEST_CHANGES_0.11.md) and [prototype scope, controls, validation and limitations](docs/PROTOTYPE.md). The [0.10](docs/PLAYTEST_CHANGES_0.10.md) and [0.9](docs/PLAYTEST_CHANGES_0.9.md) checklists record previous iterations.
+See [the 0.12 playtest changes](docs/PLAYTEST_CHANGES_0.12.md) and [prototype scope, controls, validation and limitations](docs/PROTOTYPE.md). The [0.11](docs/PLAYTEST_CHANGES_0.11.md), [0.10](docs/PLAYTEST_CHANGES_0.10.md) and [0.9](docs/PLAYTEST_CHANGES_0.9.md) checklists record previous iterations.
 
 ## Next milestones
 
@@ -59,7 +59,7 @@ npm run check  # strict TypeScript
 npm run build  # production bundle, artwork references and compressed-JavaScript budget
 ```
 
-The 96 tests include 72 complete seeded games across all supported player counts. DOM tests run in JSDOM; they do not replace visual browser/device testing. See [the validation record](docs/PROTOTYPE.md#validation).
+The 108 tests include 72 complete seeded games across all supported player counts. DOM tests run in JSDOM; they do not replace visual browser/device testing. See [the validation record](docs/PROTOTYPE.md#validation).
 
 Code: [engine](src/engine.ts), [UI](src/ui.ts), [state and commands](src/types.ts). Data: [layouts](src/layouts-data.json), [art/anchors](src/art-data.json), [card reference text](src/cards-data.json). Only the Family preset is playable; other card entries are reference data.
 

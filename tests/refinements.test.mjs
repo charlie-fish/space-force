@@ -643,7 +643,7 @@ test("reinforcement board clicks add one when available and never exceed the all
   h.close();
 });
 
-test("limited production explains Reserve availability and requires Ok before the next player", () => {
+test("limited production explains Reserve availability and confirms before commitment", () => {
   const h = harness(),
     g = fixture(),
     s = g.systems[0],
@@ -661,10 +661,12 @@ test("limited production explains Reserve availability and requires Ok before th
   h.click('[data-action="commit-action"]');
   assert.equal(h.app.getGame().turn, 0);
   assert.match(
-    h.root.querySelector(".outcome-notice").textContent,
+    h.root.querySelector(".modal").textContent,
     /could not be completed in full/,
   );
-  h.click('[data-action="acknowledge"]');
+  assert.equal(h.app.getGame().revision, g.revision);
+  h.click('[data-action="confirm-command"]');
   assert.equal(h.app.getGame().turn, 1);
+  assert.equal(h.app.getGame().pending, null);
   h.close();
 });

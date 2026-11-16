@@ -1,5 +1,14 @@
 # Change log
 
+## 0.12.0 — 2026-11-16
+
+- Simplified Player aid headings/reference text and kept both shared faces visible.
+- Added pre-commit confirmations for empty MOVE INTO/SETTLE/ATTACK and for incoming black-hole losses, including the movement follow-up after exploration.
+- Moved Reserve limit/empty interruptions to modals. Predictable shortages can be cancelled before commitment; already committed/resumed checkpoints require outcome confirmation without reopening hidden reveals or adding a Status Box step.
+- Made yellow legal-chip rings blink, kept blue hover/focus rings steady, respected reduced motion, and ordered Players & supply from the current first player.
+- Added focused/background-blocking and stale-confirmation safeguards. Application version 0.12 retains engine 0.11/schema 4 and existing save compatibility. All 108 tests and packaging checks pass; real-browser/phone visual review remains pending.
+- See the [complete 0.12 checklist](docs/PLAYTEST_CHANGES_0.12.md).
+
 ## 0.11.0 — 2026-11-16
 
 - Applied the third designer playtest batch: selected-only PLAN previews, guarded double-click/double-tap confirmation, top-first stack numbering, clearer chip rims/legal rings, dark Ivory rocket outlines and names drawn above all system art.

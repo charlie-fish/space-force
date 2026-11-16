@@ -2451,10 +2451,28 @@ svg.poker-chip {
   stroke-opacity: 1;
   vector-effect: non-scaling-stroke;
   pointer-events: stroke;
+  animation: selectable-stack-blink 1.4s step-end infinite;
 }
 .system:hover .selection-ring,
 .system:focus .selection-ring {
   stroke: #30a6d0;
+  animation: none;
+  opacity: 1;
+}
+@keyframes selectable-stack-blink {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  65% {
+    opacity: 0.18;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .system .selection-ring {
+    animation: none;
+    opacity: 1;
+  }
 }
 .selectable-chip {
   filter: none;
