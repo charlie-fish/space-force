@@ -1,5 +1,16 @@
 # Change log
 
+## 0.10.0 — 2026-11-16
+
+- Applied the second designer playtest batch: separate Status Box heading/S shortcut, highlighted turn and prompt, decision-based “Since your last turn” history, score summaries, 10pt live text, destination scrolling and mobile-specific labels.
+- Condensed every chip in tall stacks with owner-coloured rims and thin legal-chip rings; moved stack numbering into System status and doubled Settlement rockets. Replaced printed, Planet Killer and Explore holes with the supplied circular Explore artwork; Le Guin remains hole-free by default.
+- Made PLAN placement a changeable preview until “Place chip here”; kept Investments on the Board, balanced investment edits automatically, capped reinforcement drafts and enabled board-click allocation.
+- Added target-first attacks, preserved attack scrolling, reordered selected Tech targets, vertical production controls, supply-limit explanations and confirmations for unused reinforcements or tokenless Tech effects.
+- Revealed and oriented explored systems before Ship quantities, required positive legal entry, paused non-choice Explore outcomes for Ok, and added a locked-commitment redistribution decision when an opponent's reward displaces a Settlement.
+- Added Reserve-shortfall acknowledgements, automatic first-player handover and all five final-state views below the completed-game results. Autosaves preserve pending decisions; genuine 0.8/0.9 records migrate by replay.
+- All 84 rules/content/DOM/migration checks pass, including 72 seeded complete games and exact record replay. Production packaging passes with 83 self-hosted assets and approximately 47 KB compressed JavaScript. Browser/phone visual testing remains outstanding.
+- See the [complete 0.10 feedback checklist](docs/PLAYTEST_CHANGES_0.10.md). The playable preset remains local normal-turn Family/simpler Events.
+
 ## 0.9.0 — 2026-11-16
 
 - Applied the designer's first playtest feedback: top Status Box, visible stack order, highlighted chips, direct/drag PLAN placement, linked production, draft SETTLE allocations and repeatable rotation previews.

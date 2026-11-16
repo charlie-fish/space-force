@@ -69,12 +69,34 @@ export interface ActionContext {
   bank: boolean;
   settlementQueue?: { planet: string; count: number }[];
 }
+export type SettlementResume = "settle" | "genesis";
+export type Continuation =
+  | { kind: "actionDone"; actor: number }
+  | { kind: "techDone" }
+  | { kind: "allocationDone" }
+  | {
+      kind: "place";
+      system: string;
+      planet: string;
+      count: number;
+      from: "ships" | "reserve";
+      resume: SettlementResume;
+    }
+  | { kind: "settlementNext"; system: string; resume: SettlementResume };
 export type Pending =
+  | { kind: "ack"; title: string; messages: string[]; after: Continuation }
+  | {
+      kind: "redistribute";
+      system: string;
+      amount: number;
+      resume: SettlementResume;
+    }
   | {
       kind: "orient";
       system: string;
       sources: Record<string, number>;
       rotations: number[];
+      entrySources?: string[];
     }
   | {
       kind: "move";
@@ -103,8 +125,8 @@ export interface Score {
   total: number;
 }
 export interface Game {
-  schema: 2;
-  engine: "0.9.0";
+  schema: 3;
+  engine: "0.10.0";
   content: "family-simple-events-1";
   seed: number;
   rng: number;
@@ -137,6 +159,7 @@ export interface Game {
     text: string;
   }[];
   commands: { actor: number; command: Command }[];
+  decisions: { player: number; revision: number }[];
   scores: Score[];
   winners: number[];
 }
@@ -153,6 +176,7 @@ export type Command =
       credits?: number;
       attack?: AttackPayload;
       settlements?: Record<string, number>;
+      reveal?: boolean;
     }
   | { type: "orient"; rotation: number }
   | { type: "move"; sources: Record<string, number> }
@@ -160,6 +184,8 @@ export type Command =
   | { type: "finishSettle" }
   | { type: "settleBatch"; settlements: Record<string, number> }
   | { type: "continueEvent" }
+  | { type: "acknowledge" }
+  | { type: "redistribute"; ships: number; settlements: Record<string, number> }
   | { type: "nextRound" }
   | { type: "explore"; recipient: number }
   | { type: "allocate"; credits: number; ships: Record<string, number> }

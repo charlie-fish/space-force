@@ -62,6 +62,7 @@ export const ART = artData as unknown as {
   };
   features: {
     planet: { image: string; settlementSlots: { x: number; y: number }[] };
+    blackHole: { image: string; width: number; height: number };
   };
 };
 export const CARDS = [...cardData.techs, ...cardData.events] as Card[];

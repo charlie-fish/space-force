@@ -1,10 +1,10 @@
 {
-  "schema_version": 2,
-  "clarification_id": "designer-clarifications-003",
-  "date": "2026-11-13",
-  "authority": "Designer follow-up messages in the project conversation, including the seven-player extension",
+  "schema_version": 3,
+  "clarification_id": "designer-clarifications-004",
+  "date": "2026-11-16",
+  "authority": "Designer follow-up messages in the project conversation, including seven-player extension and playtest corrections",
   "printed_rules_version": "1.80",
-  "status": "confirmed_specification_not_implemented",
+  "status": "confirmed_specification_family_subset_implemented",
   "delivery_order": [
     "normal_turns",
     "selectable_simultaneous_actions_variant"
@@ -28,7 +28,8 @@
     "special_centres_allowed_together": false,
     "adams_is_seventh_home_system": true,
     "player_aid_scope": "shared",
-    "player_aid_sides": 2
+    "player_aid_sides": 2,
+    "le_guin_default_black_holes": 0
   },
   "rulings": {
     "R01": {
@@ -133,8 +134,34 @@
     "asteroid_connectivity": {
       "include_warp_links_in_board_connectivity_check": true,
       "edge_isolation_allowed_if_warps_keep_board_connected": true
+    },
+    "committed_settlements_displaced_by_explore": {
+      "source": "Designer playtest feedback, 2026-11-16",
+      "opponent_reward_first": true,
+      "place_acting_players_committed_settlements_that_still_fit": true,
+      "displaced_amount_requires_new_decision": true,
+      "displaced_amount_options": [
+        "keep_as_ships",
+        "allocate_to_another_eligible_planet_in_system"
+      ],
+      "other_committed_placements_may_be_reduced": false,
+      "supply_limits_still_apply": true
+    },
+    "black_hole_movement": {
+      "loss_only_on_entry": true,
+      "loss_on_departure": false,
+      "incoming_ships_destroyed_per_destination_black_hole": 1,
+      "loss_capped_by_incoming_ships": true,
+      "destroyed_ships_become_owner_credits": true
+    },
+    "unexplored_move_commitment": {
+      "reveal_before_choosing_ship_quantities": true,
+      "orientation_before_ship_quantities": true,
+      "at_least_one_ship_must_enter_after_reveal": true,
+      "original_entry_route_must_remain_legal": true,
+      "empty_unrevealing_action_still_allowed_under_R04": true
     }
   },
-  "supersedes": "designer-clarifications-002",
+  "supersedes": "designer-clarifications-003",
   "configuration_reference": "game-configuration.json"
 }

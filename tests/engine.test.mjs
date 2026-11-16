@@ -248,6 +248,7 @@ test("Explore gifts obey Reserve limits and revealed black holes do not kill exi
       assert.equal(g.players[1].reserve, 0);
     }
     if (effect === "credit3") assert.equal(g.players[0].reserve, 0);
+    if (g.pending?.kind === "ack") g = step(g, { type: "acknowledge" });
     if (effect === "blackHole") {
       assert.equal(system(g, s.id).extraHoles, 1);
       assert.equal(system(g, s.id).ships[0], ownBefore - 1);
@@ -600,6 +601,8 @@ test("batch SETTLE validates the whole preview before commitment and resolves mu
     "credit2",
   );
   g = step(g, { type: "explore", recipient: 1 });
+  assert.equal(g.pending.kind, "ack");
+  g = step(g, { type: "acknowledge" });
   assert.equal(g.pending, null);
   assert.equal(g.players[0].credits, 2);
   assert.equal(system(g, s.id).ships[0], 1);

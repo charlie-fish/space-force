@@ -1,7 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { JSDOM } from "jsdom";
-import { mountApp } from "../work/compiled/ui.js";
+import { harness } from "./ui-harness.mjs";
 import {
   ART,
   applyCommand,
@@ -31,7 +30,7 @@ test("Status Box is above the board and always contains the turn, supplies and s
     ["techs", "Techs (T)"],
     ["event", "Event (E)"],
     ["actions", "Actions and Supply (A)"],
-    ["player_aid", "Player Aid (P)"],
+    ["player_aid", "Player aid (P)"],
   ]) {
     h.click(`[data-view="${view}"]`);
     assert.ok(h.root.querySelector("#status-box .turn-bar"));
@@ -42,7 +41,7 @@ test("Status Box is above the board and always contains the turn, supplies and s
   h.close();
 });
 
-test("Plan has a blank sun, a translucent chip preview and one-command touch drag placement", () => {
+test("Plan has a blank sun and touch drag previews a placement until confirmed", () => {
   const h = harness();
   h.app.setGame(setup());
   const g = h.app.getGame(),
@@ -61,8 +60,10 @@ test("Plan has a blank sun, a translucent chip preview and one-command touch dra
   assert.ok(h.root.querySelector("#placement-chip"));
   assert.ok(h.root.querySelector(".drop-target"));
   h.pointer(".map-viewport", "pointerup", 100, 70);
+  assert.equal(h.app.getGame().revision, g.revision);
+  assert.deepEqual(system(h.app.getGame(), id).tokens, []);
+  h.click('[data-action="place-chip"]');
   assert.equal(h.app.getGame().revision, g.revision + 1);
-  assert.deepEqual(system(h.app.getGame(), id).tokens, [g.turn]);
   h.click(`[data-system="${id}"][role="button"]`);
   assert.equal(h.app.getGame().revision, g.revision + 1);
   assert.equal(h.root.querySelector("#placement-chip"), null);
@@ -81,12 +82,18 @@ test("all 28 stack positions are visible without inspection and selectable top c
     `[data-system="${g.systems[0].id}"][role="button"]`,
   );
   assert.deepEqual(
-    [...tile.querySelectorAll("[data-stack-index]")].map((el) =>
+    [...tile.querySelectorAll(".stack-chip")].map((el) =>
       Number(el.dataset.owner),
     ),
     g.systems[0].tokens,
   );
-  assert.ok(tile.querySelector(".selectable-chip"));
+  assert.ok(tile.querySelector(".selection-ring"));
+  assert.equal(tile.querySelectorAll("[data-stack-index]").length, 0);
+  h.click(`[data-system="${g.systems[0].id}"][role="button"]`);
+  assert.equal(
+    h.root.querySelectorAll(".system-stack-order [data-stack-index]").length,
+    28,
+  );
   h.close();
 });
 
@@ -195,8 +202,8 @@ test("attack limits targets by sacrifice, shows planet graphics, and confirms ex
   );
   h.input('[data-number="sacrifice"]', "2");
   h.input('[data-number="target-ships"]', "99");
-  assert.equal(h.root.querySelector('[data-number="target-ships"]').value, "4");
-  assert.equal(h.root.querySelector('[data-number="target-colony"]').max, "0");
+  assert.equal(h.root.querySelector('[data-number="target-ships"]').value, "5");
+  assert.equal(h.root.querySelector('[data-number="target-colony"]').max, "2");
   h.input('[data-number="sacrifice"]', "1");
   assert.equal(h.root.querySelector('[data-number="target-ships"]').value, "2");
   h.input('[data-number="sacrifice"]', "3");
@@ -223,6 +230,9 @@ test("only genuinely shared planets are described as protected", () => {
   h.app.setGame(g);
   h.click(`[data-system="${s.id}"][role="button"]`);
   h.click('[data-kind="attack"]');
+  const invest = h.root.querySelector('[data-check="invest"]');
+  invest.checked = false;
+  invest.dispatchEvent(new h.window.Event("change", { bubbles: true }));
   assert.equal(
     (
       h.root
@@ -380,12 +390,6 @@ test("Economy shows every stage, an explicit Event step, and Board reinforcement
     h.click('[data-action="all-home"]');
     h.click('[data-action="allocate"]');
   }
-  assert.equal(h.app.getGame().phase, "pass");
-  assert.match(
-    h.root.querySelector(".first-player-token").getAttribute("aria-label"),
-    /Pass first player/,
-  );
-  h.click('[data-action="next-round"]');
   assert.equal(h.app.getGame().phase, "plan");
   assert.equal(h.app.getGame().first, 1);
   h.close();
@@ -428,65 +432,6 @@ test("orientation buttons preview repeatable sixty-degree rotations and commit o
   h.close();
 });
 
-function harness(storage) {
-  const dom = new JSDOM(
-    '<!doctype html><html><body><div id="app"></div></body></html>',
-    { url: "https://space-force.test/" },
-  );
-  const { window } = dom;
-  const root = window.document.querySelector("#app");
-  const app = mountApp(root, storage ?? window.localStorage);
-  const click = (selector) => {
-    const el = root.querySelector(selector);
-    assert.ok(el, `Missing control: ${selector}`);
-    el.dispatchEvent(new window.MouseEvent("click", { bubbles: true }));
-  };
-  const key = (selector, value, extra = {}) => {
-    const el = root.querySelector(selector);
-    assert.ok(el);
-    el.dispatchEvent(
-      new window.KeyboardEvent("keydown", {
-        key: value,
-        bubbles: true,
-        cancelable: true,
-        ...extra,
-      }),
-    );
-  };
-  const input = (selector, value, event = "change") => {
-    const el = root.querySelector(selector);
-    assert.ok(el);
-    el.value = value;
-    el.dispatchEvent(new window.Event(event, { bubbles: true }));
-  };
-  const pointer = (selector, type, x, y, id = 1) => {
-    const event = new window.MouseEvent(type, {
-      clientX: x,
-      clientY: y,
-      bubbles: true,
-      cancelable: true,
-    });
-    Object.defineProperties(event, {
-      pointerType: { value: "touch" },
-      pointerId: { value: id },
-    });
-    root.querySelector(selector).dispatchEvent(event);
-  };
-  return {
-    app,
-    root,
-    window,
-    click,
-    key,
-    input,
-    pointer,
-    close: () => {
-      app.destroy();
-      window.close();
-    },
-  };
-}
-
 test("setup exposes 2–7 seats, editable names, and a reproducible map code", () => {
   const h = harness();
   const { app, root, window, click, input } = h;
@@ -528,6 +473,7 @@ test("home and chip choices commit through the real interface; all five views re
   const id = app.getGame().systems[0].id;
   for (let i = 0; i < 8; i++) {
     click(`[data-system="${id}"][role="button"]`);
+    click('[data-action="place-chip"]');
   }
   assert.equal(app.getGame().phase, "actions");
   for (const view of ["techs", "event", "actions", "player_aid", "board"]) {
@@ -579,7 +525,7 @@ test("hidden movement commits before orientation and restores its mandatory foll
     new RegExp(ART.systems[target.template].name),
   );
   click('[data-kind="move"]');
-  input(`[data-number="source"][data-id="${from.id}"]`, "2");
+  assert.equal(root.querySelector('[data-number="source"]'), null);
   click('[data-action="commit-action"]');
   assert.equal(app.getGame().pending.kind, "orient");
   assert.match(
@@ -588,6 +534,7 @@ test("hidden movement commits before orientation and restores its mandatory foll
   );
   click('[data-action="commit-orientation"]');
   assert.equal(app.getGame().pending.kind, "move");
+  input(`[data-number="source"][data-id="${from.id}"]`, "2");
   const saved = window.localStorage.getItem("space-force.local-family.v1");
   h.close();
   const resumed = harness({
@@ -596,7 +543,8 @@ test("hidden movement commits before orientation and restores its mandatory foll
   });
   resumed.click('[data-action="resume"]');
   assert.equal(resumed.app.getGame().pending.kind, "move");
-  assert.equal(resumed.root.querySelector('[data-number="source"]').value, "2");
+  assert.equal(resumed.root.querySelector('[data-number="source"]').value, "0");
+  resumed.input('[data-number="source"]', "2");
   resumed.click('[data-action="finish-move"]');
   assert.equal(resumed.app.getGame().pending, null);
   resumed.close();
@@ -743,7 +691,7 @@ test("game export downloads a versioned JSON record with setup, commands, and cu
     h.click('[data-action="export"]');
     const record = JSON.parse(await blob.text());
     assert.match(download, /^space-force-/);
-    assert.equal(record.game.engine, "0.9.0");
+    assert.equal(record.game.engine, "0.10.0");
     assert.equal(record.game.content, "family-simple-events-1");
     assert.equal(record.game.commands.length, record.game.revision);
     assert.equal(record.game.seed, h.app.getGame().seed);

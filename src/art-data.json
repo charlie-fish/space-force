@@ -552,7 +552,7 @@
       "image": "/art/systems/clarke.webp",
       "width": 400,
       "height": 462,
-      "bytes": 31170,
+      "bytes": 33162,
       "sun": {
         "x": 0.511354,
         "y": 0.427771,
@@ -567,8 +567,6 @@
           "radiusX": 0.193148,
           "radiusY": 0.169069,
           "home": true,
-          "index": 0,
-          "id": "system.clarke.planet.0",
           "settlementSlots": [
             {
               "x": 0.594556,
@@ -594,7 +592,9 @@
               "x": 0.679739,
               "y": 0.822145
             }
-          ]
+          ],
+          "index": 0,
+          "id": "system.clarke.planet.0"
         },
         {
           "capacity": 3,
@@ -603,8 +603,6 @@
           "radiusX": 0.13768,
           "radiusY": 0.118176,
           "home": false,
-          "index": 1,
-          "id": "system.clarke.planet.1",
           "settlementSlots": [
             {
               "x": 0.2459,
@@ -618,7 +616,9 @@
               "x": 0.281558,
               "y": 0.304432
             }
-          ]
+          ],
+          "index": 1,
+          "id": "system.clarke.planet.1"
         },
         {
           "capacity": 3,
@@ -627,8 +627,6 @@
           "radiusX": 0.13768,
           "radiusY": 0.118176,
           "home": false,
-          "index": 2,
-          "id": "system.clarke.planet.2",
           "settlementSlots": [
             {
               "x": 0.131002,
@@ -642,7 +640,9 @@
               "x": 0.16765,
               "y": 0.532229
             }
-          ]
+          ],
+          "index": 2,
+          "id": "system.clarke.planet.2"
         },
         {
           "capacity": 3,
@@ -651,8 +651,6 @@
           "radiusX": 0.13768,
           "radiusY": 0.119038,
           "home": false,
-          "index": 3,
-          "id": "system.clarke.planet.3",
           "settlementSlots": [
             {
               "x": 0.78077,
@@ -666,7 +664,9 @@
               "x": 0.818409,
               "y": 0.580546
             }
-          ]
+          ],
+          "index": 3,
+          "id": "system.clarke.planet.3"
         },
         {
           "capacity": 3,
@@ -675,8 +675,6 @@
           "radiusX": 0.136689,
           "radiusY": 0.118176,
           "home": false,
-          "index": 4,
-          "id": "system.clarke.planet.4",
           "settlementSlots": [
             {
               "x": 0.200337,
@@ -690,7 +688,9 @@
               "x": 0.235995,
               "y": 0.775553
             }
-          ]
+          ],
+          "index": 4,
+          "id": "system.clarke.planet.4"
         }
       ],
       "homePlanetIndex": 0,
@@ -713,6 +713,9 @@
           20.242,
           389.88,
           437.587
+        ],
+        "excludedLayers": [
+          "printed-black-hole"
         ]
       }
     },
@@ -1441,7 +1444,7 @@
       "image": "/art/systems/lem.webp",
       "width": 400,
       "height": 462,
-      "bytes": 32106,
+      "bytes": 34048,
       "sun": {
         "x": 0.5352,
         "y": 0.473752,
@@ -1456,8 +1459,6 @@
           "radiusX": 0.11886,
           "radiusY": 0.102649,
           "home": false,
-          "index": 0,
-          "id": "system.lem.planet.0",
           "settlementSlots": [
             {
               "x": 0.204373,
@@ -1467,7 +1468,9 @@
               "x": 0.289556,
               "y": 0.422895
             }
-          ]
+          ],
+          "index": 0,
+          "id": "system.lem.planet.0"
         },
         {
           "capacity": 2,
@@ -1476,8 +1479,6 @@
           "radiusX": 0.11886,
           "radiusY": 0.103511,
           "home": false,
-          "index": 1,
-          "id": "system.lem.planet.1",
           "settlementSlots": [
             {
               "x": 0.705566,
@@ -1487,7 +1488,9 @@
               "x": 0.79075,
               "y": 0.639466
             }
-          ]
+          ],
+          "index": 1,
+          "id": "system.lem.planet.1"
         },
         {
           "capacity": 1,
@@ -1496,14 +1499,14 @@
           "radiusX": 0.077259,
           "radiusY": 0.067282,
           "home": false,
-          "index": 2,
-          "id": "system.lem.planet.2",
           "settlementSlots": [
             {
               "x": 0.252908,
               "y": 0.207174
             }
-          ]
+          ],
+          "index": 2,
+          "id": "system.lem.planet.2"
         },
         {
           "capacity": 1,
@@ -1512,14 +1515,14 @@
           "radiusX": 0.077259,
           "radiusY": 0.067282,
           "home": false,
-          "index": 3,
-          "id": "system.lem.planet.3",
           "settlementSlots": [
             {
               "x": 0.236069,
               "y": 0.626527
             }
-          ]
+          ],
+          "index": 3,
+          "id": "system.lem.planet.3"
         },
         {
           "capacity": 1,
@@ -1528,14 +1531,14 @@
           "radiusX": 0.076269,
           "radiusY": 0.067282,
           "home": false,
-          "index": 4,
-          "id": "system.lem.planet.4",
           "settlementSlots": [
             {
               "x": 0.283613,
               "y": 0.795644
             }
-          ]
+          ],
+          "index": 4,
+          "id": "system.lem.planet.4"
         }
       ],
       "homePlanetIndex": null,
@@ -1568,6 +1571,9 @@
           20.242,
           756.333,
           437.587
+        ],
+        "excludedLayers": [
+          "printed-black-hole"
         ]
       }
     },
@@ -1577,7 +1583,7 @@
       "image": "/art/systems/adams.webp",
       "width": 400,
       "height": 462,
-      "bytes": 34376,
+      "bytes": 37380,
       "sun": {
         "x": 0.39802,
         "y": 0.439751,
@@ -1592,8 +1598,6 @@
           "radiusX": 0.193069,
           "radiusY": 0.168966,
           "home": true,
-          "index": 0,
-          "id": "system.adams.planet.0",
           "settlementSlots": [
             {
               "x": 0.665347,
@@ -1619,7 +1623,9 @@
               "x": 0.750495,
               "y": 0.754538
             }
-          ]
+          ],
+          "index": 0,
+          "id": "system.adams.planet.0"
         },
         {
           "capacity": 2,
@@ -1628,8 +1634,6 @@
           "radiusX": 0.118812,
           "radiusY": 0.102586,
           "home": false,
-          "index": 1,
-          "id": "system.adams.planet.1",
           "settlementSlots": [
             {
               "x": 0.091089,
@@ -1639,7 +1643,9 @@
               "x": 0.177228,
               "y": 0.338039
             }
-          ]
+          ],
+          "index": 1,
+          "id": "system.adams.planet.1"
         },
         {
           "capacity": 2,
@@ -1648,8 +1654,6 @@
           "radiusX": 0.118812,
           "radiusY": 0.102586,
           "home": false,
-          "index": 2,
-          "id": "system.adams.planet.2",
           "settlementSlots": [
             {
               "x": 0.815842,
@@ -1659,7 +1663,9 @@
               "x": 0.90099,
               "y": 0.444971
             }
-          ]
+          ],
+          "index": 2,
+          "id": "system.adams.planet.2"
         },
         {
           "capacity": 2,
@@ -1668,8 +1674,6 @@
           "radiusX": 0.118812,
           "radiusY": 0.103448,
           "home": false,
-          "index": 3,
-          "id": "system.adams.planet.3",
           "settlementSlots": [
             {
               "x": 0.1,
@@ -1679,7 +1683,9 @@
               "x": 0.186139,
               "y": 0.62864
             }
-          ]
+          ],
+          "index": 3,
+          "id": "system.adams.planet.3"
         },
         {
           "capacity": 2,
@@ -1688,8 +1694,6 @@
           "radiusX": 0.117822,
           "radiusY": 0.102586,
           "home": false,
-          "index": 4,
-          "id": "system.adams.planet.4",
           "settlementSlots": [
             {
               "x": 0.30495,
@@ -1699,7 +1703,9 @@
               "x": 0.392079,
               "y": 0.770929
             }
-          ]
+          ],
+          "index": 4,
+          "id": "system.adams.planet.4"
         }
       ],
       "homePlanetIndex": 0,
@@ -1722,6 +1728,9 @@
           0.72,
           381.6,
           418.32
+        ],
+        "excludedLayers": [
+          "printed-black-hole"
         ]
       }
     },
@@ -2727,7 +2736,9 @@
     "Cover extracted from rulebook page 1; the separately supplied inline PNG binary was not available in the execution workspace.",
     "Source sheets include duplicated player aids; exactly two faces are extracted for one shared double-sided aid.",
     "Settlement slot centres are measured from the printed PDF vector indicator circles. Each planet has exactly its printed capacity of slots, in top-to-bottom then left-to-right order, normalized to the whole tile image. Any Arcologies overflow needs a separate UI anchor.",
-    "The first-player marker uses the newer artwork on Cards page 33. Stage regions are normalized top-left rectangles padded around each printed icon; they are highlight guides, not gameplay hit regions."
+    "The first-player marker uses the newer artwork on Cards page 33. Stage regions are normalized top-left rectangles padded around each printed icon; they are highlight guides, not gameplay hit regions.",
+    "Clarke, Lem and Adams base artwork omits only the printed black-hole image XObject. Overlay features.blackHole at fixedBlackHoles centres; the unchanged source radii describe the former printed image bounds, not the new circular token diameter.",
+    "Le Guin has no printed black hole. The hole on the same source sheet belongs to the separate Lem hex."
   ],
   "cover": {
     "image": "/art/cover.webp",
@@ -2836,6 +2847,27 @@
           350.973,
           356.747
         ]
+      }
+    },
+    "blackHole": {
+      "image": "/art/black-hole.webp",
+      "width": 192,
+      "height": 192,
+      "bytes": 8950,
+      "center": {
+        "x": 0.5,
+        "y": 0.5
+      },
+      "source": {
+        "filename": "Space Force A4 Cardboard 1.40.pdf",
+        "page": 7,
+        "crop": [
+          243.344,
+          398.422,
+          329.744,
+          484.102
+        ],
+        "description": "Left circular black-hole Explore token, including its original blue rim. The print sheet slightly compresses its height; normalized to a circular 192-pixel image."
       }
     }
   }

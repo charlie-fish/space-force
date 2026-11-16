@@ -29,14 +29,15 @@ export function obstacles(s: System): Space[] {
       radiusY: art.planets[i]?.radiusY ?? 0.078,
     })),
     { ...art.sun },
-    ...(art.fixedBlackHoles as Space[]),
+    ...art.fixedBlackHoles.map((p) => ({
+      ...p,
+      radiusX: 13 / HEX_WIDTH,
+      radiusY: 13 / 200,
+    })),
     ...(art.fixedWarps as Space[]),
     { x: 0.5, y: 0.085, radiusX: 0.4, radiusY: 0.04 },
     ...(s.extraWarp
       ? [{ x: 0.24, y: 0.21, radiusX: 0.15, radiusY: 0.04 }]
-      : []),
-    ...(s.extraHoles
-      ? [{ x: 0.24, y: 0.285, radiusX: 0.15, radiusY: 0.04 }]
       : []),
   ];
 }
@@ -75,11 +76,49 @@ export function findOpenSpace(
   return best;
 }
 export function fleetPositions(s: System): Point[] {
-  const occupied: Space[] = [];
+  const occupied: Space[] = blackHolePositions(s).map((p) => ({
+    ...p,
+    radiusX: p.radius / HEX_WIDTH,
+    radiusY: p.radius / 200,
+  }));
   return s.ships.map((n) => {
     if (!n) return { x: 0, y: 0 };
     const p = findOpenSpace(s, 0.19, 0.1, occupied);
     occupied.push({ ...p, radiusX: 0.105, radiusY: 0.06 });
     return p;
   });
+}
+
+export function blackHolePositions(s: System): (Point & { radius: number })[] {
+  const art = ART.systems[s.template];
+  const fixed = art.fixedBlackHoles.map((p) => ({
+    x: p.x,
+    y: p.y,
+    radius: 13,
+  }));
+  const blocked = s.planets
+    .filter((p) => p.blocked)
+    .map((p) => {
+      const index = s.planets.indexOf(p);
+      return {
+        x: p.x,
+        y: p.y,
+        radius: (art.planets[index]?.radiusX ?? 0.09) * HEX_WIDTH,
+      };
+    });
+  const placed = [...fixed, ...blocked];
+  for (let i = 0; i < Math.max(0, (s.extraHoles ?? 0) - blocked.length); i++) {
+    const p = findOpenSpace(
+      s,
+      0.16,
+      0.14,
+      placed.map((p) => ({
+        ...p,
+        radiusX: p.radius / HEX_WIDTH,
+        radiusY: p.radius / 200,
+      })),
+    );
+    placed.push({ ...p, radius: 13 });
+  }
+  return placed;
 }

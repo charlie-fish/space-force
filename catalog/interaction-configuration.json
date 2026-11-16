@@ -1,5 +1,5 @@
 {
-  "schema_version": 3,
+  "schema_version": 4,
   "status": "local_prototype_implemented_remote_controls_pending",
   "view_ids": [
     "board",
@@ -43,10 +43,11 @@
     "ArrowKeys": "pan_board",
     "Escape": "close_overlay_restore_focus",
     "?": "shortcut_help",
-    "P": "player_aid"
+    "P": "player_aid",
+    "S": "status_box_scroll_document_top"
   },
   "keyboard_safeguards": {
-    "focus_scope": "game_interface",
+    "focus_scope": "game_interface_or_page_body",
     "camera_requires_board_focus": true,
     "ignore_editable_fields": true,
     "preserve_browser_modifiers": [
@@ -65,7 +66,7 @@
     "techs": "Techs",
     "event": "Event",
     "actions": "Actions and Supply",
-    "player_aid": "Player Aid"
+    "player_aid": "Player aid"
   },
   "actions_view_contents": [
     "move_into_slot",
@@ -97,15 +98,91 @@
     "selected_system_explore_count": true,
     "explore_outcomes_visible": true,
     "economy_first_player_token_stages": true,
-    "reinforcement_controls_on_board": true
+    "reinforcement_controls_on_board": true,
+    "heading_own_line": true,
+    "desktop_heading": "Status Box (S)",
+    "mobile_heading": "Status Box",
+    "highlighted": [
+      "player_rocket_name_badge",
+      "possessive_turn_title"
+    ],
+    "prompt_position": "immediately_below_turn_title",
+    "prompt_colour": "black",
+    "system_stack_order": "numbered_bottom_to_top_list",
+    "players_and_supply_includes_current_scores": true,
+    "history": {
+      "label": "Since your last turn",
+      "collapsible": true,
+      "starts_at": "active_players_preceding_required_decision",
+      "every_decision_counts_as_turn": true
+    },
+    "actions_phase_label": "Actions"
   },
   "plan_placement": {
-    "desktop": "translucent_cursor_hover_then_click_to_commit",
-    "touch": "tap_or_drag_and_release_on_legal_system",
-    "invalid_drop_cancels": true
+    "desktop": "translucent_cursor_hover_then_click_to_select_preview",
+    "touch": "tap_or_drag_and_release_to_select_preview",
+    "invalid_drop_cancels": true,
+    "selection_changeable_before_commit": true,
+    "commit_button": "Place chip here"
   },
   "camera_control_labels": {
     "fit_board": "Reset View",
     "pan_controls_grouped_with_zoom": true
+  },
+  "shortcut_display": {
+    "desktop": "heading_label_with_key_in_brackets",
+    "mobile": "heading_label_only",
+    "view_shortcuts_scroll_to_panel_top": true,
+    "panel_scroll_accounts_for_sticky_header": true
+  },
+  "minimum_live_text_points": 10,
+  "source_image_text_has_semantic_reference": true,
+  "chip_stacks": {
+    "retain_all_chips": true,
+    "rim_colour": "player_colour",
+    "offset": "condensed_up_to_32_world_units_overall",
+    "legal_ring": "thin_opaque_behind_every_chip_in_stack",
+    "desktop_hover_ring_changes_colour": true,
+    "order_numbers_on_board": false
+  },
+  "economy_interactions": {
+    "investments_default_view": "board",
+    "investment_overallocation": "keep_edited_choice_reduce_topmost_other_allocation",
+    "reinforcements_capped_by_available": true,
+    "confirm_unused_reinforcements": true,
+    "board_click_allocates_one_if_legal": true,
+    "first_player_handover": "automatic"
+  },
+  "feature_choosers": {
+    "selected_option_first": true,
+    "on_selection_scroll_to_far_left": true,
+    "kinds": [
+      "planet",
+      "system",
+      "system_edge"
+    ]
+  },
+  "action_controls": {
+    "invest_checkbox_position": "immediately_above_commit",
+    "production_layout": "ships_then_credits_vertical",
+    "production_reserve_limit_explained": true,
+    "empty_attack_defaults_to_invest": true,
+    "attack_targets_auto_increase_sacrifice_to_cost": true,
+    "attack_scroll_preserved": true,
+    "sacrifice_counter": "chosen_over_needed",
+    "exploration_order": [
+      "commit_reveal",
+      "orient",
+      "choose_positive_legal_entry_ships"
+    ],
+    "nonchoice_explore_outcome_requires_ok": true,
+    "reserve_shortfalls_require_ok": true,
+    "confirm_token_tech_with_no_effect": true,
+    "loss_wording": "returned_as_credits"
+  },
+  "final_state": {
+    "all_five_views_available": true,
+    "views_below_completed_results": true,
+    "navigation_mutates_game": false
   }
 }

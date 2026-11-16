@@ -1,45 +1,58 @@
 import { applyCommand, assertInvariants, createGame } from "./engine.js";
 import type { Command, Game } from "./types.js";
 
-/** Upgrade genuine 0.8 command records without discarding an in-progress game. */
+/** Replay compatible older records, accepting only the newly added pauses. */
 export function restoreGame(value: unknown): Game {
-  const stored = value as Game & { engine: string; schema: number };
-  if ((stored as { engine: string }).engine === "0.8.0") {
-    const old = value as {
-      schema: number;
-      content: string;
-      revision: number;
-      seed: number;
-      players: { name: string }[];
-      commands: { actor: number; command: Command }[];
-    };
+  const stored = value as {
+    engine: string;
+    schema: number;
+    content: string;
+    revision: number;
+    seed: number;
+    players: { name: string }[];
+    commands: { actor: number; command: Command }[];
+  };
+  if (stored.engine === "0.8.0" || stored.engine === "0.9.0") {
+    const expected = stored.engine === "0.8.0" ? 1 : 2;
     if (
-      old.schema !== 1 ||
-      old.content !== "family-simple-events-1" ||
-      !Array.isArray(old.commands) ||
-      old.commands.length !== old.revision ||
-      !Array.isArray(old.players)
+      stored.schema !== expected ||
+      stored.content !== "family-simple-events-1" ||
+      !Array.isArray(stored.commands) ||
+      stored.commands.length !== stored.revision ||
+      !Array.isArray(stored.players)
     )
       throw Error("Invalid legacy save.");
     let game = createGame(
-      old.players.length,
-      old.seed,
-      old.players.map((p) => p.name),
+      stored.players.length,
+      stored.seed,
+      stored.players.map((p) => p.name),
     );
-    const acknowledge = () => {
-      if (game.phase === "event")
-        game = applyCommand(game, game.turn, { type: "continueEvent" });
-      if (game.phase === "pass")
-        game = applyCommand(game, game.turn, { type: "nextRound" });
+    const advanceAddedPauses = () => {
+      for (let i = 0; i < 100; i++) {
+        if (game.pending?.kind === "ack")
+          game = applyCommand(game, game.turn, { type: "acknowledge" });
+        else if (game.pending?.kind === "redistribute")
+          game = applyCommand(game, game.turn, {
+            type: "redistribute",
+            ships: game.pending.amount,
+            settlements: {},
+          });
+        else if (stored.engine === "0.8.0" && game.phase === "event")
+          game = applyCommand(game, game.turn, { type: "continueEvent" });
+        else return;
+      }
+      throw Error("Legacy resolution could not complete.");
     };
-    for (const record of old.commands) {
-      acknowledge();
+    for (const record of stored.commands) {
+      advanceAddedPauses();
+      if (record.command.type === "nextRound" && game.phase === "plan")
+        continue;
       game = applyCommand(game, record.actor, record.command);
     }
-    acknowledge();
+    advanceAddedPauses();
     assertInvariants(game);
     return game;
   }
-  assertInvariants(stored);
-  return stored;
+  assertInvariants(value as Game);
+  return value as Game;
 }

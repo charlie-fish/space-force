@@ -12,7 +12,7 @@
   font-synthesis: none;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
-  font-size: 15px;
+  font-size: max(10pt, 15px);
   --ink: #242034;
   --cream: #eee7d6;
   --orange: #e89953;
@@ -98,7 +98,7 @@ h3 {
   line-height: 1.14;
 }
 h1 {
-  font-size: clamp(2.6rem, 5vw, 4.8rem);
+  font-size: max(10pt, clamp(2.6rem, 5vw, 4.8rem));
   letter-spacing: -0.045em;
   font-weight: 850;
 }
@@ -106,14 +106,14 @@ h1 span {
   color: var(--sage);
 }
 h2 {
-  font-size: clamp(1.55rem, 2.3vw, 2.2rem);
+  font-size: max(10pt, clamp(1.55rem, 2.3vw, 2.2rem));
   letter-spacing: -0.035em;
 }
 h3 {
-  font-size: 1.1rem;
+  font-size: max(10pt, 1.1rem);
 }
 h4 {
-  font-size: 0.9rem;
+  font-size: max(10pt, 0.9rem);
   margin: 1.2rem 0 0.5rem;
 }
 p {
@@ -122,7 +122,7 @@ p {
 .eyebrow {
   text-transform: uppercase;
   letter-spacing: 0.13em;
-  font-size: 0.68rem;
+  font-size: max(10pt, 0.68rem);
   font-weight: 750;
   color: #d9bd97;
 }
@@ -131,7 +131,7 @@ small {
   color: var(--muted);
 }
 small {
-  font-size: 0.76rem;
+  font-size: max(10pt, 0.76rem);
 }
 .primary {
   background: var(--orange);
@@ -163,7 +163,7 @@ small {
 .big {
   width: 100%;
   min-height: 54px;
-  font-size: 1.05rem;
+  font-size: max(10pt, 1.05rem);
 }
 .selected {
   background: #e8995325 !important;
@@ -202,7 +202,7 @@ small {
   padding: 0.9rem 1.1rem;
   border-radius: 0 8px 8px 0;
   margin-bottom: 1.4rem;
-  font-size: 0.83rem;
+  font-size: max(10pt, 0.83rem);
   line-height: 1.55;
 }
 .scope-note strong,
@@ -218,14 +218,14 @@ small {
   border: 1px solid var(--line);
   border-radius: 20px;
   padding: 0.3rem 0.65rem;
-  font-size: 0.74rem;
+  font-size: max(10pt, 0.74rem);
   color: #c6c8ba;
 }
 .check-row {
   display: flex;
   align-items: center;
   gap: 0.65rem;
-  font-size: 0.86rem;
+  font-size: max(10pt, 0.86rem);
   margin: 1rem 0;
   line-height: 1.45;
 }
@@ -262,7 +262,7 @@ small {
   padding: 0.3rem 0.6rem;
   background: #262033e0;
   border-radius: 4px;
-  font-size: 0.75rem;
+  font-size: max(10pt, 0.75rem);
 }
 .landing-copy > .eyebrow {
   margin-bottom: 1.2rem;
@@ -272,7 +272,7 @@ small {
 }
 .lead {
   color: #d4cdd2;
-  font-size: 1.14rem;
+  font-size: max(10pt, 1.14rem);
   max-width: 32rem;
 }
 .landing fieldset {
@@ -282,7 +282,7 @@ small {
 }
 .landing legend {
   font-weight: 700;
-  font-size: 0.85rem;
+  font-size: max(10pt, 0.85rem);
   margin-bottom: 0.6rem;
 }
 .player-counts {
@@ -291,7 +291,7 @@ small {
   gap: 7px;
 }
 .player-counts button {
-  font-size: 1.1rem;
+  font-size: max(10pt, 1.1rem);
   font-weight: 750;
 }
 .name-grid {
@@ -306,10 +306,10 @@ small {
   align-items: center;
 }
 .name-grid input {
-  font-size: 0.88rem;
+  font-size: max(10pt, 0.88rem);
 }
 .map-code {
-  font-size: 0.82rem;
+  font-size: max(10pt, 0.82rem);
   margin: 1rem 0 1.4rem;
   color: var(--muted);
 }
@@ -330,7 +330,7 @@ summary {
   margin-bottom: 0.65rem;
 }
 .landing-foot {
-  font-size: 0.76rem;
+  font-size: max(10pt, 0.76rem);
   color: var(--muted);
   margin: 1rem 0 0;
 }
@@ -352,7 +352,7 @@ summary {
   line-height: 0.82;
   font-family: Impact, "Arial Narrow", sans-serif;
   letter-spacing: 0.04em;
-  font-size: 1.62rem;
+  font-size: max(10pt, 1.62rem);
   color: var(--orange);
   background: none;
   border: 0;
@@ -371,11 +371,11 @@ summary {
   gap: 3px;
 }
 .round-status strong {
-  font-size: 1.08rem;
+  font-size: max(10pt, 1.08rem);
 }
 .round-status > span:last-child {
   color: #c5bfca;
-  font-size: 0.79rem;
+  font-size: max(10pt, 0.79rem);
 }
 .header-player {
   margin-left: auto;
@@ -387,7 +387,7 @@ summary {
   display: inline-flex;
   gap: 6px;
   align-items: center;
-  font-size: 0.85rem;
+  font-size: max(10pt, 0.85rem);
   font-weight: 700;
   white-space: nowrap;
 }
@@ -408,10 +408,10 @@ summary {
 .resource-pills small {
   text-transform: uppercase;
   letter-spacing: 0.06em;
-  font-size: 0.61rem;
+  font-size: max(10pt, 0.61rem);
 }
 .resource-pills strong {
-  font-size: 1.35rem;
+  font-size: max(10pt, 1.35rem);
   font-variant-numeric: tabular-nums;
 }
 .header-tools {
@@ -429,7 +429,7 @@ summary {
   gap: 10px;
   min-height: 55px;
   padding: 10px 0;
-  font-size: 0.85rem;
+  font-size: max(10pt, 0.85rem);
   flex-wrap: wrap;
 }
 .turn-dot {
@@ -445,7 +445,7 @@ summary {
 }
 .turn-bar .text-link {
   margin-left: auto;
-  font-size: 0.76rem;
+  font-size: max(10pt, 0.76rem);
 }
 .guide {
   display: flex;
@@ -458,14 +458,14 @@ summary {
   margin-bottom: 12px;
 }
 .guide p {
-  font-size: 0.8rem;
+  font-size: max(10pt, 0.8rem);
   margin: 0.2rem 0 0;
   color: #d8d9cc;
   line-height: 1.5;
 }
 .guide > .quiet {
   margin-left: auto;
-  font-size: 0.72rem;
+  font-size: max(10pt, 0.72rem);
   white-space: nowrap;
   padding: 0.5rem;
 }
@@ -483,14 +483,14 @@ summary {
   padding: 0.8rem 1rem;
   border-bottom: 3px solid transparent;
   color: #bbb5c2;
-  font-size: 0.85rem;
+  font-size: max(10pt, 0.85rem);
   display: flex;
   gap: 8px;
   justify-content: center;
   align-items: center;
 }
 .view-tabs button > span {
-  font-size: 1.2rem;
+  font-size: max(10pt, 1.2rem);
   color: #a8b693;
 }
 .view-tabs button.active {
@@ -525,7 +525,7 @@ summary {
   border-bottom: 1px solid #ffffff0b;
 }
 .map-toolbar > span {
-  font-size: 0.73rem;
+  font-size: max(10pt, 0.73rem);
   color: var(--muted);
 }
 .map-toolbar > div {
@@ -535,7 +535,7 @@ summary {
 .map-toolbar button {
   min-height: 36px;
   padding: 0.25rem 0.6rem;
-  font-size: 0.8rem;
+  font-size: max(10pt, 0.8rem);
 }
 .map-viewport {
   height: clamp(420px, 62vh, 760px);
@@ -576,33 +576,33 @@ summary {
 }
 .system-name {
   fill: #f1e6cf;
-  font-size: 10px;
+  font-size: max(10pt, 10px);
   font-weight: 700;
   text-anchor: middle;
   pointer-events: none;
 }
 .fleet-label {
   fill: #f1e6cf;
-  font-size: 11px;
+  font-size: max(10pt, 11px);
   font-weight: 800;
   text-anchor: middle;
   pointer-events: none;
 }
 .explore-label {
   fill: #2a2334;
-  font-size: 11px;
+  font-size: max(10pt, 11px);
   font-weight: 900;
   text-anchor: middle;
 }
 .blocked-label {
   fill: #ebbd86;
-  font-size: 22px;
+  font-size: max(10pt, 22px);
   font-weight: 700;
   text-anchor: middle;
 }
 .stack-count {
   fill: #f4e6c5;
-  font-size: 10px;
+  font-size: max(10pt, 10px);
   font-weight: 700;
   text-anchor: middle;
   paint-order: stroke;
@@ -611,7 +611,7 @@ summary {
   pointer-events: none;
 }
 .feature-label {
-  font-size: 9px;
+  font-size: max(10pt, 9px);
   fill: #e0d2aa;
   paint-order: stroke;
   stroke: #201b2c;
@@ -631,7 +631,7 @@ summary {
   border: 0;
 }
 .map-pan span {
-  font-size: 0.65rem;
+  font-size: max(10pt, 0.65rem);
   color: #a49dac;
   margin-left: auto;
 }
@@ -649,11 +649,11 @@ summary {
   color: #85683c;
 }
 .console h2 {
-  font-size: 1.6rem;
+  font-size: max(10pt, 1.6rem);
   margin: 0.5rem 0 1rem;
 }
 .console p {
-  font-size: 0.84rem;
+  font-size: max(10pt, 0.84rem);
   line-height: 1.6;
 }
 .console .muted,
@@ -698,7 +698,7 @@ summary {
   display: flex;
   flex-direction: column;
   gap: 8px;
-  font-size: 0.75rem;
+  font-size: max(10pt, 0.75rem);
   color: #6f6172;
   margin-bottom: 1rem;
 }
@@ -714,13 +714,13 @@ summary {
   display: flex;
   align-items: center;
   gap: 5px;
-  font-size: 0.78rem;
+  font-size: max(10pt, 0.78rem);
   margin-bottom: 3px;
 }
 .stack-player strong {
   margin-left: auto;
   color: #7a5b2e;
-  font-size: 0.65rem;
+  font-size: max(10pt, 0.65rem);
   text-transform: uppercase;
 }
 .action-grid {
@@ -730,7 +730,7 @@ summary {
 }
 .action-grid button {
   font-weight: 750;
-  font-size: 0.82rem;
+  font-size: max(10pt, 0.82rem);
 }
 .console .selected {
   background: #e8995330 !important;
@@ -743,7 +743,7 @@ summary {
   gap: 12px;
   padding: 0.5rem 0;
   border-bottom: 1px solid #a797a729;
-  font-size: 0.8rem;
+  font-size: max(10pt, 0.8rem);
   line-height: 1.5;
 }
 .quantity-row small {
@@ -796,12 +796,12 @@ summary {
   display: flex;
   flex-direction: column;
   gap: 4px;
-  font-size: 0.83rem;
+  font-size: max(10pt, 0.83rem);
 }
 .planet-choice button {
   margin-left: auto;
   white-space: nowrap;
-  font-size: 0.76rem;
+  font-size: max(10pt, 0.76rem);
 }
 .planet-choice.highlight {
   background: #e8cb9966;
@@ -815,7 +815,7 @@ summary {
 }
 .feature-options button {
   text-align: left;
-  font-size: 0.77rem;
+  font-size: max(10pt, 0.77rem);
 }
 .section-heading {
   max-width: 850px;
@@ -826,7 +826,7 @@ summary {
 }
 .section-heading p {
   color: #c8c1cc;
-  font-size: 0.9rem;
+  font-size: max(10pt, 0.9rem);
   max-width: 760px;
 }
 .section-heading button {
@@ -883,20 +883,20 @@ summary {
   flex-direction: column;
   align-items: center;
   line-height: 1;
-  font-size: 1.5rem;
+  font-size: max(10pt, 1.5rem);
   font-weight: 800;
   min-width: 37px;
   color: #8e602d;
 }
 .cost small {
   color: #8c744d;
-  font-size: 0.54rem;
+  font-size: max(10pt, 0.54rem);
   margin-top: 4px;
   text-transform: uppercase;
   letter-spacing: 0.03em;
 }
 .tech-body p {
-  font-size: 0.79rem;
+  font-size: max(10pt, 0.79rem);
   line-height: 1.55;
   margin: 0;
 }
@@ -907,7 +907,7 @@ summary {
   margin-top: auto;
 }
 .ownership .player-badge {
-  font-size: 0.65rem;
+  font-size: max(10pt, 0.65rem);
   background: #3429390b;
   border-radius: 4px;
   padding: 1px 4px;
@@ -917,11 +917,11 @@ summary {
   height: 17px;
 }
 .ownership .muted {
-  font-size: 0.68rem;
+  font-size: max(10pt, 0.68rem);
   color: #84768c;
 }
 .tech-body button {
-  font-size: 0.74rem;
+  font-size: max(10pt, 0.74rem);
   padding: 0.5rem;
   min-height: 40px;
 }
@@ -946,17 +946,17 @@ summary {
   gap: 8px;
 }
 .supply h3 {
-  font-size: 0.9rem;
+  font-size: max(10pt, 0.9rem);
   margin: 0;
   color: #d9c19f;
 }
 .supply strong {
-  font-size: 2.7rem;
+  font-size: max(10pt, 2.7rem);
   line-height: 1;
   font-weight: 750;
 }
 .supply span {
-  font-size: 0.69rem;
+  font-size: max(10pt, 0.69rem);
   color: #b9b0c3;
   text-align: center;
 }
@@ -981,10 +981,10 @@ summary {
 }
 .action-slot strong {
   text-transform: uppercase;
-  font-size: 0.76rem;
+  font-size: max(10pt, 0.76rem);
 }
 .action-slot small {
-  font-size: 0.64rem;
+  font-size: max(10pt, 0.64rem);
   color: #867789;
 }
 .receiving-slot {
@@ -1028,18 +1028,18 @@ summary {
   margin-top: 16px;
 }
 .resource-breakdown > span {
-  font-size: 0.8rem;
+  font-size: max(10pt, 0.8rem);
   color: #bcb3c5;
 }
 .resource-breakdown strong {
   color: #f1e5cc;
-  font-size: 1.2rem;
+  font-size: max(10pt, 1.2rem);
   margin-right: 4px;
 }
 .score-preview {
   color: #d3c7b3;
   text-align: center;
-  font-size: 0.85rem;
+  font-size: max(10pt, 0.85rem);
   margin: 20px 0;
 }
 .actions-view > .console {
@@ -1069,11 +1069,11 @@ summary {
   margin-bottom: 24px;
 }
 .event-status strong {
-  font-size: 2.5rem;
+  font-size: max(10pt, 2.5rem);
   color: #d3b88b;
 }
 .event-status span {
-  font-size: 0.8rem;
+  font-size: max(10pt, 0.8rem);
   color: #bdb3c6;
 }
 .event-pair {
@@ -1124,7 +1124,7 @@ summary {
   border: 1px solid #d7c5ad;
 }
 .aid-faces article > h3 {
-  font-size: 1rem;
+  font-size: max(10pt, 1rem);
   text-align: center;
 }
 .aid-faces img {
@@ -1135,7 +1135,7 @@ summary {
   margin: auto;
 }
 .aid-faces dl {
-  font-size: 0.81rem;
+  font-size: max(10pt, 0.81rem);
   margin: 16px 0 0;
 }
 .aid-faces dt {
@@ -1156,18 +1156,18 @@ summary {
   border-top: 1px solid var(--line);
   padding: 12px 0 20px;
   margin-top: 22px;
-  font-size: 0.7rem;
+  font-size: max(10pt, 0.7rem);
   color: #9f97aa;
 }
 .game-footer > .text-link {
   margin-left: auto;
-  font-size: 0.7rem;
+  font-size: max(10pt, 0.7rem);
 }
 .history {
   width: 100%;
 }
 .history summary {
-  font-size: 0.78rem;
+  font-size: max(10pt, 0.78rem);
 }
 .history ol {
   list-style: none;
@@ -1180,7 +1180,7 @@ summary {
   padding: 0.55rem 0.8rem;
   border-bottom: 1px solid #ffffff0b;
   line-height: 1.5;
-  font-size: 0.76rem;
+  font-size: max(10pt, 0.76rem);
 }
 .history li > span {
   color: #a5b58e;
@@ -1194,7 +1194,7 @@ summary {
   margin: 35px auto 55px;
 }
 .final-scores h1 {
-  font-size: clamp(2.2rem, 5vw, 4.2rem);
+  font-size: max(10pt, clamp(2.2rem, 5vw, 4.2rem));
   margin: 1rem 0;
 }
 .score-table-wrap {
@@ -1212,13 +1212,13 @@ td {
   padding: 18px 15px;
   border-bottom: 1px solid #ffffff16;
   text-align: center;
-  font-size: 0.9rem;
+  font-size: max(10pt, 0.9rem);
 }
 th:first-child {
   text-align: left;
 }
 thead th {
-  font-size: 0.7rem;
+  font-size: max(10pt, 0.7rem);
   text-transform: uppercase;
   letter-spacing: 0.08em;
   color: #b5abbd;
@@ -1262,7 +1262,7 @@ thead th {
   margin: 15px 0;
 }
 .modal p {
-  font-size: 0.88rem;
+  font-size: max(10pt, 0.88rem);
   color: #d2c9d9;
 }
 .close {
@@ -1282,7 +1282,7 @@ thead th {
   border-radius: 8px;
 }
 .card-modal h2 {
-  font-size: 1.7rem;
+  font-size: max(10pt, 1.7rem);
 }
 @media (min-width: 1500px) {
   .board-layout {
@@ -1356,13 +1356,13 @@ thead th {
     display: none;
   }
   .landing-copy h1 {
-    font-size: 2.6rem;
+    font-size: max(10pt, 2.6rem);
   }
   .landing-copy > .eyebrow {
     text-align: center;
   }
   .landing .lead {
-    font-size: 1rem;
+    font-size: max(10pt, 1rem);
   }
   .game-shell {
     padding: 0 12px 75px;
@@ -1376,7 +1376,7 @@ thead th {
     padding: 10px 0;
   }
   .wordmark {
-    font-size: 1.15rem;
+    font-size: max(10pt, 1.15rem);
     min-height: 45px;
   }
   .round-status {
@@ -1386,10 +1386,10 @@ thead th {
     display: none;
   }
   .round-status strong {
-    font-size: 0.86rem;
+    font-size: max(10pt, 0.86rem);
   }
   .round-status > span:last-child {
-    font-size: 0.66rem;
+    font-size: max(10pt, 0.66rem);
   }
   .header-player {
     gap: 5px;
@@ -1400,7 +1400,7 @@ thead th {
     text-overflow: ellipsis;
   }
   .header-player > .player-badge {
-    font-size: 0.7rem;
+    font-size: max(10pt, 0.7rem);
   }
   .header-player > .player-badge .rocket {
     width: 22px;
@@ -1414,10 +1414,10 @@ thead th {
     padding: 0.3rem 0.3rem;
   }
   .resource-pills strong {
-    font-size: 1.13rem;
+    font-size: max(10pt, 1.13rem);
   }
   .resource-pills small {
-    font-size: 0.51rem;
+    font-size: max(10pt, 0.51rem);
   }
   .header-tools {
     gap: 0;
@@ -1430,7 +1430,7 @@ thead th {
     min-height: 35px;
   }
   .turn-bar {
-    font-size: 0.76rem;
+    font-size: max(10pt, 0.76rem);
     gap: 7px;
     line-height: 1.5;
   }
@@ -1440,7 +1440,7 @@ thead th {
     order: 3;
   }
   .turn-bar .text-link {
-    font-size: 0.68rem;
+    font-size: max(10pt, 0.68rem);
   }
   .guide {
     padding: 0.6rem 0.7rem;
@@ -1449,13 +1449,13 @@ thead th {
     gap: 5px;
   }
   .guide p {
-    font-size: 0.71rem;
+    font-size: max(10pt, 0.71rem);
   }
   .guide .eyebrow {
-    font-size: 0.58rem;
+    font-size: max(10pt, 0.58rem);
   }
   .guide > .quiet {
-    font-size: 0.62rem;
+    font-size: max(10pt, 0.62rem);
     padding: 0.3rem;
   }
   .view-tabs {
@@ -1481,7 +1481,7 @@ thead th {
     flex-direction: column;
     gap: 3px;
     padding: 0.35rem 0.1rem;
-    font-size: 0.65rem;
+    font-size: max(10pt, 0.65rem);
     border-bottom: 0;
     border-top: 2px solid transparent;
   }
@@ -1490,7 +1490,7 @@ thead th {
     background: #e8995310;
   }
   .view-tabs button > span {
-    font-size: 1.15rem;
+    font-size: max(10pt, 1.15rem);
     line-height: 1.2;
   }
   .board-layout {
@@ -1509,17 +1509,17 @@ thead th {
     padding: 5px 7px;
   }
   .map-pan span {
-    font-size: 0.58rem;
+    font-size: max(10pt, 0.58rem);
   }
   .console {
     max-height: none;
     min-height: 0;
   }
   .console h2 {
-    font-size: 1.45rem;
+    font-size: max(10pt, 1.45rem);
   }
   .console p {
-    font-size: 0.82rem;
+    font-size: max(10pt, 0.82rem);
   }
   .main-panel {
     min-height: 60vh;
@@ -1536,19 +1536,19 @@ thead th {
     padding: 14px;
   }
   .tech-title h3 {
-    font-size: 1rem;
+    font-size: max(10pt, 1rem);
   }
   .tech-body p {
-    font-size: 0.78rem;
+    font-size: max(10pt, 0.78rem);
   }
   .section-heading {
     margin-top: 18px;
   }
   .section-heading h2 {
-    font-size: 1.7rem;
+    font-size: max(10pt, 1.7rem);
   }
   .section-heading p {
-    font-size: 0.83rem;
+    font-size: max(10pt, 0.83rem);
   }
   .personal-board {
     grid-template-columns: 1fr 1fr;
@@ -1574,14 +1574,14 @@ thead th {
   .supply h3 {
     width: 100%;
     text-align: center;
-    font-size: 0.8rem;
+    font-size: max(10pt, 0.8rem);
   }
   .supply strong {
-    font-size: 2rem;
+    font-size: max(10pt, 2rem);
   }
   .supply span {
     width: 100%;
-    font-size: 0.62rem;
+    font-size: max(10pt, 0.62rem);
   }
   .receiving-slot {
     width: 61px;
@@ -1592,13 +1592,13 @@ thead th {
     padding: 13px;
   }
   .resource-breakdown > span {
-    font-size: 0.68rem;
+    font-size: max(10pt, 0.68rem);
   }
   .resource-breakdown strong {
-    font-size: 1rem;
+    font-size: max(10pt, 1rem);
   }
   .score-preview {
-    font-size: 0.78rem;
+    font-size: max(10pt, 0.78rem);
   }
   .event-status {
     grid-template-columns: auto 1fr;
@@ -1606,16 +1606,16 @@ thead th {
     padding: 15px;
   }
   .event-status strong {
-    font-size: 2rem;
+    font-size: max(10pt, 2rem);
   }
   .event-pair {
     gap: 12px;
   }
   .event-card span {
-    font-size: 0.8rem;
+    font-size: max(10pt, 0.8rem);
   }
   .event-card small {
-    font-size: 0.65rem;
+    font-size: max(10pt, 0.65rem);
   }
   .aid-faces {
     grid-template-columns: 1fr;
@@ -1627,13 +1627,13 @@ thead th {
   .game-footer {
     gap: 6px;
     line-height: 1.4;
-    font-size: 0.62rem;
+    font-size: max(10pt, 0.62rem);
   }
   .game-footer > .text-link {
-    font-size: 0.64rem;
+    font-size: max(10pt, 0.64rem);
   }
   .history summary {
-    font-size: 0.73rem;
+    font-size: max(10pt, 0.73rem);
   }
   .modal-scrim {
     padding: 10px;
@@ -1643,10 +1643,10 @@ thead th {
     max-height: 90dvh;
   }
   .modal h2 {
-    font-size: 1.55rem;
+    font-size: max(10pt, 1.55rem);
   }
   .modal p {
-    font-size: 0.81rem;
+    font-size: max(10pt, 0.81rem);
   }
   .card-modal {
     grid-template-columns: 1fr;
@@ -1661,18 +1661,18 @@ thead th {
     margin: 20px auto;
   }
   .final-scores h1 {
-    font-size: 2.2rem;
+    font-size: max(10pt, 2.2rem);
   }
   th,
   td {
     padding: 12px 8px;
-    font-size: 0.77rem;
+    font-size: max(10pt, 0.77rem);
   }
   thead th {
-    font-size: 0.6rem;
+    font-size: max(10pt, 0.6rem);
   }
   .score-table-wrap .player-badge {
-    font-size: 0.7rem;
+    font-size: max(10pt, 0.7rem);
   }
   .commit-row > button {
     flex: 1;
@@ -1688,7 +1688,7 @@ thead th {
     max-width: 48px;
   }
   .round-status strong {
-    font-size: 0.75rem;
+    font-size: max(10pt, 0.75rem);
   }
   .resource-pills > span {
     min-width: 40px;
@@ -1697,7 +1697,7 @@ thead th {
     display: none;
   }
   .action-slot strong {
-    font-size: 0.68rem;
+    font-size: max(10pt, 0.68rem);
   }
   .receiving-slot {
     width: 55px;
@@ -1721,7 +1721,7 @@ thead th {
 }
 
 .player-roster {
-  font-size: 0.77rem;
+  font-size: max(10pt, 0.77rem);
   margin: 0 0 14px;
   color: #c9c0d0;
 }
@@ -1761,13 +1761,13 @@ thead th {
     gap: 6px;
   }
   .wordmark {
-    font-size: 0.95rem;
+    font-size: max(10pt, 0.95rem);
   }
   .round-status strong {
-    font-size: 0.75rem;
+    font-size: max(10pt, 0.75rem);
   }
   .round-status > span:last-child {
-    font-size: 0.6rem;
+    font-size: max(10pt, 0.6rem);
   }
   .header-player > .player-badge > span {
     display: none;
@@ -1831,7 +1831,7 @@ svg.poker-chip {
   width: auto;
 }
 .status-box .turn-bar > strong {
-  font-size: 1rem;
+  font-size: max(10pt, 1rem);
 }
 .status-box .resource-pills {
   margin: 6px 0 9px;
@@ -1861,7 +1861,7 @@ svg.poker-chip {
 .status-box .player-roster .player-badge {
   grid-column: 1/-1;
   min-width: 0;
-  font-size: 0.76rem;
+  font-size: max(10pt, 0.76rem);
 }
 .status-decision {
   min-width: 0;
@@ -1908,7 +1908,7 @@ svg.poker-chip {
   margin-bottom: 12px;
 }
 .action-result p {
-  font-size: 0.79rem;
+  font-size: max(10pt, 0.79rem);
   line-height: 1.45;
   margin: 2px 0;
 }
@@ -2058,7 +2058,7 @@ svg.poker-chip {
   border: 1px solid #e4b97444;
   padding: 8px;
   border-radius: 5px;
-  font-size: 0.75rem !important;
+  font-size: max(10pt, 0.75rem) !important;
 }
 .action-slot small {
   display: flex;
@@ -2091,7 +2091,7 @@ svg.poker-chip {
   margin: 0;
 }
 .economy-stages li {
-  font-size: 0.64rem;
+  font-size: max(10pt, 0.64rem);
   padding: 4px 6px;
   background: #38253c08;
   border-radius: 4px;
@@ -2146,7 +2146,7 @@ svg.poker-chip {
   filter: drop-shadow(0 0 4px #fff2b5);
 }
 .stack-index {
-  font-size: 6px;
+  font-size: max(10pt, 6px);
   font-weight: 800;
   text-anchor: middle;
   fill: #fff7db;
@@ -2192,7 +2192,7 @@ svg.poker-chip {
     grid-template-columns: 1fr;
   }
   .quantity-row {
-    font-size: 0.76rem;
+    font-size: max(10pt, 0.76rem);
   }
 }
 @media (max-width: 760px) {
@@ -2229,17 +2229,17 @@ svg.poker-chip {
   }
   .status-overview .turn-bar > strong {
     padding-right: 0;
-    font-size: 0.85rem;
+    font-size: max(10pt, 0.85rem);
   }
   .status-box .player-roster {
     grid-column: 1/-1;
     clear: both;
   }
   .status-box .console h2 {
-    font-size: 1.35rem;
+    font-size: max(10pt, 1.35rem);
   }
   .status-box .console p {
-    font-size: 0.79rem;
+    font-size: max(10pt, 0.79rem);
   }
   .economy-tracker {
     grid-column: 1/-1;
@@ -2264,7 +2264,7 @@ svg.poker-chip {
   }
   .economy-stages li {
     margin: 2px 0;
-    font-size: 0.62rem;
+    font-size: max(10pt, 0.62rem);
   }
   .production-controls {
     grid-template-columns: 1fr 1fr;
@@ -2275,7 +2275,7 @@ svg.poker-chip {
   }
   .view-tabs button {
     min-height: 70px;
-    font-size: 0.62rem;
+    font-size: max(10pt, 0.62rem);
     line-height: 1.25;
   }
   .game-shell {
@@ -2283,7 +2283,7 @@ svg.poker-chip {
   }
   .map-toolbar > span {
     width: 100%;
-    font-size: 0.68rem;
+    font-size: max(10pt, 0.68rem);
   }
   .map-toolbar .camera-controls {
     justify-content: center;
@@ -2297,7 +2297,7 @@ svg.poker-chip {
     min-height: 335px;
   }
   .rotation-options button {
-    font-size: 0.72rem;
+    font-size: max(10pt, 0.72rem);
     padding: 0.5rem;
   }
   .planet-options {
@@ -2325,6 +2325,195 @@ svg.poker-chip {
 .new-chip {
   animation: chip-snap 0.18s ease-out;
 }
+
+/* The Status Box remains the top decision anchor; hints are desktop-only. */
+.status-title {
+  grid-column: 1/-1;
+  display: block;
+  margin: 0 !important;
+  line-height: 1.2;
+}
+.status-title button {
+  background: none;
+  border: 0;
+  padding: 0;
+  color: #19151e;
+  font-size: max(10pt, 1.35rem);
+  font-weight: 800;
+  min-height: 38px;
+  text-align: left;
+}
+.status-phase {
+  grid-column: 1/-1;
+}
+.status-overview .turn-bar > .player-badge,
+.status-overview .turn-bar > .turn-title {
+  color: #17121a;
+  background: #e7b663;
+  border: 1px solid #96703b;
+  border-radius: 6px;
+  padding: 5px 8px;
+}
+.status-overview .turn-bar > .turn-instruction {
+  color: #000 !important;
+  font-size: max(10pt, 1rem);
+  line-height: 1.5;
+  margin-top: 2px;
+  order: 3;
+}
+.status-overview .turn-bar > .player-badge {
+  order: 1;
+}
+.status-overview .turn-bar > .turn-title {
+  order: 2;
+}
+.status-box .since-last-turn {
+  color: #302939;
+  margin: 0 0 12px;
+  border: 1px solid #a995a9;
+  border-radius: 6px;
+  padding: 9px 11px;
+}
+.since-last-turn summary {
+  cursor: pointer;
+  font-weight: 700;
+}
+.since-last-turn ol {
+  list-style: none;
+  margin: 9px 0 0;
+  padding: 0;
+  max-height: 300px;
+  overflow: auto;
+}
+.since-last-turn li {
+  padding: 7px 0;
+  border-bottom: 1px solid #b8a28b44;
+  line-height: 1.5;
+}
+.since-last-turn li > span {
+  color: #6b4b23;
+}
+.since-last-turn p {
+  margin: 8px 0 0;
+}
+.system-stack-order {
+  margin: 12px 0;
+}
+.system-stack-order ol {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+  padding: 0;
+  list-style: none;
+  margin: 7px 0;
+}
+.system-stack-order li {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  border: 1px solid #b8a28b88;
+  border-radius: 6px;
+  padding: 4px 7px;
+  background: #fff8e966;
+}
+.system-stack-order .player-badge {
+  font-size: max(10pt, 0.85rem);
+}
+.system-stack-order li > strong {
+  color: #624217;
+}
+.production-controls {
+  grid-template-columns: 1fr !important;
+}
+.invest-choice {
+  margin-top: 12px !important;
+  margin-bottom: 3px !important;
+}
+.feature-options {
+  flex-wrap: nowrap;
+  overflow-x: auto;
+  overflow-y: hidden;
+  max-height: none;
+  scroll-snap-type: x proximity;
+  align-items: stretch;
+  padding: 3px 3px 10px;
+}
+.feature-options button {
+  flex: 0 0 210px;
+  min-width: 210px;
+  scroll-snap-align: start;
+}
+.token-used {
+  color: #332239 !important;
+  background: #eee2c6 !important;
+  border-color: #c2a56e !important;
+}
+.reserve-shortfall {
+  background: #efce8b66;
+  border-left: 3px solid #8b6327;
+  padding: 8px 10px;
+  color: #382511 !important;
+}
+.outcome-notice p {
+  color: #141018 !important;
+}
+.system .selection-ring {
+  stroke: #f0bd4a;
+  stroke-width: 1.25;
+  stroke-opacity: 1;
+  vector-effect: non-scaling-stroke;
+  pointer-events: stroke;
+}
+.system:hover .selection-ring,
+.system:focus .selection-ring {
+  stroke: #30a6d0;
+}
+.selectable-chip {
+  filter: none;
+}
+.plan-mode .legal-placement.chosen > .plan-preview {
+  opacity: 0.48;
+}
+#galaxy text {
+  font-size: max(10pt, var(--board-text-size, 13.333334px)) !important;
+}
+.system-name {
+  paint-order: stroke;
+  stroke: #211d32;
+  stroke-width: 2px;
+}
+.game-header {
+  flex-wrap: wrap;
+}
+@media (max-width: 760px), (hover: none) {
+  .shortcut-hint {
+    display: none !important;
+  }
+}
+@media (max-width: 760px) {
+  .status-overview .turn-bar > .player-badge {
+    display: inline-flex;
+  }
+  .status-overview .turn-bar {
+    grid-row: 3;
+  }
+  .status-supply {
+    grid-row: 3;
+  }
+  .status-phase {
+    grid-row: 2;
+  }
+  .feature-options button {
+    flex-basis: 190px;
+    min-width: 190px;
+  }
+  .view-tabs button {
+    min-height: 90px;
+  }
+  .game-shell {
+    padding-bottom: 115px;
+  }
+}
 @keyframes chip-snap {
   from {
     transform: translateY(-9px);
@@ -2339,4 +2528,27 @@ svg.poker-chip {
   .new-chip {
     animation: none;
   }
+}
+
+#galaxy .explore-label {
+  font-size: 13.333334px !important;
+}
+
+.status-overview .turn-bar > .player-badge {
+  max-width: 100%;
+  white-space: normal;
+  overflow-wrap: anywhere;
+}
+.status-overview .turn-bar > .player-badge > span {
+  min-width: 0;
+}
+.status-overview .turn-title {
+  max-width: 100%;
+  overflow-wrap: anywhere;
+}
+
+.view-tabs button > .shortcut-hint {
+  font-size: max(10pt, 0.85rem);
+  color: inherit;
+  white-space: pre;
 }

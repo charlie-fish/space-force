@@ -68,6 +68,9 @@ export function botCommand(g) {
   if (g.phase === "pass") return { type: "nextRound" };
   const p = player(g),
     pending = g.pending;
+  if (pending?.kind === "ack") return { type: "acknowledge" };
+  if (pending?.kind === "redistribute")
+    return { type: "redistribute", ships: pending.amount, settlements: {} };
   if (pending?.kind === "orient")
     return { type: "orient", rotation: pending.rotations[0] };
   if (pending?.kind === "move")

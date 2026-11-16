@@ -1,6 +1,6 @@
 # Reminders and asset handoffs
 
-Updated 15 November 2026. Keep this checklist current as files and checks arrive. These are persistent project reminders, not scheduled notifications.
+Updated 16 November 2026. Keep this checklist current as files and checks arrive. These are persistent project reminders, not scheduled notifications.
 
 Review priorities and next steps: [REVIEW_CHECKLIST.md](REVIEW_CHECKLIST.md).
 
@@ -14,6 +14,7 @@ Review priorities and next steps: [REVIEW_CHECKLIST.md](REVIEW_CHECKLIST.md).
 ## Project work to retain
 
 - [x] Build local Board/Techs/Event/Actions and Supply/Player Aid navigation with persistent Reserve/Credits, touch camera/view gestures, and desktop shortcuts.
+- [x] Implement both designer playtest batches, including Status history/S, compact legal-chip rings, explicit PLAN confirmation, Explore pauses/redistribution, Reserve warnings, allocation balancing and final-state views. See the [0.10 checklist](PLAYTEST_CHANGES_0.10.md).
 - [ ] Complete visual desktop/phone and accessibility playtests of the local prototype; see [PROTOTYPE.md](PROTOTYPE.md#validation).
 - [ ] Implement the confirmed five-minute majority-removal core with reviewed phase handling, skipped turns, audit records, and automatic last-player victory.
 
@@ -27,7 +28,7 @@ Review priorities and next steps: [REVIEW_CHECKLIST.md](REVIEW_CHECKLIST.md).
 - [ ] Validate silhouette/colour mapping and final chip/board proportions against the forthcoming STLs and device playtests.
 
 - [x] Implement and test complete local normal-turn Family/simpler-Events games, including all ten Family Techs, scoring, draft Undo, autosave/resume and deterministic record export.
-- [x] Prepare 80 optimised self-hosted PDF assets, including both aid faces and a matching rulebook cover illustration. Archive of the original inline PNG remains outstanding.
+- [x] Prepare 83 optimised self-hosted PDF assets, including both aid faces, Economy/Planet Nine tokens and circular black-hole artwork. Archive of the original inline PNG remains outstanding.
 
 ## Recorded and settled
 

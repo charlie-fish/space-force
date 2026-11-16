@@ -10,6 +10,7 @@ import argparse
 import csv
 import io
 import json
+import re
 from pathlib import Path
 
 import fitz
@@ -94,6 +95,34 @@ def page_image(page, clip, width):
     clip = fitz.Rect(clip)
     pix = page.get_pixmap(matrix=fitz.Matrix(width / clip.width, width / clip.width), clip=clip, alpha=False)
     return Image.frombytes('RGB', (pix.width, pix.height), pix.samples)
+
+
+def page_without_image_layers(page, excluded_xrefs):
+    """Clone a source page and omit selected image paint operations.
+
+    Removing only the named XObject's Do operator exposes the actual layers
+    beneath it. The original PDF, transforms, clips and all other paint
+    operations remain unchanged; no raster repair or background synthesis is
+    involved. Return the clone so its lifetime covers the eventual render.
+    """
+    names = {image[7] for image in page.get_images(full=True) if image[0] in excluded_xrefs}
+    assert len(names) == len(excluded_xrefs), (excluded_xrefs, names)
+    document = fitz.open()
+    document.insert_pdf(page.parent, from_page=page.number, to_page=page.number)
+    cloned_page = document[0]
+    removed = {name: 0 for name in names}
+    for xref in cloned_page.get_contents():
+        stream = document.xref_stream(xref)
+        for name in names:
+            # Source resource names contain no PDF name escapes. Retain the
+            # surrounding graphics-state operators so subsequent layers keep
+            # their exact original transforms and clipping paths.
+            pattern = rb'/' + re.escape(name.encode('ascii')) + rb'\s+Do\b'
+            stream, count = re.subn(pattern, b'', stream)
+            removed[name] += count
+        document.update_stream(xref, stream)
+    assert all(removed.values()), removed
+    return document
 
 
 def save_webp(image, target, quality=78):
@@ -202,15 +231,41 @@ def extract_planet_nine(cardboard):
                        'crop': [round(coordinate, 3) for coordinate in rect]}}
 
 
+def extract_black_hole(cardboard):
+    """Use the original circular Explore token, including its blue rim."""
+    page = cardboard[6]
+    images = [fitz.Rect(info['bbox']) for info in page.get_image_info(xrefs=True)]
+    overlays = [rect for rect in images if 80 < rect.width < 84 and 78 < rect.height < 82
+                and rect.x0 < 300 and rect.y0 > 390]
+    assert len(overlays) == 1
+    centre = (overlays[0].tl + overlays[0].br) / 2
+    discs = [rect for rect in images if 84 < rect.width < 88 and 84 < rect.height < 88
+             and rect.contains(centre)]
+    assert len(discs) == 1
+    rect = discs[0]
+    # Keep the source XObjects' own circular soft masks. Rendering against a
+    # white paper matte and then applying an ellipse would leave a white fringe.
+    scale = 384 / rect.width
+    pixmap = page.get_pixmap(matrix=fitz.Matrix(scale, scale), clip=rect, alpha=True)
+    image = Image.open(io.BytesIO(pixmap.tobytes('png'))).convert('RGBA')
+    image = image.resize((192, 192), Image.Resampling.LANCZOS)
+    return {**save_webp(image, OUTPUT/'public/art/black-hole.webp', quality=84),
+            'center': {'x': .5, 'y': .5},
+            'source': {'filename': 'Space Force A4 Cardboard 1.40.pdf', 'page': 7,
+                       'crop': [round(coordinate, 3) for coordinate in rect],
+                       'description': 'Left circular black-hole Explore token, including its original blue rim. The print sheet slightly compresses its height; normalized to a circular 192-pixel image.'}}
+
+
 def extract_tile(row, document):
     page = document[int(row['source_pdf_page']) - 1]
     images = page.get_image_info(xrefs=True)
     backgrounds = sorted([fitz.Rect(i['bbox']) for i in images if 360 < fitz.Rect(i['bbox']).width < 367 and 414 < fitz.Rect(i['bbox']).height < 420], key=lambda r:r.x0)
     assert len(backgrounds) == 2, row['name']
     tile_rect = backgrounds[0 if row['sheet_position'] == 'left' else 1]
-    candidates = [fitz.Rect(i['bbox']) for i in images if tile_rect.contains(fitz.Rect(i['bbox']).tl + (fitz.Rect(i['bbox']).br - fitz.Rect(i['bbox']).tl) / 2)]
+    candidates = [(fitz.Rect(i['bbox']), i['xref']) for i in images if tile_rect.contains(fitz.Rect(i['bbox']).tl + (fitz.Rect(i['bbox']).br - fitz.Rect(i['bbox']).tl) / 2)]
     planets, suns, holes, warps, blocked = [], [], [], [], []
-    for rect in candidates:
+    hole_xrefs = set()
+    for rect, xref in candidates:
         w,h = rect.width,rect.height
         capacity = 6 if 138<w<142 and abs(w-h)<2 else 3 if 97<w<102 and abs(w-h)<2 else 2 if 84<w<88 and abs(w-h)<2 else 1 if 53<w<58 and abs(w-h)<2 else None
         if capacity:
@@ -221,6 +276,7 @@ def extract_tile(row, document):
             suns.append(anchor(rect,tile_rect))
         elif 150<w<220 and 70<h<160:
             holes.append(anchor(rect,tile_rect))
+            hole_xrefs.add(xref)
         elif 113<w<121 and 90<h<99:
             warps.append(anchor(rect,tile_rect))
         elif 40<w<51 and 200<h<240:
@@ -235,18 +291,24 @@ def extract_tile(row, document):
     assert len(holes)==int(row['fixed_black_holes']),(row['name'],holes)
     assert len(warps)==int(row['fixed_warps']),(row['name'],warps)
     # Render oversized before masking/resampling to keep the hex outline clean.
-    image=page_image(page,tile_rect,800).convert('RGBA')
+    filtered_document = page_without_image_layers(page, hole_xrefs) if hole_xrefs else None
+    image=page_image(filtered_document[0] if filtered_document else page,tile_rect,800).convert('RGBA')
+    if filtered_document:
+        filtered_document.close()
     mask=Image.new('L',image.size,0)
     w,h=image.size
     ImageDraw.Draw(mask).polygon([(w/2,0),(w,h/4),(w,3*h/4),(w/2,h),(0,3*h/4),(0,h/4)],fill=255)
     image.putalpha(mask)
     image=image.resize((400,462),Image.Resampling.LANCZOS)
     file=OUTPUT/'public/art/systems'/f"{row['system_id'].split('.',1)[1]}.webp"
+    source={'filename':DOCUMENT_NAMES[row['source_id']],'page':int(row['source_pdf_page']),'position':row['sheet_position'],'crop':[round(x,3) for x in tile_rect]}
+    if hole_xrefs:
+        source['excludedLayers']=['printed-black-hole']
     return {
         'id':row['system_id'],'name':row['name'],**save_webp(image,file,quality=68),
         'sun':suns[0],'planets':planets,'homePlanetIndex':next((p['index'] for p in planets if p['home']),None),
         'fixedBlackHoles':holes,'fixedWarps':warps,'blockedEdges':sorted(set(blocked)),
-        'source':{'filename':DOCUMENT_NAMES[row['source_id']],'page':int(row['source_pdf_page']),'position':row['sheet_position'],'crop':[round(x,3) for x in tile_rect]},
+        'source':source,
     }
 
 
@@ -264,7 +326,8 @@ if __name__ == '__main__':
             manifest['systems'][row['system_id']]=extract_tile(row,docs[row['source_id']])
     cards=fitz.open(source_file(args.source_dir,'SpaceForce Cards v1.80.pdf'))
     manifest['firstPlayer']=extract_first_player(cards)
-    manifest['features']={'planet':extract_planet_nine(docs['pdf.cardboard'])}
+    manifest['features']={'planet':extract_planet_nine(docs['pdf.cardboard']),
+                          'blackHole':extract_black_hole(docs['pdf.cardboard'])}
     with (OUTPUT/'catalog/cards.csv').open(newline='') as handle:
         for row in csv.DictReader(handle):
             slug=row['card_id'].split('.',1)[1]
@@ -296,6 +359,8 @@ if __name__ == '__main__':
         'Settlement slot centres are measured from the printed PDF vector indicator circles. Each planet has exactly its printed capacity of slots, in top-to-bottom then left-to-right order, normalized to the whole tile image. Any Arcologies overflow needs a separate UI anchor.',
         'The first-player marker uses the newer artwork on Cards page 33. Stage regions are normalized top-left rectangles padded around each printed icon; they are highlight guides, not gameplay hit regions.',
         'Suns are deliberately anchored at their printed positions, which differ from geometric hex centres.',
+        'Clarke, Lem and Adams base artwork omits only the printed black-hole image XObject. Overlay features.blackHole at fixedBlackHoles centres; the unchanged source radii describe the former printed image bounds, not the new circular token diameter.',
+        'Le Guin has no printed black hole. The hole on the same source sheet belongs to the separate Lem hex.',
         'Lem has TWO printed asteroid belts, at edges 0 and 3; the systems.csv transcription has been corrected to include both.',
         'Le Guin has FOUR planets, capacities 2;2;1;1. The catalogue transcription has been corrected to exclude the central sun.',
         'Card artwork remains the supplied original; semantic text applies designer clarifications, including Rapid Advance direct conversion and Spice non-recursion.',
