@@ -1,5 +1,5 @@
 {
-  "schema_version": 6,
+  "schema_version": 7,
   "status": "local_prototype_implemented_remote_controls_pending",
   "view_ids": [
     "board",
@@ -156,7 +156,13 @@
     "outer_grey_outline": false,
     "yellow_legal_ring": "slow_blink",
     "blue_hover_or_focus_ring": "steady",
-    "respect_reduced_motion": true
+    "respect_reduced_motion": true,
+    "rim_side_outlines": {
+      "colour": "black",
+      "screen_width_px": 0.5,
+      "segments": "lower_left_and_lower_right",
+      "centre_unoutlined": true
+    }
   },
   "economy_interactions": {
     "investments_default_view": "board",
@@ -173,7 +179,20 @@
       "planet",
       "system",
       "system_edge"
-    ]
+    ],
+    "layout": "compact_horizontal_content_sized_row",
+    "planet_thumbnail_px": 44,
+    "system_previews": {
+      "current_public_state": true,
+      "width_px": 96,
+      "height_px": 110,
+      "same_renderer_as_board": true,
+      "hidden_fronts_revealed": false,
+      "available_in_all_views": true,
+      "nested_controls": false
+    },
+    "unchanged_targets_and_previews_cached": true,
+    "cache_invalidated_on_replaced_position": true
   },
   "action_controls": {
     "invest_checkbox_position": "immediately_above_commit",
@@ -205,7 +224,8 @@
     "predictable_reserve_shortfall": "confirm_before_commit_or_go_back",
     "committed_reserve_checkpoint": "modal_confirm_outcome_no_reveal_undo",
     "background_controls_blocked_during_modal": true,
-    "stale_confirmation_rejected": true
+    "stale_confirmation_rejected": true,
+    "empty_attack_confirmation": "Use your ATTACK action without attacking any Ships?"
   },
   "final_state": {
     "all_five_views_available": true,

@@ -806,17 +806,6 @@ summary {
 .planet-choice.highlight {
   background: #e8cb9966;
 }
-.feature-options {
-  display: flex;
-  flex-direction: column;
-  gap: 5px;
-  max-height: 300px;
-  overflow: auto;
-}
-.feature-options button {
-  text-align: left;
-  font-size: max(10pt, 0.77rem);
-}
 .section-heading {
   max-width: 850px;
   margin: 15px 0 25px;
@@ -2025,24 +2014,6 @@ svg.poker-chip {
   outline: 2px solid #b67637;
   outline-offset: -2px;
 }
-.feature-options {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 7px;
-  max-height: 250px;
-  overflow: auto;
-}
-.feature-options button {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  flex: 1 1 160px;
-  min-width: 0;
-}
-.feature-options .planet-preview {
-  width: 48px;
-  height: 48px;
-}
 .rotation-options {
   display: flex;
   align-items: center;
@@ -2295,9 +2266,6 @@ svg.poker-chip {
   .planet-options {
     grid-template-columns: 1fr;
   }
-  .feature-options {
-    max-height: 200px;
-  }
 }
 @media (prefers-reduced-motion: reduce) {
   .plan-preview {
@@ -2417,20 +2385,6 @@ svg.poker-chip {
   margin-top: 12px !important;
   margin-bottom: 3px !important;
 }
-.feature-options {
-  flex-wrap: nowrap;
-  overflow-x: auto;
-  overflow-y: hidden;
-  max-height: none;
-  scroll-snap-type: x proximity;
-  align-items: stretch;
-  padding: 3px 3px 10px;
-}
-.feature-options button {
-  flex: 0 0 210px;
-  min-width: 210px;
-  scroll-snap-align: start;
-}
 .token-used {
   color: #332239 !important;
   background: #eee2c6 !important;
@@ -2480,7 +2434,8 @@ svg.poker-chip {
 .plan-mode .legal-placement.chosen > .plan-preview {
   opacity: 0.48;
 }
-#galaxy text {
+#galaxy text,
+.system-preview text {
   font-size: max(10pt, var(--board-text-size, 13.333334px)) !important;
 }
 .system-name {
@@ -2509,10 +2464,6 @@ svg.poker-chip {
   .status-phase {
     grid-row: 2;
   }
-  .feature-options button {
-    flex-basis: 190px;
-    min-width: 190px;
-  }
   .view-tabs button {
     min-height: 90px;
   }
@@ -2536,7 +2487,8 @@ svg.poker-chip {
   }
 }
 
-#galaxy .explore-label {
+#galaxy .explore-label,
+.system-preview .explore-label {
   font-size: 13.333334px !important;
 }
 
@@ -2553,4 +2505,62 @@ svg.poker-chip {
   font-size: max(10pt, 0.85rem);
   color: inherit;
   white-space: pre;
+}
+
+.shared-art-defs {
+  position: absolute;
+  width: 0;
+  height: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+.feature-options {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: nowrap;
+  gap: 6px;
+  overflow-x: auto;
+  overflow-y: hidden;
+  scroll-snap-type: x proximity;
+  align-items: flex-start;
+  padding: 3px 3px 10px;
+}
+.feature-options button {
+  display: flex;
+  align-items: center;
+  flex: 0 0 auto;
+  min-width: 0;
+  max-width: 176px;
+  gap: 6px;
+  padding: 0.4rem 0.5rem;
+  font-size: max(10pt, 0.85rem);
+  text-align: left;
+  scroll-snap-align: start;
+}
+.feature-options button > span {
+  max-width: 8ch;
+  white-space: normal;
+  overflow-wrap: anywhere;
+}
+.feature-options .planet-preview {
+  width: 44px;
+  height: 44px;
+  flex: none;
+}
+.feature-options .system-target {
+  flex-direction: column;
+  width: 112px;
+  padding: 6px;
+  gap: 4px;
+  text-align: center;
+}
+.feature-options .system-target > span {
+  max-width: 100%;
+}
+.system-preview {
+  display: block;
+  width: 96px;
+  height: 110px;
+  flex: none;
+  pointer-events: none;
 }

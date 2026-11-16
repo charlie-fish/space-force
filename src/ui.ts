@@ -8,7 +8,7 @@ import {
   canPlan,
   createGame,
   edges,
-  featureOptions,
+  featureOptions as computeFeatureOptions,
   freeSpace,
   hasTech,
   nameOf,
@@ -112,7 +112,7 @@ const CHIP_RIMS = STYLES.map((style, index) => {
     (_, i) =>
       `<g transform="rotate(${i * 30}) translate(0 -22)">${CHIP_MOTIFS[index]}</g>`,
   ).join("");
-  return `<circle cy="2" r="26" fill="${style.color}"/><circle r="26" fill="${style.color}"/><g style="color:#f5e9cc">${rim}</g><circle r="18.5" fill="none" stroke="#352d4266"/>`;
+  return `<circle cy="2" r="26" fill="${style.color}"/><circle r="26" fill="${style.color}"/><g style="color:#f5e9cc">${rim}</g><circle r="18.5" fill="none" stroke="#352d4266"/><path class="chip-side-outline" d="M25.114 8.729A26 26 0 0 1 13 24.517M-13 24.517A26 26 0 0 1-25.114 8.729" fill="none" stroke="#000" stroke-width=".5" vector-effect="non-scaling-stroke"/>`;
 });
 function chipFace(
   style: number,
@@ -129,6 +129,27 @@ export function mountApp(
   root: HTMLElement,
   storage?: Pick<Storage, "getItem" | "setItem" | "removeItem">,
 ) {
+  let previewCache = new WeakMap<System, string>();
+  let featureCache = new WeakMap<
+    Game,
+    Map<string, ReturnType<typeof computeFeatureOptions>>
+  >();
+  function featureOptions(
+    g: Game,
+    tech: string,
+  ): ReturnType<typeof computeFeatureOptions> {
+    let choices = featureCache.get(g);
+    if (!choices) {
+      choices = new Map();
+      featureCache.set(g, choices);
+    }
+    let options = choices.get(tech);
+    if (!options) {
+      options = computeFeatureOptions(g, tech);
+      choices.set(tech, options);
+    }
+    return options;
+  }
   let game: Game | null = null;
   let selected: string | null = null;
   let selectedPlanet: string | null = null;
@@ -443,7 +464,7 @@ export function mountApp(
     return `<aside class="guide" aria-label="Learn as you play"><div><span class="eyebrow">Learn as you play</span><p>${escape(g.pending ? instruction(g) : tips[g.phase])}</p></div>${button("Hide guide", "guide-off", "", false, "quiet")}</aside>`;
   }
   function landing() {
-    return `<main class="landing"><div class="landing-art"><img src="${ART.cover.image}" width="562" height="768" alt="Space Force cover: rocket fleets above a ringed planet"/><span class="cover-credit">A game by Charlie Fish</span></div><section class="landing-copy"><div class="eyebrow">Local pass-and-play · Prototype 0.12</div><h1>Claim your<br/><span>corner of space.</span></h1><p class="lead">Plan your moves. Explore new systems. Settle the galaxy.</p><div class="scope-note"><strong>This build: Family Techs + simpler Events.</strong><span>A complete local game for 2–7 players on one device. Event cards count rounds; their effects and auctions are disabled. Remote rooms and the wider card set follow later.</span></div><form id="setup-form"><fieldset><legend>How many players?</legend><div class="player-counts">${Array.from({ length: 6 }, (_, i) => button(String(i + 2), "count", `data-count="${i + 2}" aria-pressed="${count === i + 2}"`, false, count === i + 2 ? "selected" : "")).join("")}</div></fieldset><div class="name-grid">${names
+    return `<main class="landing"><div class="landing-art"><img src="${ART.cover.image}" width="562" height="768" alt="Space Force cover: rocket fleets above a ringed planet"/><span class="cover-credit">A game by Charlie Fish</span></div><section class="landing-copy"><div class="eyebrow">Local pass-and-play · Prototype 0.13</div><h1>Claim your<br/><span>corner of space.</span></h1><p class="lead">Plan your moves. Explore new systems. Settle the galaxy.</p><div class="scope-note"><strong>This build: Family Techs + simpler Events.</strong><span>A complete local game for 2–7 players on one device. Event cards count rounds; their effects and auctions are disabled. Remote rooms and the wider card set follow later.</span></div><form id="setup-form"><fieldset><legend>How many players?</legend><div class="player-counts">${Array.from({ length: 6 }, (_, i) => button(String(i + 2), "count", `data-count="${i + 2}" aria-pressed="${count === i + 2}"`, false, count === i + 2 ? "selected" : "")).join("")}</div></fieldset><div class="name-grid">${names
       .slice(0, count)
       .map(
         (name, i) =>
@@ -493,6 +514,140 @@ export function mountApp(
         .join(", ")}`,
     )}" viewBox="${(p.x - rx) * 400} ${(p.y - ry) * 462} ${rx * 800} ${ry * 924}">${image}${owners.map((id, j) => glyph(id, slots[j].x * 400, slots[j].y * 462, 27)).join("")}</svg>`;
   }
+  function systemTile(
+    g: Game,
+    s: System,
+    miniature = false,
+    feature: ReturnType<typeof featureOptions> = [],
+  ) {
+    const W = HEX_WIDTH,
+      x = miniature ? 0 : W * (s.q + s.r / 2),
+      y = miniature ? 0 : 150 * s.r;
+    const art = ART.systems[s.template];
+    const rotation =
+      !miniature && g.pending?.kind === "orient" && g.pending.system === s.id
+        ? orientation
+        : s.rotation;
+    const sun = s.revealed
+      ? rotatePoint(art.sun.x, art.sun.y, rotation)
+      : { x: 0, y: 0 };
+    const top = s.tokens[s.tokens.length - 1],
+      eligible =
+        !miniature && g.phase === "actions" && !g.pending && top === g.turn;
+    const legal = !miniature && g.phase === "plan" && canPlan(g, s);
+    const planets = !s.revealed
+      ? ""
+      : s.planets
+          .map((p, i) => {
+            const center = rotatePoint(p.x, p.y, rotation),
+              size = art.planets[i] ? art.planets[i].radiusX * W : 16;
+            const occupied = p.owners.flatMap(
+              (n, id) => Array(n).fill(id) as number[],
+            );
+            const slots = slotsFor(s, i);
+            const planned =
+              !miniature &&
+              selected === s.id &&
+              !draft.invest &&
+              (draft.action === "settle" ||
+                g.pending?.kind === "settle" ||
+                g.pending?.kind === "redistribute")
+                ? (draft.settlements[p.id] ?? 0)
+                : 0;
+            const colonies = [...occupied, ...Array(planned).fill(g.turn)]
+              .map((id, j) => {
+                const slot = slots[j] ?? { x: p.x, y: p.y },
+                  point = rotatePoint(slot.x, slot.y, rotation);
+                return glyph(id, point.x, point.y, 24, 0, j >= occupied.length);
+              })
+              .join("");
+            return `<g ${miniature ? `data-preview-planet="${p.id}"` : `data-system="${s.id}" data-planet="${p.id}"`}><title>${p.home ? "Home planet" : `Planet ${i + 1}`}: ${occupied.length}/${p.capacity} Settlements${p.explore ? ", hidden Explore token" : ""}</title>${i >= art.planets.length ? `<image href="${ART.features.planet.image}" x="${center.x - 16}" y="${center.y - 16}" width="32" height="32" transform="rotate(${rotation * 60} ${center.x} ${center.y})"/>` : ""}<circle cx="${center.x}" cy="${center.y}" r="${size + 2}" fill="transparent" stroke="${!miniature && selectedPlanet === p.id ? "#fff2c2" : "transparent"}" stroke-width="2"/>${colonies}${p.explore ? `<g class="explore-token"><circle cx="${center.x - size * 0.72}" cy="${center.y - size * 0.72}" r="7" fill="#d7bf78" stroke="#332a35"/><text x="${center.x - size * 0.72}" y="${center.y - size * 0.72 + 3}" class="explore-label">?</text></g>` : ""}</g>`;
+          })
+          .join("");
+    const positions = fleetPositions(s);
+    const fleets = s.ships
+      .map((n, id) => {
+        if (!n) return "";
+        const pos = positions[id],
+          point = rotatePoint(pos.x, pos.y, rotation);
+        return `<g class="fleet-badge" data-fleet-player="${id}" data-center-x="${point.x}" data-center-y="${point.y}" data-x="${pos.x}" data-y="${pos.y}" aria-label="${attrs(player(g, id).name)}: ${n} Ships"><rect x="${point.x - 16}" y="${point.y - 10}" width="33" height="20" rx="6" fill="#211d32" fill-opacity=".92"/>${glyph(id, point.x - 5, point.y, 16, 90)}<text x="${point.x + 9}" y="${point.y + 4}" class="fleet-label">${n}</text></g>`;
+      })
+      .join("");
+    const radius = s.revealed ? Math.min(28, art.sun.radiusX * W) : 25;
+    const step = Math.min(3, 32 / Math.max(1, s.tokens.length - 1));
+    const topY = sun.y - step * (s.tokens.length - 1);
+    // Draw the opaque selection ring behind every chip, preserving all rims beneath.
+    const ring = eligible
+      ? `<circle class="selection-ring" cx="${sun.x}" cy="${topY}" r="${radius + 1.6}" fill="none"/>`
+      : "";
+    const chips =
+      ring +
+      s.tokens
+        .map(
+          (owner, i) =>
+            `<g class="${miniature ? "preview-chip" : "stack-chip"} ${eligible && i === s.tokens.length - 1 ? "selectable-chip" : ""} ${!miniature && snapSystem === s.id && i === s.tokens.length - 1 ? "new-chip" : ""}" data-owner="${owner}" data-stack-position="${i}" data-chip-rise="${step * i}">${chipFace(owner, sun.x, sun.y - step * i, radius, i === s.tokens.length - 1, true)}</g>`,
+        )
+        .join("");
+    const holes = !s.revealed
+      ? ""
+      : blackHolePositions(s)
+          .map((h) => {
+            const p = rotatePoint(h.x, h.y, rotation);
+            return `<g class="black-hole-token"><title>Black hole: destroys one incoming Ship, returned as a Credit</title><circle cx="${p.x}" cy="${p.y}" r="${h.radius}" fill="#10121a"/><image href="${ART.features.blackHole.image}" x="${p.x - h.radius}" y="${p.y - h.radius}" width="${h.radius * 2}" height="${h.radius * 2}"/></g>`;
+          })
+          .join("");
+    const ghost =
+      legal && selected === s.id
+        ? `<g class="plan-preview" pointer-events="none">${chipFace(g.turn, sun.x, sun.y - step * s.tokens.length, s.revealed ? Math.min(28, art.sun.radiusX * W) : 25, true, true)}</g>`
+        : "";
+    const extraEdges = s.extraEdges
+      .map(
+        (e) =>
+          `<g class="asteroid-belt-token" data-edge="${e}" transform="rotate(${e * 60})"><image href="${ART.features.asteroidBelt.image}" x="${W / 2 - (50 * ART.features.asteroidBelt.width) / ART.features.asteroidBelt.height}" y="-50" width="${(100 * ART.features.asteroidBelt.width) / ART.features.asteroidBelt.height}" height="100"/></g>`,
+      )
+      .join("");
+    const warpAnchor = s.revealed ? warpPosition(s) : null;
+    const warpToken = warpAnchor
+      ? (() => {
+          const point = rotatePoint(warpAnchor.x, warpAnchor.y, rotation);
+          return `<g class="warp-token" data-x="${warpAnchor.x}" data-y="${warpAnchor.y}"><title>Artificial Warp</title><image href="${ART.features.warp.image}" x="${point.x - WARP_WIDTH / 2}" y="${point.y - WARP_HEIGHT / 2}" width="${WARP_WIDTH}" height="${WARP_HEIGHT}" transform="rotate(${rotation * 60} ${point.x} ${point.y})"/></g>`;
+        })()
+      : "";
+    const edgeTargets = feature
+      .filter((o) => o.system === s.id)
+      .map(
+        (o) =>
+          `<line data-system="${s.id}" data-edge="${o.edge}" role="button" tabindex="0" aria-label="Edge ${o.edge! + 1} of ${attrs(nameOf(s))}" class="edge-target ${!miniature && selected === s.id && selectedEdge === o.edge ? "selected-edge" : ""}" x1="${W / 2}" y1="-50" x2="${W / 2}" y2="50" transform="rotate(${o.edge! * 60})"/>`,
+      )
+      .join("");
+    return `<g transform="translate(${x} ${y})" class="${miniature ? "system-snapshot" : "system"} ${!miniature && selected === s.id ? "chosen" : ""} ${eligible ? "eligible" : ""} ${legal ? "legal-placement" : ""}" ${miniature ? `data-snapshot-system="${s.id}"` : `data-system="${s.id}" role="button" tabindex="0"`} aria-label="${attrs(nameOf(s))}${
+      s.tokens.length
+        ? `, stack top to bottom: ${s.tokens
+            .slice()
+            .reverse()
+            .map((id) => attrs(player(g, id).name))
+            .join(", ")}`
+        : ""
+    }"><g transform="rotate(${s.revealed ? rotation * 60 : 0})"><image href="${s.revealed ? art.image : ART.backs.system.image}" x="${-W / 2}" y="-100" width="${W}" height="200" clip-path="url(#hex-clip)"/></g>${!s.revealed ? '<circle class="blank-sun" cx="0" cy="0" r="25"/>' : ""}<polygon points="0,-100 ${W / 2},-50 ${W / 2},50 0,100 ${-W / 2},50 ${-W / 2},-50" class="hex-outline"/>${extraEdges}${planets}${holes}${fleets}${chips}${ghost}${warpToken}${edgeTargets}</g>`;
+  }
+  function sharedArt(g: Game) {
+    return `<svg class="shared-art-defs" width="0" height="0" aria-hidden="true" focusable="false"><defs><clipPath id="hex-clip"><polygon points="0,-100 ${HEX_WIDTH / 2},-50 ${HEX_WIDTH / 2},50 0,100 ${-HEX_WIDTH / 2},50 ${-HEX_WIDTH / 2},-50"/></clipPath>${g.players.map((p) => `<g id="chip-rim-${p.style}">${CHIP_RIMS[p.style]}</g>`).join("")}</defs></svg>`;
+  }
+  function systemIllustration(g: Game, s: System) {
+    const cached = previewCache.get(s);
+    if (cached) return cached;
+    const details = [
+      nameOf(s),
+      s.revealed ? `${s.planets.length} planets` : "contents hidden",
+      ...s.ships.flatMap((n, id) =>
+        n ? [`${player(g, id).name}: ${n} Ships`] : [],
+      ),
+      `${s.tokens.length} action chips`,
+    ].join(", ");
+    const markup = `<svg class="system-preview" data-preview-system="${s.id}" width="96" height="110" viewBox="${-HEX_WIDTH / 2 - 12} -112 ${HEX_WIDTH + 24} 224" role="img" aria-label="${attrs(details)}" focusable="false">${systemTile(g, s, true)}</svg>`;
+    previewCache.set(s, markup);
+    return markup;
+  }
   function systemMap(g: Game) {
     const W = HEX_WIDTH;
     const centers = g.systems.map((s) => ({
@@ -507,119 +662,7 @@ export function mountApp(
         ? featureOptions(g, g.pending.tech)
         : [];
     const tiles = centers
-      .map(({ s, x, y }) => {
-        const art = ART.systems[s.template];
-        const rotation =
-          g.pending?.kind === "orient" && g.pending.system === s.id
-            ? orientation
-            : s.rotation;
-        const sun = s.revealed
-          ? rotatePoint(art.sun.x, art.sun.y, rotation)
-          : { x: 0, y: 0 };
-        const top = s.tokens[s.tokens.length - 1],
-          eligible = g.phase === "actions" && !g.pending && top === g.turn;
-        const legal = g.phase === "plan" && canPlan(g, s);
-        const planets = !s.revealed
-          ? ""
-          : s.planets
-              .map((p, i) => {
-                const center = rotatePoint(p.x, p.y, rotation),
-                  size = art.planets[i] ? art.planets[i].radiusX * W : 16;
-                const occupied = p.owners.flatMap(
-                  (n, id) => Array(n).fill(id) as number[],
-                );
-                const slots = slotsFor(s, i);
-                const planned =
-                  selected === s.id &&
-                  !draft.invest &&
-                  (draft.action === "settle" ||
-                    g.pending?.kind === "settle" ||
-                    g.pending?.kind === "redistribute")
-                    ? (draft.settlements[p.id] ?? 0)
-                    : 0;
-                const colonies = [...occupied, ...Array(planned).fill(g.turn)]
-                  .map((id, j) => {
-                    const slot = slots[j] ?? { x: p.x, y: p.y },
-                      point = rotatePoint(slot.x, slot.y, rotation);
-                    return glyph(
-                      id,
-                      point.x,
-                      point.y,
-                      24,
-                      0,
-                      j >= occupied.length,
-                    );
-                  })
-                  .join("");
-                return `<g data-system="${s.id}" data-planet="${p.id}"><title>${p.home ? "Home planet" : `Planet ${i + 1}`}: ${occupied.length}/${p.capacity} Settlements${p.explore ? ", hidden Explore token" : ""}</title>${i >= art.planets.length ? `<image href="${ART.features.planet.image}" x="${center.x - 16}" y="${center.y - 16}" width="32" height="32" transform="rotate(${rotation * 60} ${center.x} ${center.y})"/>` : ""}<circle cx="${center.x}" cy="${center.y}" r="${size + 2}" fill="transparent" stroke="${selectedPlanet === p.id ? "#fff2c2" : "transparent"}" stroke-width="2"/>${colonies}${p.explore ? `<g class="explore-token"><circle cx="${center.x - size * 0.72}" cy="${center.y - size * 0.72}" r="7" fill="#d7bf78" stroke="#332a35"/><text x="${center.x - size * 0.72}" y="${center.y - size * 0.72 + 3}" class="explore-label">?</text></g>` : ""}</g>`;
-              })
-              .join("");
-        const positions = fleetPositions(s);
-        const fleets = s.ships
-          .map((n, id) => {
-            if (!n) return "";
-            const pos = positions[id],
-              point = rotatePoint(pos.x, pos.y, rotation);
-            return `<g class="fleet-badge" data-fleet-player="${id}" data-center-x="${point.x}" data-center-y="${point.y}" data-x="${pos.x}" data-y="${pos.y}" aria-label="${attrs(player(g, id).name)}: ${n} Ships"><rect x="${point.x - 16}" y="${point.y - 10}" width="33" height="20" rx="6" fill="#211d32" fill-opacity=".92"/>${glyph(id, point.x - 5, point.y, 16, 90)}<text x="${point.x + 9}" y="${point.y + 4}" class="fleet-label">${n}</text></g>`;
-          })
-          .join("");
-        const radius = s.revealed ? Math.min(28, art.sun.radiusX * W) : 25;
-        const step = Math.min(3, 32 / Math.max(1, s.tokens.length - 1));
-        const topY = sun.y - step * (s.tokens.length - 1);
-        // Draw the opaque selection ring behind every chip, preserving all rims beneath.
-        const ring = eligible
-          ? `<circle class="selection-ring" cx="${sun.x}" cy="${topY}" r="${radius + 1.6}" fill="none"/>`
-          : "";
-        const chips =
-          ring +
-          s.tokens
-            .map(
-              (owner, i) =>
-                `<g class="stack-chip ${eligible && i === s.tokens.length - 1 ? "selectable-chip" : ""} ${snapSystem === s.id && i === s.tokens.length - 1 ? "new-chip" : ""}" data-owner="${owner}" data-stack-position="${i}" data-chip-rise="${step * i}">${chipFace(owner, sun.x, sun.y - step * i, radius, i === s.tokens.length - 1, true)}</g>`,
-            )
-            .join("");
-        const holes = !s.revealed
-          ? ""
-          : blackHolePositions(s)
-              .map((h) => {
-                const p = rotatePoint(h.x, h.y, rotation);
-                return `<g class="black-hole-token"><title>Black hole: destroys one incoming Ship, returned as a Credit</title><circle cx="${p.x}" cy="${p.y}" r="${h.radius}" fill="#10121a"/><image href="${ART.features.blackHole.image}" x="${p.x - h.radius}" y="${p.y - h.radius}" width="${h.radius * 2}" height="${h.radius * 2}"/></g>`;
-              })
-              .join("");
-        const ghost =
-          legal && selected === s.id
-            ? `<g class="plan-preview" pointer-events="none">${chipFace(g.turn, sun.x, sun.y - step * s.tokens.length, s.revealed ? Math.min(28, art.sun.radiusX * W) : 25, true, true)}</g>`
-            : "";
-        const extraEdges = s.extraEdges
-          .map(
-            (e) =>
-              `<g class="asteroid-belt-token" data-edge="${e}" transform="rotate(${e * 60})"><image href="${ART.features.asteroidBelt.image}" x="${W / 2 - (50 * ART.features.asteroidBelt.width) / ART.features.asteroidBelt.height}" y="-50" width="${(100 * ART.features.asteroidBelt.width) / ART.features.asteroidBelt.height}" height="100"/></g>`,
-          )
-          .join("");
-        const warpAnchor = s.revealed ? warpPosition(s) : null;
-        const warpToken = warpAnchor
-          ? (() => {
-              const point = rotatePoint(warpAnchor.x, warpAnchor.y, rotation);
-              return `<g class="warp-token" data-x="${warpAnchor.x}" data-y="${warpAnchor.y}"><title>Artificial Warp</title><image href="${ART.features.warp.image}" x="${point.x - WARP_WIDTH / 2}" y="${point.y - WARP_HEIGHT / 2}" width="${WARP_WIDTH}" height="${WARP_HEIGHT}" transform="rotate(${rotation * 60} ${point.x} ${point.y})"/></g>`;
-            })()
-          : "";
-        const edgeTargets = feature
-          .filter((o) => o.system === s.id)
-          .map(
-            (o) =>
-              `<line data-system="${s.id}" data-edge="${o.edge}" role="button" tabindex="0" aria-label="Edge ${o.edge! + 1} of ${attrs(nameOf(s))}" class="edge-target ${selected === s.id && selectedEdge === o.edge ? "selected-edge" : ""}" x1="${W / 2}" y1="-50" x2="${W / 2}" y2="50" transform="rotate(${o.edge! * 60})"/>`,
-          )
-          .join("");
-        return `<g transform="translate(${x} ${y})" class="system ${selected === s.id ? "chosen" : ""} ${eligible ? "eligible" : ""} ${legal ? "legal-placement" : ""}" data-system="${s.id}" role="button" tabindex="0" aria-label="${attrs(nameOf(s))}${
-          s.tokens.length
-            ? `, stack top to bottom: ${s.tokens
-                .slice()
-                .reverse()
-                .map((id) => attrs(player(g, id).name))
-                .join(", ")}`
-            : ""
-        }"><g transform="rotate(${s.revealed ? rotation * 60 : 0})"><image href="${s.revealed ? art.image : ART.backs.system.image}" x="${-W / 2}" y="-100" width="${W}" height="200" clip-path="url(#hex-clip)"/></g>${!s.revealed ? '<circle class="blank-sun" cx="0" cy="0" r="25"/>' : ""}<polygon points="0,-100 ${W / 2},-50 ${W / 2},50 0,100 ${-W / 2},50 ${-W / 2},-50" class="hex-outline"/>${extraEdges}${planets}${holes}${fleets}${chips}${ghost}${warpToken}${edgeTargets}</g>`;
-      })
+      .map(({ s }) => systemTile(g, s, false, feature))
       .join("");
     const labels = centers
       .map(
@@ -629,7 +672,7 @@ export function mountApp(
       .join("");
     snapSystem = null;
     const cursorSvg = `<svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="-29 -29 58 60"><g opacity=".65">${chipFace(g.turn, 0, 0, 24)}</g></svg>`;
-    return `<section class="map-wrap ${g.phase === "plan" ? "plan-mode" : ""}" aria-label="Galaxy board"><div class="map-toolbar"><span>${g.phase === "plan" ? "Select a system, then confirm; double-click or double-tap to place" : "Select a system to inspect"}</span><div class="camera-controls">${button("←", "pan-left", 'aria-label="Pan left"')}${button("↑", "pan-up", 'aria-label="Pan up"')}${button("↓", "pan-down", 'aria-label="Pan down"')}${button("→", "pan-right", 'aria-label="Pan right"')}${button("−", "zoom-out", 'aria-label="Zoom out"')}${button("+", "zoom-in", 'aria-label="Zoom in"')}${button("Reset View", "fit", 'aria-label="Reset View"')}</div></div><div class="map-viewport" tabindex="0" aria-label="Galaxy map; arrow keys pan, plus and minus zoom" ${g.phase === "plan" && selected && canPlan(g, system(g, selected)) ? `style="cursor:url(&quot;data:image/svg+xml,${encodeURIComponent(cursorSvg)}&quot;) 24 24,pointer"` : ""}><svg id="galaxy" role="group" aria-label="Space Force galaxy" viewBox="${vx} ${vy} ${vw} ${vh}"><defs><clipPath id="hex-clip"><polygon points="0,-100 ${W / 2},-50 ${W / 2},50 0,100 ${-W / 2},50 ${-W / 2},-50"/></clipPath>${g.players.map((p) => `<g id="chip-rim-${p.style}">${CHIP_RIMS[p.style]}</g>`).join("")}</defs>${tiles}<g class="system-labels" aria-hidden="true" pointer-events="none">${labels}</g></svg></div></section>`;
+    return `<section class="map-wrap ${g.phase === "plan" ? "plan-mode" : ""}" aria-label="Galaxy board"><div class="map-toolbar"><span>${g.phase === "plan" ? "Select a system, then confirm; double-click or double-tap to place" : "Select a system to inspect"}</span><div class="camera-controls">${button("←", "pan-left", 'aria-label="Pan left"')}${button("↑", "pan-up", 'aria-label="Pan up"')}${button("↓", "pan-down", 'aria-label="Pan down"')}${button("→", "pan-right", 'aria-label="Pan right"')}${button("−", "zoom-out", 'aria-label="Zoom out"')}${button("+", "zoom-in", 'aria-label="Zoom in"')}${button("Reset View", "fit", 'aria-label="Reset View"')}</div></div><div class="map-viewport" tabindex="0" aria-label="Galaxy map; arrow keys pan, plus and minus zoom" ${g.phase === "plan" && selected && canPlan(g, system(g, selected)) ? `style="cursor:url(&quot;data:image/svg+xml,${encodeURIComponent(cursorSvg)}&quot;) 24 24,pointer"` : ""}><svg id="galaxy" role="group" aria-label="Space Force galaxy" viewBox="${vx} ${vy} ${vw} ${vh}">${tiles}<g class="system-labels" aria-hidden="true" pointer-events="none">${labels}</g></svg></div></section>`;
   }
 
   function cameraBox() {
@@ -655,15 +698,29 @@ export function mountApp(
       ?.setAttribute("viewBox", cameraBox().join(" "));
     updateBoardTypography();
   }
+  function updateTypography() {
+    updateBoardTypography();
+    root.querySelectorAll<SVGSVGElement>(".system-preview").forEach((svg) => {
+      updateSvgTypography(svg, HEX_WIDTH + 24, 224, 96 / (HEX_WIDTH + 24));
+    });
+  }
   function updateBoardTypography() {
     const svg = root.querySelector<SVGSVGElement>("#galaxy");
     if (!svg) return;
-    const rect = svg.getBoundingClientRect(),
-      box = cameraBox();
+    const box = cameraBox();
+    updateSvgTypography(svg, box[2], box[3]);
+  }
+  function updateSvgTypography(
+    svg: SVGSVGElement,
+    width: number,
+    height: number,
+    fallbackScale = 1,
+  ) {
+    const rect = svg.getBoundingClientRect();
     const scale =
       rect.width > 0 && rect.height > 0
-        ? Math.min(rect.width / box[2], rect.height / box[3])
-        : 1;
+        ? Math.min(rect.width / width, rect.height / height)
+        : fallbackScale;
     const font = Math.max(40 / 3, 40 / 3 / scale);
     svg.style.setProperty("--board-text-size", `${font}px`);
     const labels = [...svg.querySelectorAll<SVGGElement>(".system-label")].map(
@@ -926,11 +983,11 @@ export function mountApp(
           const target = system(g, o.system),
             index = target.planets.findIndex((p) => p.id === o.planet);
           return button(
-            `${o.planet ? planetIllustration(target, index) : ""}<span>${escape(nameOf(target))}${o.edge !== undefined ? ` · edge ${o.edge + 1}` : ""}</span>`,
+            `${o.planet ? planetIllustration(target, index) : o.edge === undefined ? systemIllustration(g, target) : ""}<span>${escape(nameOf(target))}${o.edge !== undefined ? ` · edge ${o.edge + 1}` : ""}</span>`,
             "feature-option",
             `data-system-id="${o.system}" ${o.planet ? `data-planet="${o.planet}"` : ""} ${o.edge !== undefined ? `data-edge="${o.edge}"` : ""} aria-pressed="${match(o)}"`,
             false,
-            `secondary ${match(o) ? "selected" : ""}`,
+            `secondary feature-choice ${o.planet ? "planet-target" : o.edge === undefined ? "system-target" : "edge-choice"} ${match(o) ? "selected" : ""}`,
           );
         })
         .join(
@@ -977,7 +1034,7 @@ export function mountApp(
     else if (g.phase === "actions" && s.tokens[s.tokens.length - 1] === g.turn)
       controls = `<div class="action-grid">${(Object.keys(ACTION_LABELS) as Action[]).map((action) => button(ACTION_LABELS[action], "select-action", `data-kind="${action}" aria-pressed="${draft.action === action}"`, player(g).used.includes(action), draft.action === action ? "selected" : "")).join("")}</div>${draft.action ? `${actionForm(g, s)}${!draft.invest && hasTech(g, g.turn, "banking") ? `<label class="check-row"><input type="checkbox" data-check="bank" ${draft.bank ? "checked" : ""}/>Banking: also Invest if Reserve allows</label>` : ""}<label class="check-row invest-choice"><input type="checkbox" data-check="invest" ${draft.invest ? "checked" : ""}/><strong>Invest instead of acting</strong></label><div class="commit-row">${button("Commit action", "commit-action", "", false, "primary")}</div><small>Change your selection freely before Commit. Hidden reveals and committed moves stay locked.</small>` : "<p>Select an unused action slot.</p>"}`;
     else if (g.phase === "actions")
-      controls = "<p>Select a highlighted stack with your colour on top.</p>";
+      controls = "<p>Select a stack with your colour on top.</p>";
     return `<section id="system-status" class="console"><span class="eyebrow">System status</span><h2>${escape(nameOf(s))}</h2>${info}${stackOrder(g, s)}${controls}</section>`;
   }
 
@@ -1099,7 +1156,7 @@ export function mountApp(
   function actionsView(g: Game) {
     const p = player(g);
     const live = scoreGame(g).find((s) => s.player === p.id)!;
-    return `<section class="actions-view"><div class="section-heading"><span class="eyebrow">Your action board</span><h2>${escape(p.name)}’s Actions</h2><p>Four slots, once each round. The chips and receiving cutouts share the same diameter.</p></div><div class="personal-board"><div class="supply reserve"><h3>Reserve</h3>${rocket(p.style, 68)}<strong>${p.reserve}</strong><span>Uncommitted rockets</span></div><div class="action-board">${(Object.keys(ACTION_LABELS) as Action[]).map((action) => `<div class="action-slot ${p.used.includes(action) ? "used" : ""}"><div class="receiving-slot">${p.used.includes(action) ? `<svg class="poker-chip" aria-hidden="true" viewBox="-29 -29 58 60">${chipFace(p.style, 0, 0, 26)}</svg>` : '<span class="empty-chip"></span>'}</div><strong>${ACTION_LABELS[action]}</strong><small>${p.investedActions.includes(action) ? `${rocket(p.style, 18)} Invested this round` : p.used.includes(action) ? "Used this round" : "Available"}</small></div>`).join("")}</div><div class="supply credits"><h3>Credits</h3>${rocket(p.style, 68)}<strong>${p.credits}</strong><span>Spend on Tech</span></div></div><div class="resource-breakdown"><span><strong>${p.invested}</strong> Invested</span><span><strong>${g.systems.reduce((n, s) => n + s.ships[p.id], 0)}</strong> Ships</span><span><strong>${g.systems.reduce((n, s) => n + s.planets.reduce((a, planet) => a + planet.owners[p.id], 0), 0)}</strong> Settlements</span><span><strong>${p.techs.length}</strong> Tech markers</span><span><strong>40</strong> Rockets total</span></div><p class="score-preview">Current position: ${live.planets} settled planets + ${live.systems} ship systems + ${live.techs} Techs = <strong>${live.total} points</strong></p><p class="muted">Resolve chips on the Board. Select a stack, assign an unused slot, then act or Invest.</p>${button("Return to Board", "to-board", "", false, "secondary")}</section>`;
+    return `<section class="actions-view"><div class="section-heading"><span class="eyebrow">Your action board</span><h2>${escape(p.name)}’s Actions</h2><p>Four action slots. You can do each action once per round.</p></div><div class="personal-board"><div class="supply reserve"><h3>Reserve</h3>${rocket(p.style, 68)}<strong>${p.reserve}</strong><span>Uncommitted rockets</span></div><div class="action-board">${(Object.keys(ACTION_LABELS) as Action[]).map((action) => `<div class="action-slot ${p.used.includes(action) ? "used" : ""}"><div class="receiving-slot">${p.used.includes(action) ? `<svg class="poker-chip" aria-hidden="true" viewBox="-29 -29 58 60">${chipFace(p.style, 0, 0, 26)}</svg>` : '<span class="empty-chip"></span>'}</div><strong>${ACTION_LABELS[action]}</strong><small>${p.investedActions.includes(action) ? `${rocket(p.style, 18)} Invested this round` : p.used.includes(action) ? "Used this round" : "Available"}</small></div>`).join("")}</div><div class="supply credits"><h3>Credits</h3>${rocket(p.style, 68)}<strong>${p.credits}</strong><span>Spend on Tech</span></div></div><div class="resource-breakdown"><span><strong>${p.invested}</strong> Invested</span><span><strong>${g.systems.reduce((n, s) => n + s.ships[p.id], 0)}</strong> Ships</span><span><strong>${g.systems.reduce((n, s) => n + s.planets.reduce((a, planet) => a + planet.owners[p.id], 0), 0)}</strong> Settlements</span><span><strong>${p.techs.length}</strong> Tech markers</span><span><strong>40</strong> Rockets total</span></div><p class="score-preview">Current position: ${live.planets} settled planets + ${live.systems} ship systems + ${live.techs} Techs = <strong>${live.total} points</strong></p><p class="muted">Resolve chips on the Board. Select a stack, assign an unused slot, then act or Invest.</p>${button("Return to Board", "to-board", "", false, "secondary")}</section>`;
   }
   function techView(g: Game) {
     return `<section><div class="section-heading"><span class="eyebrow">Official Family preset</span><h2>Technology for a growing empire.</h2><p>Ten shared Techs. Multiple players can own a card; each purchase uses one Reserve rocket as its marker.</p>${g.phase === "tech" && !g.pending ? button("Pass this purchase", "pass-tech", "", false, "secondary") : '<span class="small-tag">Purchases happen during Economy</span>'}</div><div class="tech-grid">${g.market
@@ -1203,7 +1260,7 @@ export function mountApp(
         actions: "A",
         player_aid: "P",
       };
-      root.innerHTML = `<div class="game-shell"><header class="game-header"><button class="wordmark" data-action="help" aria-label="Space Force help"><span>SPACE</span><span>FORCE</span></button><div class="round-status"><span class="eyebrow">Local Family game · simpler Events</span><strong>Round ${g.round} / ${g.players.length <= 3 ? 6 : 5}</strong><span>${phaseLabel(g)}</span></div><div class="header-player">${badge(p.style, p.name)}<div class="resource-pills"><span><small>Reserve</small><strong>${p.reserve}</strong></span><span><small>Credits</small><strong>${p.credits}</strong></span></div></div><div class="header-tools">${button("?", "help", 'aria-label="Open Help"')}${button("New", "new-game", "", false, "quiet")}</div></header>${statusBox(g)}${g.phase === "finished" ? finalScores(g) : tutorial(g)}<nav class="view-tabs" aria-label="Game views" role="tablist">${(Object.keys(VIEW_LABELS) as View[]).map((v) => `<button id="tab-${v}" role="tab" aria-selected="${view === v}" aria-controls="game-panel" data-view="${v}" class="${view === v ? "active" : ""}"><span aria-hidden="true">${{ board: "⬡", techs: "✧", event: "◷", actions: "↗", player_aid: "▤" }[v]}</span>${VIEW_LABELS[v]}<span class="shortcut-hint"> (${shortcuts[v]})</span></button>`).join("")}</nav><main id="game-panel" class="main-panel" role="tabpanel" aria-labelledby="tab-${view}" tabindex="-1">${panel}</main><footer class="game-footer"><span>${autosave ? "Autosaved on this device" : "Session only · local storage unavailable"}</span><span>Normal turns · ${g.players.length} players · revision ${g.revision}</span>${button("Game record ↓", "export", "", false, "text-link")}<details class="history"><summary>Recent game history</summary><ol>${g.log
+      root.innerHTML = `<div class="game-shell">${sharedArt(g)}<header class="game-header"><button class="wordmark" data-action="help" aria-label="Space Force help"><span>SPACE</span><span>FORCE</span></button><div class="round-status"><span class="eyebrow">Local Family game · simpler Events</span><strong>Round ${g.round} / ${g.players.length <= 3 ? 6 : 5}</strong><span>${phaseLabel(g)}</span></div><div class="header-player">${badge(p.style, p.name)}<div class="resource-pills"><span><small>Reserve</small><strong>${p.reserve}</strong></span><span><small>Credits</small><strong>${p.credits}</strong></span></div></div><div class="header-tools">${button("?", "help", 'aria-label="Open Help"')}${button("New", "new-game", "", false, "quiet")}</div></header>${statusBox(g)}${g.phase === "finished" ? finalScores(g) : tutorial(g)}<nav class="view-tabs" aria-label="Game views" role="tablist">${(Object.keys(VIEW_LABELS) as View[]).map((v) => `<button id="tab-${v}" role="tab" aria-selected="${view === v}" aria-controls="game-panel" data-view="${v}" class="${view === v ? "active" : ""}"><span aria-hidden="true">${{ board: "⬡", techs: "✧", event: "◷", actions: "↗", player_aid: "▤" }[v]}</span>${VIEW_LABELS[v]}<span class="shortcut-hint"> (${shortcuts[v]})</span></button>`).join("")}</nav><main id="game-panel" class="main-panel" role="tabpanel" aria-labelledby="tab-${view}" tabindex="-1">${panel}</main><footer class="game-footer"><span>${autosave ? "Autosaved on this device" : "Session only · local storage unavailable"}</span><span>Normal turns · ${g.players.length} players · revision ${g.revision}</span>${button("Game record ↓", "export", "", false, "text-link")}<details class="history"><summary>Recent game history</summary><ol>${g.log
         .slice(-30)
         .reverse()
         .map(
@@ -1264,7 +1321,7 @@ export function mountApp(
     }
     const options = root.querySelector<HTMLElement>(".feature-options");
     if (options) options.scrollLeft = 0;
-    updateBoardTypography();
+    updateTypography();
     const modal = root.querySelector<HTMLElement>(".modal");
     if (modal && !modal.contains(root.ownerDocument.activeElement))
       modal
@@ -1278,7 +1335,7 @@ export function mountApp(
       [
         JSON.stringify(
           {
-            application: "Space Force local prototype 0.12.0",
+            application: "Space Force local prototype 0.13.0",
             exportedAt: new Date().toISOString(),
             game,
           },
@@ -2065,10 +2122,7 @@ export function mountApp(
     if (t.dataset.name !== undefined || t.id === "map-code" || t.dataset.number)
       input(event);
   };
-  root.ownerDocument.defaultView?.addEventListener(
-    "resize",
-    updateBoardTypography,
-  );
+  root.ownerDocument.defaultView?.addEventListener("resize", updateTypography);
   root.addEventListener("click", click);
   root.addEventListener("change", input);
   root.addEventListener("input", liveInput);
@@ -2084,6 +2138,8 @@ export function mountApp(
     getView: () => view,
     setGame: (value: Game) => {
       assertInvariants(value);
+      previewCache = new WeakMap();
+      featureCache = new WeakMap();
       game = value;
       planTap = null;
       selected = null;
@@ -2095,7 +2151,7 @@ export function mountApp(
       cancelPlacement();
       root.ownerDocument.defaultView?.removeEventListener(
         "resize",
-        updateBoardTypography,
+        updateTypography,
       );
       root.replaceChildren();
       root.removeEventListener("click", click);

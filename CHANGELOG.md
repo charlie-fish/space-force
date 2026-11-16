@@ -1,5 +1,14 @@
 # Change log
 
+## 0.13.0 — 2026-11-16
+
+- Updated the Actions and Supply explanation, stack-selection prompt and empty-ATTACK confirmation wording.
+- Added thin black side segments to chip rims, leaving the middle clear to preserve player-colour readability.
+- Replaced inherited column/fixed-size Tech choices with compact horizontal options; added current-state system previews without revealing unexplored contents.
+- Reused the board renderer, shared SVG definitions and text-sizing logic for previews in every view. Cached unchanged target lists/preview markup and consolidated redundant chooser CSS without adding dependencies.
+- All 112 tests and production/portable checks pass. Engine 0.11/schema 4 and saves remain compatible; browser/phone visual review remains pending.
+- See the [complete 0.13 checklist](docs/PLAYTEST_CHANGES_0.13.md).
+
 ## 0.12.0 — 2026-11-16
 
 - Simplified Player aid headings/reference text and kept both shared faces visible.

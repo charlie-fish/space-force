@@ -24,7 +24,7 @@ export function intentWarnings(game: Game, command: Command): string[] {
       const sacrifice = command.attack?.sacrifice ?? 0;
       if (!sacrifice)
         messages.push(
-          "No Ships are selected to sacrifice. Use your ATTACK action without sacrificing any Ships?",
+          "No Ships are selected to sacrifice. Use your ATTACK action without attacking any Ships?",
         );
       else {
         const needed =
