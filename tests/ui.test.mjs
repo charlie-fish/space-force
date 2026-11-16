@@ -11,7 +11,422 @@ import {
   fixture,
   setup,
   system,
+  credits,
+  ships,
+  settlement,
 } from "./helpers.mjs";
+
+test("Status Box is above the board and always contains the turn, supplies and shortcut-labelled views", () => {
+  const h = harness();
+  h.app.setGame(fixture());
+  assert.ok(h.root.querySelector("#status-box .turn-bar"));
+  assert.ok(h.root.querySelector("#status-box .player-roster"));
+  assert.ok(
+    h.root
+      .querySelector("#status-box")
+      .compareDocumentPosition(h.root.querySelector(".main-panel")) & 4,
+  );
+  for (const [view, label] of [
+    ["board", "Board (B)"],
+    ["techs", "Techs (T)"],
+    ["event", "Event (E)"],
+    ["actions", "Actions and Supply (A)"],
+    ["player_aid", "Player Aid (P)"],
+  ]) {
+    h.click(`[data-view="${view}"]`);
+    assert.ok(h.root.querySelector("#status-box .turn-bar"));
+    assert.ok(
+      h.root.querySelector(`[data-view="${view}"]`).textContent.endsWith(label),
+    );
+  }
+  h.close();
+});
+
+test("Plan has a blank sun, a translucent chip preview and one-command touch drag placement", () => {
+  const h = harness();
+  h.app.setGame(setup());
+  const g = h.app.getGame(),
+    target = g.systems.find((s) => !s.revealed),
+    id = target.id;
+  assert.ok(h.root.querySelector(".blank-sun"));
+  assert.ok(h.root.querySelector(".plan-preview"));
+  assert.match(
+    h.root.querySelector(".map-viewport").getAttribute("style"),
+    /data:image/,
+  );
+  h.window.document.elementFromPoint = () =>
+    h.root.querySelector(`[data-system="${id}"][role="button"]`);
+  h.pointer(`[data-system="${id}"][role="button"]`, "pointerdown", 50, 50);
+  h.pointer(".map-viewport", "pointermove", 100, 70);
+  assert.ok(h.root.querySelector("#placement-chip"));
+  assert.ok(h.root.querySelector(".drop-target"));
+  h.pointer(".map-viewport", "pointerup", 100, 70);
+  assert.equal(h.app.getGame().revision, g.revision + 1);
+  assert.deepEqual(system(h.app.getGame(), id).tokens, [g.turn]);
+  h.click(`[data-system="${id}"][role="button"]`);
+  assert.equal(h.app.getGame().revision, g.revision + 1);
+  assert.equal(h.root.querySelector("#placement-chip"), null);
+  h.close();
+});
+
+test("all 28 stack positions are visible without inspection and selectable top chips are highlighted", () => {
+  const g = setup(7);
+  g.phase = "actions";
+  g.turn = 6;
+  g.players.forEach((p) => (p.unplaced = 0));
+  g.systems[0].tokens = Array.from({ length: 28 }, (_, i) => i % 7);
+  const h = harness();
+  h.app.setGame(g);
+  const tile = h.root.querySelector(
+    `[data-system="${g.systems[0].id}"][role="button"]`,
+  );
+  assert.deepEqual(
+    [...tile.querySelectorAll("[data-stack-index]")].map((el) =>
+      Number(el.dataset.owner),
+    ),
+    g.systems[0].tokens,
+  );
+  assert.ok(tile.querySelector(".selectable-chip"));
+  h.close();
+});
+
+test("production Ships and Credits stay linked in both directions and commit the displayed split", () => {
+  const h = harness(),
+    g = fixture(),
+    id = g.systems[0].id;
+  h.app.setGame(g);
+  h.click(`[data-system="${id}"][role="button"]`);
+  h.click('[data-kind="produce"]');
+  const total = Number(
+    h.root.querySelector('[data-number="produce-credits"]').value,
+  );
+  assert.ok(total > 0);
+  h.input('[data-number="produce-ships"]', String(total));
+  assert.equal(
+    h.root.querySelector('[data-number="produce-credits"]').value,
+    "0",
+  );
+  h.input('[data-number="produce-credits"]', String(total));
+  assert.equal(
+    h.root.querySelector('[data-number="produce-ships"]').value,
+    "0",
+  );
+  h.click('[data-action="commit-action"]');
+  assert.equal(h.app.getGame().players[0].credits, total);
+  h.close();
+});
+
+test("Settlement quantities and snapped previews can increase and decrease before any command is committed", () => {
+  const h = harness(),
+    g = fixture(),
+    s = g.systems[0],
+    p = s.planets.find((p) => !p.home && p.capacity >= 2);
+  h.app.setGame(g);
+  h.click(`[data-system="${s.id}"][role="button"]`);
+  h.click('[data-kind="settle"]');
+  const input = `[data-number="settlement"][data-planet="${p.id}"]`;
+  h.input(input, "2");
+  assert.equal(h.app.getGame().revision, g.revision);
+  assert.equal(h.root.querySelectorAll(".settlement-draft").length, 2);
+  h.input(input, "1");
+  assert.equal(h.root.querySelectorAll(".settlement-draft").length, 1);
+  assert.equal(system(h.app.getGame(), s.id).ships[0], 3);
+  const slot =
+    ART.systems[s.template].planets[s.planets.indexOf(p)].settlementSlots[0];
+  assert.ok(slot);
+  h.click('[data-action="commit-action"]');
+  assert.equal(
+    system(h.app.getGame(), s.id).planets.find((o) => o.id === p.id).owners[0],
+    1,
+  );
+  assert.equal(system(h.app.getGame(), s.id).ships[0], 2);
+  h.close();
+});
+
+test("Status Box reports hidden Explore tokens and then shows the revealed outcome", () => {
+  const h = harness(),
+    g = fixture(),
+    s = g.systems[0],
+    p = s.planets.find((p) => !p.home);
+  p.capacity = 1;
+  p.explore = "otherSettlement";
+  h.app.setGame(g);
+  h.click(`[data-system="${s.id}"][role="button"]`);
+  assert.match(
+    h.root.querySelector("#status-box").textContent,
+    /1 Explore token/,
+  );
+  h.click('[data-kind="settle"]');
+  h.input(`[data-number="settlement"][data-planet="${p.id}"]`, "1");
+  h.click('[data-action="commit-action"]');
+  assert.equal(h.app.getGame().pending.kind, "explore");
+  assert.match(
+    h.root.querySelector("#status-box").textContent,
+    /Explore token revealed/,
+  );
+  h.click('[data-recipient="1"]');
+  assert.match(
+    h.root.querySelector("#status-box").textContent,
+    /received 1 Settlement/,
+  );
+  assert.deepEqual(
+    system(h.app.getGame(), s.id).planets.find((q) => q.id === p.id).owners,
+    [0, 1],
+  );
+  h.close();
+});
+
+test("attack limits targets by sacrifice, shows planet graphics, and confirms excess sacrifices", () => {
+  const h = harness(),
+    g = fixture(),
+    s = g.systems[0],
+    index = s.planets.findIndex((p) => !p.home && p.capacity >= 2);
+  ships(g, s, 0, 2);
+  ships(g, s, 1, 5);
+  settlement(g, s, index, 1, 2);
+  h.app.setGame(g);
+  h.click(`[data-system="${s.id}"][role="button"]`);
+  h.click('[data-kind="attack"]');
+  assert.match(h.root.querySelector("#status-box").textContent, /out of 5/);
+  assert.ok(h.root.querySelector(".attack-planet svg"));
+  assert.doesNotMatch(
+    h.root.querySelector(".attack-planets").textContent,
+    /protected because/,
+  );
+  h.input('[data-number="sacrifice"]', "2");
+  h.input('[data-number="target-ships"]', "99");
+  assert.equal(h.root.querySelector('[data-number="target-ships"]').value, "4");
+  assert.equal(h.root.querySelector('[data-number="target-colony"]').max, "0");
+  h.input('[data-number="sacrifice"]', "1");
+  assert.equal(h.root.querySelector('[data-number="target-ships"]').value, "2");
+  h.input('[data-number="sacrifice"]', "3");
+  h.input('[data-number="target-ships"]', "1");
+  h.input('[data-number="target-colony"]', "1");
+  h.click('[data-action="commit-action"]');
+  assert.ok(h.root.querySelector('[role="dialog"]'));
+  assert.equal(h.app.getGame().revision, g.revision);
+  h.click('[data-action="cancel-confirmation"]');
+  assert.equal(h.root.querySelector('[data-number="sacrifice"]').value, "3");
+  h.click('[data-action="commit-action"]');
+  h.click('[data-action="confirm-command"]');
+  assert.equal(h.app.getGame().players[0].credits, 3);
+  assert.equal(h.app.getGame().players[1].credits, 2);
+  h.close();
+});
+
+test("only genuinely shared planets are described as protected", () => {
+  const h = harness(),
+    g = fixture(),
+    s = g.systems[0],
+    home = s.planets.findIndex((p) => p.home);
+  settlement(g, s, home, 1, 1);
+  h.app.setGame(g);
+  h.click(`[data-system="${s.id}"][role="button"]`);
+  h.click('[data-kind="attack"]');
+  assert.equal(
+    (
+      h.root
+        .querySelector(".attack-planets")
+        .textContent.match(/Protected because you share it/g) || []
+    ).length,
+    1,
+  );
+  h.close();
+});
+
+test("Invest defaults on empty actions, can be unchecked, and invested slots show a rocket marker", () => {
+  const h = harness(),
+    g = fixture(),
+    s = g.systems.find((s) => !s.revealed);
+  s.revealed = true;
+  g.systems.forEach((s) => (s.tokens = []));
+  s.tokens = [0, 0];
+  h.app.setGame(g);
+  h.click(`[data-system="${s.id}"][role="button"]`);
+  for (const action of ["move", "settle", "produce", "attack"]) {
+    h.click(`[data-kind="${action}"]`);
+    assert.equal(h.root.querySelector('[data-check="invest"]').checked, true);
+  }
+  const check = h.root.querySelector('[data-check="invest"]');
+  check.checked = false;
+  check.dispatchEvent(new h.window.Event("change", { bubbles: true }));
+  assert.equal(h.root.querySelector('[data-check="invest"]').checked, false);
+  h.click('[data-kind="move"]');
+  h.click('[data-action="commit-action"]');
+  h.click('[data-view="actions"]');
+  const label = [...h.root.querySelectorAll(".action-slot")].find((el) =>
+    el.textContent.includes("Move into"),
+  );
+  assert.match(label.textContent, /Invested this round/);
+  assert.ok(label.querySelector("small svg.rocket"));
+  h.close();
+});
+
+test("Techs sort by cost and token cards show when their token has already been placed", () => {
+  const h = harness(),
+    g = fixture();
+  g.phase = "tech";
+  credits(g, 0, 15);
+  g.features = { warp: true, planet: true, asteroid: true, blackHole: true };
+  h.app.setGame(g);
+  h.click('[data-view="techs"]');
+  const values = [...h.root.querySelectorAll("[data-tech-value]")].map((el) =>
+    Number(el.dataset.techValue),
+  );
+  assert.deepEqual(
+    values,
+    values.slice().sort((a, b) => a - b),
+  );
+  for (const id of [
+    "artificial-warp",
+    "planet-nine",
+    "kessler-syndrome",
+    "planet-killer",
+  ])
+    assert.ok(h.root.querySelector(`[data-tech-id="tech.${id}"] .token-used`));
+  assert.match(
+    h.root.querySelector("#status-box").textContent,
+    /15 Credits available/,
+  );
+  h.close();
+});
+
+test("planet and Kessler edge selections on the map highlight their Status Box options before commitment", () => {
+  for (const id of ["genesis", "kessler-syndrome"]) {
+    const h = harness(),
+      g = fixture();
+    g.phase = "tech";
+    credits(g, 0, 12);
+    const pending = applyCommand(g, 0, { type: "buy", tech: `tech.${id}` });
+    h.app.setGame(pending);
+    const target =
+      id === "genesis"
+        ? h.root.querySelector(".feature-options button[data-planet]")
+        : h.root.querySelector(".edge-target");
+    const systemId =
+      id === "genesis" ? target.dataset.systemId : target.dataset.system;
+    const selector =
+      id === "genesis"
+        ? `#galaxy [data-system="${systemId}"][data-planet="${target.dataset.planet}"]`
+        : `#galaxy .edge-target[data-system="${systemId}"][data-edge="${target.dataset.edge}"]`;
+    h.click(selector);
+    assert.ok(h.root.querySelector('.feature-options [aria-pressed="true"]'));
+    assert.equal(h.app.getGame().revision, pending.revision);
+    assert.equal(
+      h.root.querySelector('[data-action="commit-feature"]').disabled,
+      false,
+    );
+    h.click('[data-action="commit-feature"]');
+    assert.equal(h.app.getGame().revision, pending.revision + 1);
+    h.close();
+  }
+});
+
+test("Genesis without any empty valid planet asks for confirmation while preserving Credits on cancel", () => {
+  const h = harness(),
+    g = fixture();
+  g.phase = "tech";
+  credits(g, 0, 6);
+  for (const s of g.systems.filter((s) => s.revealed))
+    for (const p of s.planets)
+      while (sum(p.owners) < p.capacity) {
+        const owner = g.players.find((p) => p.reserve > 0);
+        p.owners[owner.id]++;
+        owner.reserve--;
+      }
+  h.app.setGame(g);
+  h.click('[data-view="techs"]');
+  h.click('[data-action="buy"][data-tech="tech.genesis"]');
+  assert.match(
+    h.root.querySelector('[role="dialog"]').textContent,
+    /no empty, valid planets/,
+  );
+  h.click('[data-action="cancel-confirmation"]');
+  assert.equal(h.app.getGame().players[0].credits, 6);
+  h.click('[data-action="buy"][data-tech="tech.genesis"]');
+  h.click('[data-action="confirm-command"]');
+  assert.ok(h.app.getGame().players[0].techs.includes("tech.genesis"));
+  assert.equal(h.app.getGame().players[0].credits, 0);
+  h.close();
+});
+
+test("Economy shows every stage, an explicit Event step, and Board reinforcements after Tech", () => {
+  const h = harness(),
+    g = fixture();
+  g.phase = "investments";
+  g.players[0].invested = 1;
+  g.players[0].reserve--;
+  h.app.setGame(g);
+  assert.match(
+    h.root.querySelector(".first-player-token").getAttribute("aria-label"),
+    /Investments/,
+  );
+  h.click('[data-action="allocate"]');
+  assert.equal(h.app.getGame().phase, "event");
+  assert.equal(h.app.getView(), "event");
+  assert.equal(h.root.querySelectorAll(".event-pair img").length, 2);
+  assert.match(
+    h.root.querySelector(".first-player-token").getAttribute("aria-label"),
+    /Event/,
+  );
+  h.click('[data-action="continue-event"]');
+  assert.equal(h.app.getView(), "techs");
+  h.click('[data-action="pass-tech"]');
+  h.click('[data-action="pass-tech"]');
+  assert.equal(h.app.getGame().phase, "reinforce");
+  assert.equal(h.app.getView(), "board");
+  assert.ok(h.root.querySelector('#status-box [data-action="allocate"]'));
+  for (let i = 0; i < 2; i++) {
+    h.click('[data-action="all-home"]');
+    h.click('[data-action="allocate"]');
+  }
+  assert.equal(h.app.getGame().phase, "pass");
+  assert.match(
+    h.root.querySelector(".first-player-token").getAttribute("aria-label"),
+    /Pass first player/,
+  );
+  h.click('[data-action="next-round"]');
+  assert.equal(h.app.getGame().phase, "plan");
+  assert.equal(h.app.getGame().first, 1);
+  h.close();
+});
+
+function sum(a) {
+  return a.reduce((n, v) => n + v, 0);
+}
+
+test("orientation buttons preview repeatable sixty-degree rotations and commit only a legal choice", () => {
+  const h = harness(),
+    g = fixture(),
+    from = system(g, g.players[0].home),
+    target = g.systems.find((s) => !s.revealed && canMove(g, 0, from, s));
+  g.systems.forEach((s) => (s.tokens = []));
+  target.tokens = [0];
+  h.app.setGame(
+    applyCommand(g, 0, {
+      type: "resolve",
+      system: target.id,
+      action: "move",
+      sources: { [from.id]: 1 },
+    }),
+  );
+  const revision = h.app.getGame().revision,
+    rotations = h.app.getGame().pending.rotations;
+  for (let i = 0; i < 6; i++) {
+    h.click('[data-action="rotate-preview"][data-delta="1"]');
+    assert.equal(h.app.getGame().revision, revision);
+  }
+  assert.equal(
+    h.root.querySelector('[data-action="commit-orientation"]').disabled,
+    false,
+  );
+  h.click('[data-action="rotate-preview"][data-delta="-1"]');
+  h.click('[data-action="rotate-preview"][data-delta="1"]');
+  h.click('[data-action="commit-orientation"]');
+  assert.equal(h.app.getGame().pending.kind, "move");
+  assert.ok(rotations.includes(system(h.app.getGame(), target.id).rotation));
+  h.close();
+});
 
 function harness(storage) {
   const dom = new JSDOM(
@@ -88,7 +503,7 @@ test("setup exposes 2–7 seats, editable names, and a reproducible map code", (
   assert.equal(app.getGame().players[0].name, "Ada");
   assert.equal(root.querySelectorAll('[role="tab"]').length, 5);
   assert.match(
-    root.querySelector(".header-player").textContent,
+    root.querySelector(".status-supply").textContent,
     /Reserve40Credits0/,
   );
   assert.match(root.querySelector(".turn-bar").textContent, /Ada/);
@@ -113,7 +528,6 @@ test("home and chip choices commit through the real interface; all five views re
   const id = app.getGame().systems[0].id;
   for (let i = 0; i < 8; i++) {
     click(`[data-system="${id}"][role="button"]`);
-    click('[data-action="place-chip"]');
   }
   assert.equal(app.getGame().phase, "actions");
   for (const view of ["techs", "event", "actions", "player_aid", "board"]) {
@@ -130,7 +544,7 @@ test("home and chip choices commit through the real interface; all five views re
   h.close();
 });
 
-test("draft Undo resets choices without changing state; commit consumes a slot and cannot be undone", () => {
+test("changing action choices resets the draft before commit without a redundant Undo button", () => {
   const h = harness();
   const { app, root, window, click } = h;
   const g = fixture();
@@ -138,8 +552,9 @@ test("draft Undo resets choices without changing state; commit consumes a slot a
   click(`[data-system="${g.systems[0].id}"][role="button"]`);
   click('[data-kind="produce"]');
   assert.equal(app.getGame().revision, g.revision);
-  click('[data-action="undo-draft"]');
-  assert.equal(root.querySelector('[data-action="commit-action"]'), null);
+  assert.equal(root.querySelector('[data-action="undo-draft"]'), null);
+  click('[data-kind="move"]');
+  assert.equal(app.getGame().revision, g.revision);
   click('[data-kind="produce"]');
   click('[data-action="commit-action"]');
   assert.equal(app.getGame().revision, g.revision + 1);
@@ -167,8 +582,11 @@ test("hidden movement commits before orientation and restores its mandatory foll
   input(`[data-number="source"][data-id="${from.id}"]`, "2");
   click('[data-action="commit-action"]');
   assert.equal(app.getGame().pending.kind, "orient");
-  assert.match(root.querySelector(".console").textContent, /Undo locked/);
-  click('[data-action="orient"]');
+  assert.match(
+    root.querySelector(".console").textContent,
+    /orientation preview/,
+  );
+  click('[data-action="commit-orientation"]');
   assert.equal(app.getGame().pending.kind, "move");
   const saved = window.localStorage.getItem("space-force.local-family.v1");
   h.close();
@@ -294,7 +712,7 @@ test("resume opens pending Tech placements on the Board, and malformed view data
   });
   h.click('[data-action="resume"]');
   assert.equal(h.app.getView(), "board");
-  assert.ok(h.root.querySelector('[data-action="feature"]'));
+  assert.ok(h.root.querySelector('[data-action="feature-option"]'));
   h.close();
   const corrupt = fixture();
   corrupt.phase = "tech";
@@ -325,7 +743,7 @@ test("game export downloads a versioned JSON record with setup, commands, and cu
     h.click('[data-action="export"]');
     const record = JSON.parse(await blob.text());
     assert.match(download, /^space-force-/);
-    assert.equal(record.game.engine, "0.8.0");
+    assert.equal(record.game.engine, "0.9.0");
     assert.equal(record.game.content, "family-simple-events-1");
     assert.equal(record.game.commands.length, record.game.revision);
     assert.equal(record.game.seed, h.app.getGame().seed);
@@ -347,7 +765,6 @@ test("Tech, allocation, Explore, and final-score interfaces render real engine c
       !seen.has(g.phase)
     ) {
       h.app.setGame(g);
-      h.click('[data-action="decision"]');
       assert.ok(
         h.root.querySelector(
           g.phase === "tech"

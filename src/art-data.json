@@ -32,7 +32,33 @@
           "radiusY": 0.168206,
           "home": true,
           "index": 0,
-          "id": "system.banks.planet.0"
+          "id": "system.banks.planet.0",
+          "settlementSlots": [
+            {
+              "x": 0.774168,
+              "y": 0.483207
+            },
+            {
+              "x": 0.8781,
+              "y": 0.535035
+            },
+            {
+              "x": 0.674304,
+              "y": 0.542068
+            },
+            {
+              "x": 0.780617,
+              "y": 0.594579
+            },
+            {
+              "x": 0.696908,
+              "y": 0.659224
+            },
+            {
+              "x": 0.859351,
+              "y": 0.659224
+            }
+          ]
         },
         {
           "capacity": 3,
@@ -42,7 +68,21 @@
           "radiusY": 0.119038,
           "home": false,
           "index": 1,
-          "id": "system.banks.planet.1"
+          "id": "system.banks.planet.1",
+          "settlementSlots": [
+            {
+              "x": 0.387872,
+              "y": 0.173439
+            },
+            {
+              "x": 0.490884,
+              "y": 0.195004
+            },
+            {
+              "x": 0.425511,
+              "y": 0.264036
+            }
+          ]
         },
         {
           "capacity": 3,
@@ -52,7 +92,21 @@
           "radiusY": 0.119038,
           "home": false,
           "index": 2,
-          "id": "system.banks.planet.2"
+          "id": "system.banks.planet.2",
+          "settlementSlots": [
+            {
+              "x": 0.688984,
+              "y": 0.245921
+            },
+            {
+              "x": 0.791997,
+              "y": 0.267486
+            },
+            {
+              "x": 0.726623,
+              "y": 0.336518
+            }
+          ]
         },
         {
           "capacity": 3,
@@ -62,7 +116,21 @@
           "radiusY": 0.119038,
           "home": false,
           "index": 3,
-          "id": "system.banks.planet.3"
+          "id": "system.banks.planet.3",
+          "settlementSlots": [
+            {
+              "x": 0.421549,
+              "y": 0.732569
+            },
+            {
+              "x": 0.523571,
+              "y": 0.754134
+            },
+            {
+              "x": 0.457207,
+              "y": 0.823166
+            }
+          ]
         },
         {
           "capacity": 2,
@@ -72,7 +140,17 @@
           "radiusY": 0.102649,
           "home": false,
           "index": 4,
-          "id": "system.banks.planet.4"
+          "id": "system.banks.planet.4",
+          "settlementSlots": [
+            {
+              "x": 0.132322,
+              "y": 0.336518
+            },
+            {
+              "x": 0.218497,
+              "y": 0.367583
+            }
+          ]
         }
       ],
       "homePlanetIndex": 0,
@@ -113,7 +191,33 @@
           "radiusY": 0.168206,
           "home": true,
           "index": 0,
-          "id": "system.attwood.planet.0"
+          "id": "system.attwood.planet.0",
+          "settlementSlots": [
+            {
+              "x": 0.738913,
+              "y": 0.519436
+            },
+            {
+              "x": 0.842557,
+              "y": 0.57131
+            },
+            {
+              "x": 0.638771,
+              "y": 0.578333
+            },
+            {
+              "x": 0.745083,
+              "y": 0.630849
+            },
+            {
+              "x": 0.661654,
+              "y": 0.695465
+            },
+            {
+              "x": 0.824096,
+              "y": 0.695465
+            }
+          ]
         },
         {
           "capacity": 2,
@@ -123,7 +227,17 @@
           "radiusY": 0.102649,
           "home": false,
           "index": 1,
-          "id": "system.attwood.planet.1"
+          "id": "system.attwood.planet.1",
+          "settlementSlots": [
+            {
+              "x": 0.723065,
+              "y": 0.289926
+            },
+            {
+              "x": 0.808248,
+              "y": 0.320979
+            }
+          ]
         },
         {
           "capacity": 2,
@@ -133,7 +247,17 @@
           "radiusY": 0.102649,
           "home": false,
           "index": 2,
-          "id": "system.attwood.planet.2"
+          "id": "system.attwood.planet.2",
+          "settlementSlots": [
+            {
+              "x": 0.135699,
+              "y": 0.41245
+            },
+            {
+              "x": 0.221872,
+              "y": 0.443516
+            }
+          ]
         },
         {
           "capacity": 2,
@@ -143,7 +267,17 @@
           "radiusY": 0.103511,
           "home": false,
           "index": 3,
-          "id": "system.attwood.planet.3"
+          "id": "system.attwood.planet.3",
+          "settlementSlots": [
+            {
+              "x": 0.320922,
+              "y": 0.63766
+            },
+            {
+              "x": 0.407096,
+              "y": 0.669576
+            }
+          ]
         }
       ],
       "homePlanetIndex": 0,
@@ -184,7 +318,33 @@
           "radiusY": 0.168206,
           "home": true,
           "index": 0,
-          "id": "system.butler.planet.0"
+          "id": "system.butler.planet.0",
+          "settlementSlots": [
+            {
+              "x": 0.671131,
+              "y": 0.566316
+            },
+            {
+              "x": 0.775194,
+              "y": 0.619032
+            },
+            {
+              "x": 0.571408,
+              "y": 0.626074
+            },
+            {
+              "x": 0.6777,
+              "y": 0.67858
+            },
+            {
+              "x": 0.593872,
+              "y": 0.744058
+            },
+            {
+              "x": 0.756314,
+              "y": 0.744058
+            }
+          ]
         },
         {
           "capacity": 3,
@@ -194,7 +354,21 @@
           "radiusY": 0.119038,
           "home": false,
           "index": 1,
-          "id": "system.butler.planet.1"
+          "id": "system.butler.planet.1",
+          "settlementSlots": [
+            {
+              "x": 0.66915,
+              "y": 0.264311
+            },
+            {
+              "x": 0.772162,
+              "y": 0.285888
+            },
+            {
+              "x": 0.705798,
+              "y": 0.354908
+            }
+          ]
         },
         {
           "capacity": 2,
@@ -204,7 +378,17 @@
           "radiusY": 0.102649,
           "home": false,
           "index": 2,
-          "id": "system.butler.planet.2"
+          "id": "system.butler.planet.2",
+          "settlementSlots": [
+            {
+              "x": 0.190738,
+              "y": 0.664676
+            },
+            {
+              "x": 0.276911,
+              "y": 0.695741
+            }
+          ]
         },
         {
           "capacity": 1,
@@ -214,7 +398,13 @@
           "radiusY": 0.067282,
           "home": false,
           "index": 3,
-          "id": "system.butler.planet.3"
+          "id": "system.butler.planet.3",
+          "settlementSlots": [
+            {
+              "x": 0.191728,
+              "y": 0.291064
+            }
+          ]
         }
       ],
       "homePlanetIndex": 0,
@@ -255,7 +445,33 @@
           "radiusY": 0.169069,
           "home": true,
           "index": 0,
-          "id": "system.bujold.planet.0"
+          "id": "system.bujold.planet.0",
+          "settlementSlots": [
+            {
+              "x": 0.698278,
+              "y": 0.512811
+            },
+            {
+              "x": 0.802769,
+              "y": 0.56535
+            },
+            {
+              "x": 0.598972,
+              "y": 0.572375
+            },
+            {
+              "x": 0.705284,
+              "y": 0.624885
+            },
+            {
+              "x": 0.622009,
+              "y": 0.689703
+            },
+            {
+              "x": 0.784452,
+              "y": 0.690565
+            }
+          ]
         },
         {
           "capacity": 3,
@@ -265,7 +481,21 @@
           "radiusY": 0.119038,
           "home": false,
           "index": 1,
-          "id": "system.bujold.planet.1"
+          "id": "system.bujold.planet.1",
+          "settlementSlots": [
+            {
+              "x": 0.295144,
+              "y": 0.662088
+            },
+            {
+              "x": 0.398156,
+              "y": 0.683665
+            },
+            {
+              "x": 0.332783,
+              "y": 0.753559
+            }
+          ]
         },
         {
           "capacity": 1,
@@ -275,7 +505,13 @@
           "radiusY": 0.06642,
           "home": false,
           "index": 2,
-          "id": "system.bujold.planet.2"
+          "id": "system.bujold.planet.2",
+          "settlementSlots": [
+            {
+              "x": 0.727003,
+              "y": 0.245334
+            }
+          ]
         },
         {
           "capacity": 1,
@@ -285,7 +521,13 @@
           "radiusY": 0.067282,
           "home": false,
           "index": 3,
-          "id": "system.bujold.planet.3"
+          "id": "system.bujold.planet.3",
+          "settlementSlots": [
+            {
+              "x": 0.205009,
+              "y": 0.513673
+            }
+          ]
         }
       ],
       "homePlanetIndex": 0,
@@ -326,7 +568,33 @@
           "radiusY": 0.169069,
           "home": true,
           "index": 0,
-          "id": "system.clarke.planet.0"
+          "id": "system.clarke.planet.0",
+          "settlementSlots": [
+            {
+              "x": 0.594556,
+              "y": 0.644402
+            },
+            {
+              "x": 0.698784,
+              "y": 0.696688
+            },
+            {
+              "x": 0.49498,
+              "y": 0.703724
+            },
+            {
+              "x": 0.601297,
+              "y": 0.756231
+            },
+            {
+              "x": 0.517297,
+              "y": 0.821282
+            },
+            {
+              "x": 0.679739,
+              "y": 0.822145
+            }
+          ]
         },
         {
           "capacity": 3,
@@ -336,7 +604,21 @@
           "radiusY": 0.118176,
           "home": false,
           "index": 1,
-          "id": "system.clarke.planet.1"
+          "id": "system.clarke.planet.1",
+          "settlementSlots": [
+            {
+              "x": 0.2459,
+              "y": 0.212973
+            },
+            {
+              "x": 0.347921,
+              "y": 0.2354
+            },
+            {
+              "x": 0.281558,
+              "y": 0.304432
+            }
+          ]
         },
         {
           "capacity": 3,
@@ -346,7 +628,21 @@
           "radiusY": 0.118176,
           "home": false,
           "index": 2,
-          "id": "system.clarke.planet.2"
+          "id": "system.clarke.planet.2",
+          "settlementSlots": [
+            {
+              "x": 0.131002,
+              "y": 0.440758
+            },
+            {
+              "x": 0.234014,
+              "y": 0.463197
+            },
+            {
+              "x": 0.16765,
+              "y": 0.532229
+            }
+          ]
         },
         {
           "capacity": 3,
@@ -356,7 +652,21 @@
           "radiusY": 0.119038,
           "home": false,
           "index": 3,
-          "id": "system.clarke.planet.3"
+          "id": "system.clarke.planet.3",
+          "settlementSlots": [
+            {
+              "x": 0.78077,
+              "y": 0.489087
+            },
+            {
+              "x": 0.883782,
+              "y": 0.511515
+            },
+            {
+              "x": 0.818409,
+              "y": 0.580546
+            }
+          ]
         },
         {
           "capacity": 3,
@@ -366,7 +676,21 @@
           "radiusY": 0.118176,
           "home": false,
           "index": 4,
-          "id": "system.clarke.planet.4"
+          "id": "system.clarke.planet.4",
+          "settlementSlots": [
+            {
+              "x": 0.200337,
+              "y": 0.684094
+            },
+            {
+              "x": 0.301368,
+              "y": 0.706521
+            },
+            {
+              "x": 0.235995,
+              "y": 0.775553
+            }
+          ]
         }
       ],
       "homePlanetIndex": 0,
@@ -414,7 +738,33 @@
           "radiusY": 0.168206,
           "home": true,
           "index": 0,
-          "id": "system.simak.planet.0"
+          "id": "system.simak.planet.0",
+          "settlementSlots": [
+            {
+              "x": 0.761365,
+              "y": 0.508927
+            },
+            {
+              "x": 0.86629,
+              "y": 0.56129
+            },
+            {
+              "x": 0.662493,
+              "y": 0.568321
+            },
+            {
+              "x": 0.76881,
+              "y": 0.620828
+            },
+            {
+              "x": 0.685096,
+              "y": 0.685819
+            },
+            {
+              "x": 0.848529,
+              "y": 0.685819
+            }
+          ]
         },
         {
           "capacity": 2,
@@ -424,7 +774,17 @@
           "radiusY": 0.103512,
           "home": false,
           "index": 1,
-          "id": "system.simak.planet.1"
+          "id": "system.simak.planet.1",
+          "settlementSlots": [
+            {
+              "x": 0.688068,
+              "y": 0.270778
+            },
+            {
+              "x": 0.773251,
+              "y": 0.301844
+            }
+          ]
         },
         {
           "capacity": 2,
@@ -434,7 +794,17 @@
           "radiusY": 0.103511,
           "home": false,
           "index": 2,
-          "id": "system.simak.planet.2"
+          "id": "system.simak.planet.2",
+          "settlementSlots": [
+            {
+              "x": 0.131406,
+              "y": 0.458884
+            },
+            {
+              "x": 0.216589,
+              "y": 0.48995
+            }
+          ]
         },
         {
           "capacity": 2,
@@ -444,7 +814,17 @@
           "radiusY": 0.102649,
           "home": false,
           "index": 3,
-          "id": "system.simak.planet.3"
+          "id": "system.simak.planet.3",
+          "settlementSlots": [
+            {
+              "x": 0.310687,
+              "y": 0.711697
+            },
+            {
+              "x": 0.39686,
+              "y": 0.742762
+            }
+          ]
         }
       ],
       "homePlanetIndex": 0,
@@ -485,7 +865,17 @@
           "radiusY": 0.102649,
           "home": false,
           "index": 0,
-          "id": "system.heinlein.planet.0"
+          "id": "system.heinlein.planet.0",
+          "settlementSlots": [
+            {
+              "x": 0.734217,
+              "y": 0.248327
+            },
+            {
+              "x": 0.82039,
+              "y": 0.27938
+            }
+          ]
         },
         {
           "capacity": 2,
@@ -495,7 +885,17 @@
           "radiusY": 0.102649,
           "home": false,
           "index": 1,
-          "id": "system.heinlein.planet.1"
+          "id": "system.heinlein.planet.1",
+          "settlementSlots": [
+            {
+              "x": 0.708463,
+              "y": 0.512353
+            },
+            {
+              "x": 0.793647,
+              "y": 0.544281
+            }
+          ]
         },
         {
           "capacity": 2,
@@ -505,7 +905,17 @@
           "radiusY": 0.102649,
           "home": false,
           "index": 2,
-          "id": "system.heinlein.planet.2"
+          "id": "system.heinlein.planet.2",
+          "settlementSlots": [
+            {
+              "x": 0.189441,
+              "y": 0.664218
+            },
+            {
+              "x": 0.275615,
+              "y": 0.695283
+            }
+          ]
         },
         {
           "capacity": 1,
@@ -515,7 +925,13 @@
           "radiusY": 0.067282,
           "home": false,
           "index": 3,
-          "id": "system.heinlein.planet.3"
+          "id": "system.heinlein.planet.3",
+          "settlementSlots": [
+            {
+              "x": 0.203308,
+              "y": 0.350137
+            }
+          ]
         },
         {
           "capacity": 1,
@@ -525,7 +941,13 @@
           "radiusY": 0.067282,
           "home": false,
           "index": 4,
-          "id": "system.heinlein.planet.4"
+          "id": "system.heinlein.planet.4",
+          "settlementSlots": [
+            {
+              "x": 0.510363,
+              "y": 0.691833
+            }
+          ]
         },
         {
           "capacity": 1,
@@ -535,7 +957,13 @@
           "radiusY": 0.067282,
           "home": false,
           "index": 5,
-          "id": "system.heinlein.planet.5"
+          "id": "system.heinlein.planet.5",
+          "settlementSlots": [
+            {
+              "x": 0.710444,
+              "y": 0.753101
+            }
+          ]
         }
       ],
       "homePlanetIndex": null,
@@ -585,7 +1013,17 @@
           "radiusY": 0.102649,
           "home": false,
           "index": 0,
-          "id": "system.harrison.planet.0"
+          "id": "system.harrison.planet.0",
+          "settlementSlots": [
+            {
+              "x": 0.640524,
+              "y": 0.239689
+            },
+            {
+              "x": 0.726697,
+              "y": 0.270754
+            }
+          ]
         },
         {
           "capacity": 2,
@@ -595,7 +1033,17 @@
           "radiusY": 0.102649,
           "home": false,
           "index": 1,
-          "id": "system.harrison.planet.1"
+          "id": "system.harrison.planet.1",
+          "settlementSlots": [
+            {
+              "x": 0.219561,
+              "y": 0.289744
+            },
+            {
+              "x": 0.304744,
+              "y": 0.320809
+            }
+          ]
         },
         {
           "capacity": 2,
@@ -605,7 +1053,17 @@
           "radiusY": 0.102649,
           "home": false,
           "index": 2,
-          "id": "system.harrison.planet.2"
+          "id": "system.harrison.planet.2",
+          "settlementSlots": [
+            {
+              "x": 0.766317,
+              "y": 0.588286
+            },
+            {
+              "x": 0.8515,
+              "y": 0.619351
+            }
+          ]
         },
         {
           "capacity": 2,
@@ -615,7 +1073,17 @@
           "radiusY": 0.102649,
           "home": false,
           "index": 3,
-          "id": "system.harrison.planet.3"
+          "id": "system.harrison.planet.3",
+          "settlementSlots": [
+            {
+              "x": 0.236399,
+              "y": 0.683207
+            },
+            {
+              "x": 0.322573,
+              "y": 0.714272
+            }
+          ]
         }
       ],
       "homePlanetIndex": null,
@@ -658,7 +1126,21 @@
           "radiusY": 0.119038,
           "home": false,
           "index": 0,
-          "id": "system.jemisin.planet.0"
+          "id": "system.jemisin.planet.0",
+          "settlementSlots": [
+            {
+              "x": 0.604461,
+              "y": 0.215536
+            },
+            {
+              "x": 0.706482,
+              "y": 0.237964
+            },
+            {
+              "x": 0.640119,
+              "y": 0.306995
+            }
+          ]
         },
         {
           "capacity": 2,
@@ -668,7 +1150,17 @@
           "radiusY": 0.102649,
           "home": false,
           "index": 1,
-          "id": "system.jemisin.planet.1"
+          "id": "system.jemisin.planet.1",
+          "settlementSlots": [
+            {
+              "x": 0.751055,
+              "y": 0.550319
+            },
+            {
+              "x": 0.836238,
+              "y": 0.581385
+            }
+          ]
         },
         {
           "capacity": 2,
@@ -678,7 +1170,17 @@
           "radiusY": 0.102649,
           "home": false,
           "index": 2,
-          "id": "system.jemisin.planet.2"
+          "id": "system.jemisin.planet.2",
+          "settlementSlots": [
+            {
+              "x": 0.263729,
+              "y": 0.678031
+            },
+            {
+              "x": 0.348912,
+              "y": 0.709085
+            }
+          ]
         },
         {
           "capacity": 1,
@@ -688,7 +1190,13 @@
           "radiusY": 0.06642,
           "home": false,
           "index": 3,
-          "id": "system.jemisin.planet.3"
+          "id": "system.jemisin.planet.3",
+          "settlementSlots": [
+            {
+              "x": 0.196375,
+              "y": 0.389829
+            }
+          ]
         }
       ],
       "homePlanetIndex": null,
@@ -731,7 +1239,21 @@
           "radiusY": 0.119038,
           "home": false,
           "index": 0,
-          "id": "system.willis.planet.0"
+          "id": "system.willis.planet.0",
+          "settlementSlots": [
+            {
+              "x": 0.735612,
+              "y": 0.340649
+            },
+            {
+              "x": 0.838624,
+              "y": 0.362226
+            },
+            {
+              "x": 0.77226,
+              "y": 0.431245
+            }
+          ]
         },
         {
           "capacity": 3,
@@ -741,7 +1263,21 @@
           "radiusY": 0.118176,
           "home": false,
           "index": 1,
-          "id": "system.willis.planet.1"
+          "id": "system.willis.planet.1",
+          "settlementSlots": [
+            {
+              "x": 0.519683,
+              "y": 0.672844
+            },
+            {
+              "x": 0.620714,
+              "y": 0.695283
+            },
+            {
+              "x": 0.555341,
+              "y": 0.764315
+            }
+          ]
         },
         {
           "capacity": 1,
@@ -751,7 +1287,13 @@
           "radiusY": 0.06642,
           "home": false,
           "index": 2,
-          "id": "system.willis.planet.2"
+          "id": "system.willis.planet.2",
+          "settlementSlots": [
+            {
+              "x": 0.4761,
+              "y": 0.143054
+            }
+          ]
         },
         {
           "capacity": 1,
@@ -761,7 +1303,13 @@
           "radiusY": 0.067282,
           "home": false,
           "index": 3,
-          "id": "system.willis.planet.3"
+          "id": "system.willis.planet.3",
+          "settlementSlots": [
+            {
+              "x": 0.194798,
+              "y": 0.577072
+            }
+          ]
         }
       ],
       "homePlanetIndex": null,
@@ -804,7 +1352,17 @@
           "radiusY": 0.103512,
           "home": false,
           "index": 0,
-          "id": "system.le-guin.planet.0"
+          "id": "system.le-guin.planet.0",
+          "settlementSlots": [
+            {
+              "x": 0.7012,
+              "y": 0.292607
+            },
+            {
+              "x": 0.786383,
+              "y": 0.32366
+            }
+          ]
         },
         {
           "capacity": 2,
@@ -814,7 +1372,17 @@
           "radiusY": 0.102649,
           "home": false,
           "index": 1,
-          "id": "system.le-guin.planet.1"
+          "id": "system.le-guin.planet.1",
+          "settlementSlots": [
+            {
+              "x": 0.770535,
+              "y": 0.629978
+            },
+            {
+              "x": 0.857699,
+              "y": 0.661043
+            }
+          ]
         },
         {
           "capacity": 1,
@@ -824,7 +1392,13 @@
           "radiusY": 0.067282,
           "home": false,
           "index": 2,
-          "id": "system.le-guin.planet.2"
+          "id": "system.le-guin.planet.2",
+          "settlementSlots": [
+            {
+              "x": 0.251513,
+              "y": 0.290019
+            }
+          ]
         },
         {
           "capacity": 1,
@@ -834,7 +1408,13 @@
           "radiusY": 0.067282,
           "home": false,
           "index": 3,
-          "id": "system.le-guin.planet.3"
+          "id": "system.le-guin.planet.3",
+          "settlementSlots": [
+            {
+              "x": 0.247551,
+              "y": 0.662768
+            }
+          ]
         }
       ],
       "homePlanetIndex": null,
@@ -877,7 +1457,17 @@
           "radiusY": 0.102649,
           "home": false,
           "index": 0,
-          "id": "system.lem.planet.0"
+          "id": "system.lem.planet.0",
+          "settlementSlots": [
+            {
+              "x": 0.204373,
+              "y": 0.391829
+            },
+            {
+              "x": 0.289556,
+              "y": 0.422895
+            }
+          ]
         },
         {
           "capacity": 2,
@@ -887,7 +1477,17 @@
           "radiusY": 0.103511,
           "home": false,
           "index": 1,
-          "id": "system.lem.planet.1"
+          "id": "system.lem.planet.1",
+          "settlementSlots": [
+            {
+              "x": 0.705566,
+              "y": 0.608413
+            },
+            {
+              "x": 0.79075,
+              "y": 0.639466
+            }
+          ]
         },
         {
           "capacity": 1,
@@ -897,7 +1497,13 @@
           "radiusY": 0.067282,
           "home": false,
           "index": 2,
-          "id": "system.lem.planet.2"
+          "id": "system.lem.planet.2",
+          "settlementSlots": [
+            {
+              "x": 0.252908,
+              "y": 0.207174
+            }
+          ]
         },
         {
           "capacity": 1,
@@ -907,7 +1513,13 @@
           "radiusY": 0.067282,
           "home": false,
           "index": 3,
-          "id": "system.lem.planet.3"
+          "id": "system.lem.planet.3",
+          "settlementSlots": [
+            {
+              "x": 0.236069,
+              "y": 0.626527
+            }
+          ]
         },
         {
           "capacity": 1,
@@ -917,7 +1529,13 @@
           "radiusY": 0.067282,
           "home": false,
           "index": 4,
-          "id": "system.lem.planet.4"
+          "id": "system.lem.planet.4",
+          "settlementSlots": [
+            {
+              "x": 0.283613,
+              "y": 0.795644
+            }
+          ]
         }
       ],
       "homePlanetIndex": null,
@@ -975,7 +1593,33 @@
           "radiusY": 0.168966,
           "home": true,
           "index": 0,
-          "id": "system.adams.planet.0"
+          "id": "system.adams.planet.0",
+          "settlementSlots": [
+            {
+              "x": 0.665347,
+              "y": 0.577766
+            },
+            {
+              "x": 0.769362,
+              "y": 0.629921
+            },
+            {
+              "x": 0.565663,
+              "y": 0.636949
+            },
+            {
+              "x": 0.67192,
+              "y": 0.689428
+            },
+            {
+              "x": 0.588119,
+              "y": 0.753676
+            },
+            {
+              "x": 0.750495,
+              "y": 0.754538
+            }
+          ]
         },
         {
           "capacity": 2,
@@ -985,7 +1629,17 @@
           "radiusY": 0.102586,
           "home": false,
           "index": 1,
-          "id": "system.adams.planet.1"
+          "id": "system.adams.planet.1",
+          "settlementSlots": [
+            {
+              "x": 0.091089,
+              "y": 0.306992
+            },
+            {
+              "x": 0.177228,
+              "y": 0.338039
+            }
+          ]
         },
         {
           "capacity": 2,
@@ -995,7 +1649,17 @@
           "radiusY": 0.102586,
           "home": false,
           "index": 2,
-          "id": "system.adams.planet.2"
+          "id": "system.adams.planet.2",
+          "settlementSlots": [
+            {
+              "x": 0.815842,
+              "y": 0.413925
+            },
+            {
+              "x": 0.90099,
+              "y": 0.444971
+            }
+          ]
         },
         {
           "capacity": 2,
@@ -1005,7 +1669,17 @@
           "radiusY": 0.103448,
           "home": false,
           "index": 3,
-          "id": "system.adams.planet.3"
+          "id": "system.adams.planet.3",
+          "settlementSlots": [
+            {
+              "x": 0.1,
+              "y": 0.597593
+            },
+            {
+              "x": 0.186139,
+              "y": 0.62864
+            }
+          ]
         },
         {
           "capacity": 2,
@@ -1015,7 +1689,17 @@
           "radiusY": 0.102586,
           "home": false,
           "index": 4,
-          "id": "system.adams.planet.4"
+          "id": "system.adams.planet.4",
+          "settlementSlots": [
+            {
+              "x": 0.30495,
+              "y": 0.739883
+            },
+            {
+              "x": 0.392079,
+              "y": 0.770929
+            }
+          ]
         }
       ],
       "homePlanetIndex": 0,
@@ -2041,7 +2725,9 @@
     "Le Guin has FOUR planets, capacities 2;2;1;1. The catalogue transcription has been corrected to exclude the central sun.",
     "Card artwork remains the supplied original; semantic text applies designer clarifications, including Rapid Advance direct conversion and Spice non-recursion.",
     "Cover extracted from rulebook page 1; the separately supplied inline PNG binary was not available in the execution workspace.",
-    "Source sheets include duplicated player aids; exactly two faces are extracted for one shared double-sided aid."
+    "Source sheets include duplicated player aids; exactly two faces are extracted for one shared double-sided aid.",
+    "Settlement slot centres are measured from the printed PDF vector indicator circles. Each planet has exactly its printed capacity of slots, in top-to-bottom then left-to-right order, normalized to the whole tile image. Any Arcologies overflow needs a separate UI anchor.",
+    "The first-player marker uses the newer artwork on Cards page 33. Stage regions are normalized top-left rectangles padded around each printed icon; they are highlight guides, not gameplay hit regions."
   ],
   "cover": {
     "image": "/art/cover.webp",
@@ -2052,6 +2738,105 @@
       "filename": "Space Force rules v1.80.pdf",
       "page": 1,
       "description": "Embedded cover illustration; matching designer branding, includes by Charlie Fish credit."
+    }
+  },
+  "firstPlayer": {
+    "image": "/art/first-player.webp",
+    "width": 600,
+    "height": 408,
+    "bytes": 28494,
+    "stages": [
+      {
+        "id": "investments",
+        "label": "Investments",
+        "region": {
+          "x": 0.171107,
+          "y": 0.408748,
+          "width": 0.127049,
+          "height": 0.241327
+        }
+      },
+      {
+        "id": "event",
+        "label": "Event",
+        "region": {
+          "x": 0.339139,
+          "y": 0.378582,
+          "width": 0.147541,
+          "height": 0.301659
+        }
+      },
+      {
+        "id": "tech",
+        "label": "Tech",
+        "region": {
+          "x": 0.515369,
+          "y": 0.402715,
+          "width": 0.122951,
+          "height": 0.259427
+        }
+      },
+      {
+        "id": "reinforce",
+        "label": "Reinforce",
+        "region": {
+          "x": 0.707992,
+          "y": 0.396682,
+          "width": 0.069672,
+          "height": 0.259427
+        }
+      },
+      {
+        "id": "pass",
+        "label": "Pass first player",
+        "region": {
+          "x": 0.796107,
+          "y": 0.444947,
+          "width": 0.118852,
+          "height": 0.165913
+        }
+      }
+    ],
+    "source": {
+      "filename": "SpaceForce Cards v1.80.pdf",
+      "page": 33,
+      "crop": [
+        7.0,
+        24.25,
+        172.75,
+        268.25
+      ],
+      "rotation": "90 degrees counter-clockwise",
+      "description": "Original rocket silhouette with Economy icons; exterior page labels excluded. Highlight regions are padded around the source icon bounds."
+    }
+  },
+  "features": {
+    "planet": {
+      "image": "/art/planet-nine.webp",
+      "width": 160,
+      "height": 158,
+      "bytes": 5014,
+      "capacity": 1,
+      "center": {
+        "x": 0.5,
+        "y": 0.5
+      },
+      "settlementSlots": [
+        {
+          "x": 0.461539,
+          "y": 0.480673
+        }
+      ],
+      "source": {
+        "filename": "Space Force A4 Cardboard 1.40.pdf",
+        "page": 7,
+        "crop": [
+          294.813,
+          301.307,
+          350.973,
+          356.747
+        ]
+      }
     }
   }
 }

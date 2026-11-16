@@ -4,8 +4,10 @@ export type Phase =
   | "plan"
   | "actions"
   | "investments"
+  | "event"
   | "tech"
   | "reinforce"
+  | "pass"
   | "finished";
 export type Explore =
   | "credit1"
@@ -48,6 +50,7 @@ export interface Player {
   invested: number;
   techs: string[];
   used: Action[];
+  investedActions: Action[];
   home: string | null;
   unplaced: number;
 }
@@ -64,6 +67,7 @@ export interface ActionContext {
   system: string;
   kind: Action;
   bank: boolean;
+  settlementQueue?: { planet: string; count: number }[];
 }
 export type Pending =
   | {
@@ -99,8 +103,8 @@ export interface Score {
   total: number;
 }
 export interface Game {
-  schema: 1;
-  engine: "0.8.0";
+  schema: 2;
+  engine: "0.9.0";
   content: "family-simple-events-1";
   seed: number;
   rng: number;
@@ -148,11 +152,15 @@ export type Command =
       sources?: Record<string, number>;
       credits?: number;
       attack?: AttackPayload;
+      settlements?: Record<string, number>;
     }
   | { type: "orient"; rotation: number }
   | { type: "move"; sources: Record<string, number> }
   | { type: "settle"; planet: string; count: number }
   | { type: "finishSettle" }
+  | { type: "settleBatch"; settlements: Record<string, number> }
+  | { type: "continueEvent" }
+  | { type: "nextRound" }
   | { type: "explore"; recipient: number }
   | { type: "allocate"; credits: number; ships: Record<string, number> }
   | { type: "buy"; tech: string | null }

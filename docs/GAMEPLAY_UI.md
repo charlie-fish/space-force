@@ -1,31 +1,31 @@
 # In-game navigation and controls
 
-Version 0.6 · 15 November 2026 · Specification, not implemented
+Version 0.9 · 16 November 2026 · Local prototype implemented; remote requirements retained
 
-The designer requires easy access to Board, Techs, Event, Actions, and Player Aid. Actions contains the player's action board with Reserve and Credits; Player Aid contains one shared two-sided reference visible to all players. Phone gestures and desktop shortcuts complement visible controls. Exact bindings/layout below are proposed defaults to validate in the first playable prototype.
+The designer requires easy access to Board, Techs, Event, Actions and Supply, and Player Aid. Actions and Supply contains the player's action board with Reserve and Credits; Player Aid contains one shared two-sided reference visible to all players. Phone gestures and desktop shortcuts complement visible controls. Bindings and the local interactions below are implemented; visual browser/device validation remains pending. Remote-only controls remain planned.
 
 ## Five persistent destinations
 
 | Destination | Contents |
 | --- | --- |
-| Board | Whole-map view, legal selections, system/planet details, action-token stack order, zoom controls, and Fit board |
+| Board | Whole-map view, legal selections, system/planet details, action-token stack order, zoom controls, and Reset View |
 | Techs | Shared displayed Techs, costs and public ownership, the player's owned Techs, readable card details, and purchase eligibility when relevant |
 | Event | Active Event and its remaining duration; the two publicly revealed candidates and bidding/selection controls during the Event step; a clear empty state when no Event is active |
-| Actions | Four action slots and their used/available/Invested/Event-blocked states, plus the player's Reserve and Credits, each with a distinct label and count |
+| Actions and Supply | Four action slots and their used/available/Invested/Event-blocked states, plus the player's Reserve and Credits, each with a distinct label and count |
 | Player Aid | One shared reference with both faces rendered together: Actions and Play Sequence/Scoring |
 
-Always show a compact current-turn/phase indicator, waiting/pending-action status, and the player's Reserve/Credits totals. Keep those two resource counts accessible while inspecting Techs or the Event. Actions expands them into the corresponding supply areas using the player's rocket silhouette and colour. Explain the other rocket roles through a supply breakdown so all forty rockets remain understandable.
+Always show a compact current-turn/phase indicator, waiting/pending-action status, and the player's Reserve/Credits totals. Keep those two resource counts accessible while inspecting Techs or the Event. Actions and Supply expands them into the corresponding supply areas using the player's rocket silhouette and colour. Explain the other rocket roles through a supply breakdown so all forty rockets remain understandable.
 
-Use a labelled bottom navigation bar or equivalent on phones. On larger screens, keep the board visible with docked detail panels where space permits. The same five destinations and names work in either layout. Provide obvious close/back controls and a Return to required action button when a decision is waiting in another view.
+Use a labelled bottom navigation bar or equivalent on phones. Place the Status Box above the board/views. Always include the current turn and Players & supply in this box; put the selected system, current decision, Credits, Explore counts and revealed results there as well. During Economy, show the supplied first-player token with its current stage highlighted. After Tech, open the Board and show reinforcement controls in the Status Box. The same five destinations and names work in either layout. Provide obvious close/back controls and a Return to required action button when a decision is waiting in another view.
 
 Preserve map pan/zoom, selected system, card scroll position, and keyboard focus when switching views. Switching views never submits a game action, loses a draft bid, or reveals a secret. Label draft previews separately from confirmed resource totals. The Event view shows only information the player is entitled to see; Foresight's private peek remains restricted.
 
 ## Phone and tablet controls
 
 - Pinch/spread on the board zooms around the gesture focus. One-finger dragging on the board background pans it.
-- Tap a system, planet, or chip to inspect/select it. Use explicit confirmations for game-changing actions.
+- During PLAN, desktop hover shows a translucent chip cursor/legal target and clicking places it directly. Touch can tap, or drag a translucent chip over systems and release to place; releasing off a legal target cancels. Outside PLAN, select systems/planets/chips to inspect or prepare a draft.
 - Swipe between detail views through a dedicated header/handle area. Panning the board or scrolling a card must not unexpectedly switch destinations.
-- Provide visible zoom-in, zoom-out, Fit board, destination tabs, and accessible directional/detail controls so multi-touch or swiping is never required.
+- Provide visible zoom-in, zoom-out, Reset View, destination tabs, and accessible directional/detail controls so multi-touch or swiping is never required.
 - Keep zoomed-board controls and touch hit areas usable without changing the specified visual chip/sun/cutout proportions. Provide a detail/list alternative where pieces are crowded.
 - Support portrait, landscape, mobile safe areas, and on-screen keyboards. Preserve ordinary browser/text zoom outside the board's gesture area.
 
@@ -42,9 +42,9 @@ There is **one shared player aid**, not one supply copy per player. Both faces a
 | B | Board |
 | T | Techs |
 | E | Event |
-| A | Actions |
+| A | Actions and Supply |
 | P | Player Aid |
-| R | Fit/reset board camera |
+| R | Reset board camera |
 | + / − | Zoom board in/out while the board has focus |
 | Arrow keys | Pan while the board has focus |
 | Escape | Close the current detail/overlay and restore focus |
@@ -54,9 +54,13 @@ Show shortcut hints beside visible controls and provide a Help reference. Charac
 
 Focus-scoped/disableable character shortcuts follow [W3C guidance on character-key shortcuts](https://www.w3.org/WAI/WCAG22/Understanding/character-key-shortcuts.html). Exact bindings remain a prototype review item.
 
+## Designer playtest refinements
+
+Stack order is visible without inspection; available top chips are highlighted. Use measured capacity indicators for Settlement snaps, a blank sun on system backs, and empty-space placement for fleet labels and Planet Nine where possible. Show both linked production quantities. SETTLE allocations and clockwise/anti-clockwise 60-degree rotation previews remain editable until Commit. Cap attack targets by the chosen sacrifice, show planet graphics/Settlements, and ask before excess sacrifices or buying Genesis without a valid empty planet. Show token-used indicators on the four token Techs and sort Techs low-to-high, with Sabotage last. Board-selected Tech systems/planets/edges highlight their Status Box option. See the [complete 0.9 checklist](PLAYTEST_CHANGES_0.9.md).
+
 ## Commit and Undo
 
-Undo is available only while a move is uncommitted and no hidden information has been revealed during that resolution. Once committed, a move cannot be undone, even if no other player has acted. A hidden reveal, such as flipping an Explore token, also prevents Undo; any reveal step creates an irreversible checkpoint and its required follow-up must be completed. Disable Undo while a commit request is unresolved. A rejected request returns to an editable draft only if no state change or reveal occurred. Navigation and text-field editing are separate from game Undo. See the [confirmed undo policy](PROJECT_BRIEF.md#undo-policy).
+There is no redundant Undo draft button: selecting another action or editing quantities changes the draft. Undo is available only while a move is uncommitted and no hidden information has been revealed during that resolution. Once committed, a move cannot be undone, even if no other player has acted. A hidden reveal, such as flipping an Explore token, also prevents Undo; any reveal step creates an irreversible checkpoint and its required follow-up must be completed. Disable Undo while a commit request is unresolved. A rejected request returns to an editable draft only if no state change or reveal occurred. Navigation and text-field editing are separate from game Undo. See the [confirmed undo policy](PROJECT_BRIEF.md#undo-policy).
 
 ## Idle warnings and recovery
 

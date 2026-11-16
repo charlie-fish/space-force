@@ -77,7 +77,7 @@ The extra copies reuse existing art. They are quantities in content data, not th
 
 ## Implemented prototype assets
 
-The [art manifest](../src/art-data.json) maps stable component IDs to 80 optimised self-hosted WebP assets, dimensions, source pages and normalised anchors. The [extraction script](../scripts/prepare-assets.py) regenerates these from the supplied PDFs. Both aid faces are included once. The matching cover illustration is extracted from rulebook page 1; the separately supplied PNG original remains to be archived. Full card artwork/reference data is available, while only the ten Family Tech effects are playable in this build.
+The [art manifest](../src/art-data.json) maps stable component IDs to 82 optimised self-hosted WebP assets, dimensions, source pages and normalised anchors. The [extraction script](../scripts/prepare-assets.py) regenerates these from the supplied PDFs. Both aid faces are included once. The manifest also contains all 142 printed settlement-circle centres, the first-player token with Economy-stage rectangles, and the Planet Nine token with its single settlement anchor. The matching cover illustration is extracted from rulebook page 1; the separately supplied PNG original remains to be archived. Full card artwork/reference data is available, while only the ten Family Tech effects are playable in this build.
 
 ## Artwork pipeline
 

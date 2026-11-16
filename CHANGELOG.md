@@ -1,5 +1,14 @@
 # Change log
 
+## 0.9.0 — 2026-11-16
+
+- Applied the designer's first playtest feedback: top Status Box, visible stack order, highlighted chips, direct/drag PLAN placement, linked production, draft SETTLE allocations and repeatable rotation previews.
+- Added measured settlement snaps, adaptive fleet/Planet Nine placement, graphical attack targets and legal quantity caps, excess-sacrifice/empty-Genesis confirmations, invested-slot markers, token-availability badges, sorted Techs and board-linked feature/edge choices.
+- Renamed Actions to Actions and Supply, labelled view shortcuts, regrouped pan/zoom/Reset View controls and retained public supplies in the persistent header.
+- Made Event and first-player handover explicit Economy steps, highlighted stages on the supplied first-player token, and moved reinforcement decisions to the Board's Status Box.
+- Preserved old games through versioned command replay. Added regression coverage for the new interactions, hidden reveal batches, inbound-only black-hole losses and source geometry.
+- See [the complete feedback checklist](docs/PLAYTEST_CHANGES_0.9.md). Full Event effects/auctions and remote services remain later milestones; browser/device visual verification is still pending.
+
 ## 0.8.0 — 2026-11-15
 
 - Implemented the first local 2–7-player normal-turn prototype using the official Family Tech preset and simpler Events variant. Includes setup, chip stacks, four actions, Investments, all ten Family Techs, Economy, scoring and ties.

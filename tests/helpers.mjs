@@ -64,6 +64,8 @@ export function tech(g, id, name) {
 
 // A deterministic test driver, not a solo player shipped in the application.
 export function botCommand(g) {
+  if (g.phase === "event") return { type: "continueEvent" };
+  if (g.phase === "pass") return { type: "nextRound" };
   const p = player(g),
     pending = g.pending;
   if (pending?.kind === "orient")
@@ -136,7 +138,18 @@ export function botCommand(g) {
         (s) => s.ships[p.id] && s.planets.some((p) => freeSpace(p)),
       );
       if (s)
-        return { type: "resolve", action: "settle", system: s.id, bank: true };
+        return {
+          type: "resolve",
+          action: "settle",
+          system: s.id,
+          bank: true,
+          settlements: Object.fromEntries(
+            s.planets
+              .filter((p) => freeSpace(p))
+              .slice(0, s.ships[g.turn])
+              .map((p) => [p.id, 1]),
+          ),
+        };
     }
     if (!p.used.includes("produce")) {
       const s = options.find((s) => production(g, s) > 0);

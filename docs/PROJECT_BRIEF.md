@@ -112,7 +112,7 @@ Run multiplayer integration tests with seven independent browser contexts, inclu
 
 ## Current implementation
 
-Prototype 0.8 provides a local normal-turn game for two to seven people on one device, using the official Family Tech preset and simpler Events variant. The five views, draft Undo, pending-choice autosave/resume, all ten Family Techs, complete Economy/scoring and command-record replay are implemented and tested. All 60 card faces/reference texts are prepared; the other card effects are not selectable. Visual browser/device QA remains pending. This implements the first rules/UI slice without claiming the server, full card content, or production features. See [PROTOTYPE.md](PROTOTYPE.md) for exact scope and validation.
+Prototype 0.9 provides a local normal-turn game for two to seven people on one device, using the official Family Tech preset and simpler Events variant. The five views, draft Undo, pending-choice autosave/resume, all ten Family Techs, complete Economy/scoring and command-record replay are implemented and tested. All 60 card faces/reference texts are prepared; the other card effects are not selectable. Visual browser/device QA remains pending. This implements the first rules/UI slice without claiming the server, full card content, or production features. See [PROTOTYPE.md](PROTOTYPE.md) for exact scope and validation.
 
 ## Delivery stages
 

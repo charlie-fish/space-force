@@ -1,6 +1,6 @@
 {
-  "schema_version": 2,
-  "status": "specification_not_implemented",
+  "schema_version": 3,
+  "status": "local_prototype_implemented_remote_controls_pending",
   "view_ids": [
     "board",
     "techs",
@@ -57,14 +57,14 @@
     "character_shortcuts_disableable": true,
     "global_shortcut_commits_game_actions": false
   },
-  "exact_bindings_status": "proposed_for_prototype_review",
+  "exact_bindings_status": "implemented_pending_device_playtest",
   "idle_warning_visible_in_all_views": true,
   "dropout_policy_reference": "dropout-policy.json",
   "view_labels": {
     "board": "Board",
     "techs": "Techs",
     "event": "Event",
-    "actions": "Actions",
+    "actions": "Actions and Supply",
     "player_aid": "Player Aid"
   },
   "actions_view_contents": [
@@ -84,5 +84,28 @@
     "front_back_toggle_required": false
   },
   "undo_policy_reference": "undo-policy.json",
-  "tutorial_configuration_reference": "tutorial-configuration.json"
+  "tutorial_configuration_reference": "tutorial-configuration.json",
+  "status_box": {
+    "position": "above_board_and_views",
+    "always_includes": [
+      "current_turn",
+      "players_and_supply",
+      "reserve",
+      "credits",
+      "current_decision"
+    ],
+    "selected_system_explore_count": true,
+    "explore_outcomes_visible": true,
+    "economy_first_player_token_stages": true,
+    "reinforcement_controls_on_board": true
+  },
+  "plan_placement": {
+    "desktop": "translucent_cursor_hover_then_click_to_commit",
+    "touch": "tap_or_drag_and_release_on_legal_system",
+    "invalid_drop_cancels": true
+  },
+  "camera_control_labels": {
+    "fit_board": "Reset View",
+    "pan_controls_grouped_with_zoom": true
+  }
 }

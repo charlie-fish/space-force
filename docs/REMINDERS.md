@@ -13,7 +13,7 @@ Review priorities and next steps: [REVIEW_CHECKLIST.md](REVIEW_CHECKLIST.md).
 
 ## Project work to retain
 
-- [x] Build local Board/Techs/Event/Actions/Player Aid navigation with persistent Reserve/Credits, touch camera/view gestures, and desktop shortcuts.
+- [x] Build local Board/Techs/Event/Actions and Supply/Player Aid navigation with persistent Reserve/Credits, touch camera/view gestures, and desktop shortcuts.
 - [ ] Complete visual desktop/phone and accessibility playtests of the local prototype; see [PROTOTYPE.md](PROTOTYPE.md#validation).
 - [ ] Implement the confirmed five-minute majority-removal core with reviewed phase handling, skipped turns, audit records, and automatic last-player victory.
 

@@ -27,6 +27,8 @@ for (const section of [
   manifest.cards,
   manifest.aids,
   manifest.backs,
+  manifest.features,
+  { firstPlayer: manifest.firstPlayer },
   { cover: manifest.cover },
 ]) {
   for (const asset of Object.values(section))

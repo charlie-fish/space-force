@@ -109,6 +109,99 @@ def anchor(rect, tile_rect):
             'radiusY': round(rect.height / (2 * tile_rect.height), 6)}
 
 
+def settlement_slots(page, planet_rect, reference_rect):
+    """Measure the centres of the printed grey indicator circles.
+
+    These circles are vector paths over the planet raster. Each circle consists
+    of four cubic Beziers; the longer arms of the indicator are separate paths.
+    Coordinates are fractions of the reference image, usually the whole hex.
+    """
+    circles = []
+    for drawing in page.get_drawings():
+        rect = drawing['rect']
+        fill = drawing['fill']
+        if not (fill and all(abs(channel - .647) < .002 for channel in fill)):
+            continue
+        if not (10 < rect.width < 20 and 10 < rect.height < 20):
+            continue
+        if len(drawing['items']) != 4 or any(item[0] != 'c' for item in drawing['items']):
+            continue
+        centre = (rect.tl + rect.br) / 2
+        if planet_rect.contains(centre):
+            circles.append(centre)
+    circles.sort(key=lambda point: (point.y, point.x))
+    return [{'x': round((point.x-reference_rect.x0)/reference_rect.width, 6),
+             'y': round((point.y-reference_rect.y0)/reference_rect.height, 6)} for point in circles]
+
+
+def extract_first_player(cards):
+    """Extract the newer marker on Cards page 33 without the exterior labels."""
+    page = cards[32]
+    silhouette = page.get_drawings()[0]
+    assert len(silhouette['items']) == 11 and all(item[0] == 'c' for item in silhouette['items'])
+    # Reuse the source outline as an alpha mask. Its Bezier control points lie
+    # outside the visible outline, so a plain bounding-box crop is insufficient.
+    mask_document = fitz.open()
+    mask_page = mask_document.new_page(width=page.rect.width, height=page.rect.height)
+    shape = mask_page.new_shape()
+    for item in silhouette['items']:
+        shape.draw_bezier(*item[1:])
+    shape.finish(fill=(1, 1, 1), color=None, closePath=True)
+    shape.commit()
+    scale = 4
+    pixmap = page.get_pixmap(matrix=fitz.Matrix(scale, scale), alpha=False)
+    image = Image.frombytes('RGB', (pixmap.width, pixmap.height), pixmap.samples).convert('RGBA')
+    mask_pixmap = mask_page.get_pixmap(matrix=fitz.Matrix(scale, scale), alpha=True)
+    mask = Image.frombytes('RGBA', (mask_pixmap.width, mask_pixmap.height), mask_pixmap.samples).getchannel('A')
+    image.putalpha(mask)
+    crop = mask.getbbox()
+    image = image.crop(crop).transpose(Image.Transpose.ROTATE_90)
+    image = image.resize((600, round(image.height * 600 / image.width)), Image.Resampling.LANCZOS)
+    # Padded source-object bounds surround each printed Economy icon. After the
+    # counter-clockwise rotation, the five stages read from left to right.
+    stage_bounds = [
+        ('investments', 'Investments', (65, 66, 105, 97)),
+        ('event', 'Event', (60, 107, 110, 143)),
+        ('tech', 'Tech', (63, 150, 106, 180)),
+        ('reinforce', 'Reinforce', (64, 197, 107, 214)),
+        ('pass', 'Pass first player', (71.5, 218.5, 99, 247.5)),
+    ]
+    crop_rect = fitz.Rect([coordinate / scale for coordinate in crop])
+    stages = []
+    for stage_id, label, bounds in stage_bounds:
+        rect = fitz.Rect(bounds)
+        stages.append({'id': stage_id, 'label': label, 'region': {
+            'x': round((rect.y0-crop_rect.y0)/crop_rect.height, 6),
+            'y': round((crop_rect.x1-rect.x1)/crop_rect.width, 6),
+            'width': round(rect.height/crop_rect.height, 6),
+            'height': round(rect.width/crop_rect.width, 6),
+        }})
+    return {**save_webp(image, OUTPUT/'public/art/first-player.webp', quality=86),
+            'stages': stages,
+            'source': {'filename': 'SpaceForce Cards v1.80.pdf', 'page': 33,
+                       'crop': list(crop_rect), 'rotation': '90 degrees counter-clockwise',
+                       'description': 'Original rocket silhouette with Economy icons; exterior page labels excluded. Highlight regions are padded around the source icon bounds.'}}
+
+
+def extract_planet_nine(cardboard):
+    page = cardboard[6]
+    images = [fitz.Rect(info['bbox']) for info in page.get_image_info(xrefs=True)]
+    planets = [rect for rect in images if 53 < rect.width < 58 and 53 < rect.height < 58]
+    assert len(planets) == 1
+    rect = planets[0]
+    slots = settlement_slots(page, rect, rect)
+    assert len(slots) == 1
+    image = page_image(page, rect, 320).convert('RGBA')
+    mask = Image.new('L', image.size, 0)
+    ImageDraw.Draw(mask).ellipse((0, 0, image.width-1, image.height-1), fill=255)
+    image.putalpha(mask)
+    image = image.resize((160, round(image.height/2)), Image.Resampling.LANCZOS)
+    return {**save_webp(image, OUTPUT/'public/art/planet-nine.webp', quality=84),
+            'capacity': 1, 'center': {'x': .5, 'y': .5}, 'settlementSlots': slots,
+            'source': {'filename': 'Space Force A4 Cardboard 1.40.pdf', 'page': 7,
+                       'crop': [round(coordinate, 3) for coordinate in rect]}}
+
+
 def extract_tile(row, document):
     page = document[int(row['source_pdf_page']) - 1]
     images = page.get_image_info(xrefs=True)
@@ -121,7 +214,9 @@ def extract_tile(row, document):
         w,h = rect.width,rect.height
         capacity = 6 if 138<w<142 and abs(w-h)<2 else 3 if 97<w<102 and abs(w-h)<2 else 2 if 84<w<88 and abs(w-h)<2 else 1 if 53<w<58 and abs(w-h)<2 else None
         if capacity:
-            planets.append({'capacity':capacity, **anchor(rect,tile_rect), 'home':capacity==6})
+            slots = settlement_slots(page, rect, tile_rect)
+            assert len(slots) == capacity, (row['name'], capacity, len(slots))
+            planets.append({'capacity':capacity, **anchor(rect,tile_rect), 'home':capacity==6, 'settlementSlots':slots})
         elif 112<w<116 and 112<h<116:
             suns.append(anchor(rect,tile_rect))
         elif 150<w<220 and 70<h<160:
@@ -168,6 +263,8 @@ if __name__ == '__main__':
         for row in csv.DictReader(handle):
             manifest['systems'][row['system_id']]=extract_tile(row,docs[row['source_id']])
     cards=fitz.open(source_file(args.source_dir,'SpaceForce Cards v1.80.pdf'))
+    manifest['firstPlayer']=extract_first_player(cards)
+    manifest['features']={'planet':extract_planet_nine(docs['pdf.cardboard'])}
     with (OUTPUT/'catalog/cards.csv').open(newline='') as handle:
         for row in csv.DictReader(handle):
             slug=row['card_id'].split('.',1)[1]
@@ -196,6 +293,8 @@ if __name__ == '__main__':
     manifest['backs']['system']={**save_webp(background,OUTPUT/'public/art/system-back.webp',quality=68),'source':{'filename':DOCUMENT_NAMES['pdf.cardboard'],'page':1,'description':'Embedded starfield background, masked to remove print crop marks.'}}
     manifest['notes']=[
         'All centres/radii are derived from source PDF image bounding boxes, not inferred from the raster at runtime.',
+        'Settlement slot centres are measured from the printed PDF vector indicator circles. Each planet has exactly its printed capacity of slots, in top-to-bottom then left-to-right order, normalized to the whole tile image. Any Arcologies overflow needs a separate UI anchor.',
+        'The first-player marker uses the newer artwork on Cards page 33. Stage regions are normalized top-left rectangles padded around each printed icon; they are highlight guides, not gameplay hit regions.',
         'Suns are deliberately anchored at their printed positions, which differ from geometric hex centres.',
         'Lem has TWO printed asteroid belts, at edges 0 and 3; the systems.csv transcription has been corrected to include both.',
         'Le Guin has FOUR planets, capacities 2;2;1;1. The catalogue transcription has been corrected to exclude the central sun.',

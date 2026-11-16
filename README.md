@@ -2,7 +2,7 @@
 
 A browser implementation of Charlie Fish's board game, for desktop and mobile.
 
-**Current implementation: prototype 0.8.0, 15 November 2026.** A complete local pass-and-play game for **2–7 players sharing one device**, using normal turns, the official ten-Tech **Family** preset, and the rulebook's **simpler Events** variant. Event cards count rounds; their effects and auctions are disabled. This is the first implementation milestone; remote multiplayer is next.
+**Current implementation: prototype 0.9.0, 16 November 2026.** A complete local pass-and-play game for **2–7 players sharing one device**, using normal turns, the official ten-Tech **Family** preset, and the rulebook's **simpler Events** variant. Event cards count rounds; their effects and auctions are disabled. This is the first implementation milestone; remote multiplayer is next.
 
 ## Run the prototype
 
@@ -27,14 +27,17 @@ For a production static build, run `npm run build`; serve the generated `dist/` 
 
 - Correct layouts, home/hidden pools, and 40 rockets/four chips per player. Six-player games use Asimov; seven-player games use Adams as the central seventh home.
 - Ordered chip stacks, all four actions, Investments, limited supplies, Economy, all ten Family Tech effects, final scoring and tie-breaks.
-- Board, Techs, Event, Actions, and Player Aid views. Both shared-aid faces appear together. Reserve and Credits stay visible; the player summary shows everyone's public supplies.
+- Board, Techs, Event, Actions and Supply, and Player Aid views. Both shared-aid faces appear together. Reserve and Credits stay visible; the player summary shows everyone's public supplies.
 - Seven provisional rocket silhouettes and matching poker-chip rim motifs, with chips anchored to the printed suns.
-- Map pan/pinch/zoom, tap alternatives, view swipes on the navigation bar, keyboard shortcuts, focus handling, reduced motion, semantic card text, and a skippable contextual guide.
-- Draft-only Undo. Committed actions and hidden reveals stay locked. Autosave/resume works through pending reveals and choices, with a session fallback when storage is blocked.
+- A top Status Box containing the current turn, public supplies, selected system, current decision and Explore/action results.
+- Direct/drag chip placement, linked production quantities, editable Settlement allocations, 60-degree orientation previews, graphical attack targets with legal caps, excess-sacrifice/empty-Genesis confirmations, and highlighted Tech target/edge selection.
+- Map pan/pinch/zoom, grouped pan/zoom/Reset View controls, labelled keyboard shortcuts, focus handling, reduced motion, semantic card text and a skippable contextual guide.
+- Visible Economy stages on the supplied first-player token, an explicit Event review step, and reinforcement controls on the Board.
+- Editable action and Settlement drafts, without a redundant Undo button. Committed actions and hidden reveals stay locked. Autosave/resume works through pending reveals and choices, with a session fallback when storage is blocked.
 - Exportable local game records with version, setup seed, command history, final state and scores. Deterministic replay tests cover complete games.
 - Optimised, self-hosted artwork from the supplied PDFs, replaceable through stable IDs and an art manifest. No runtime framework, external fonts, Steam links, or 3D engine.
 
-See [prototype scope, controls, validation and limitations](docs/PROTOTYPE.md).
+See [the 0.9 playtest changes](docs/PLAYTEST_CHANGES_0.9.md) and [prototype scope, controls, validation and limitations](docs/PROTOTYPE.md).
 
 ## Next milestones
 

@@ -459,7 +459,8 @@ test("last Event pair is followed by another round; final Tech step scores witho
   g.players[0].invested = 1;
   g.players[0].reserve--;
   g = step(g, { type: "allocate", credits: 1, ships: {} });
-  assert.equal(g.phase, "tech");
+  assert.equal(g.phase, "event");
+  g = step(g, { type: "continueEvent" });
   assert.equal(g.finalEconomy, false);
   assert.equal(g.events.length, 0);
   while (g.phase === "tech") g = step(g, { type: "buy", tech: null });
@@ -470,6 +471,8 @@ test("last Event pair is followed by another round; final Tech step scores witho
   g.players[g.turn].invested = 1;
   g = step(g, { type: "allocate", credits: 1, ships: {} });
   assert.equal(g.finalEconomy, true);
+  assert.equal(g.phase, "event");
+  g = step(g, { type: "continueEvent" });
   while (g.phase === "tech") g = step(g, { type: "buy", tech: null });
   assert.equal(g.phase, "finished");
   assert.equal(g.scores.length, 2);
@@ -567,3 +570,83 @@ for (let count = 2; count <= 7; count++)
       assert.ok(g.log.some((l) => l.text.startsWith("Placed 1 Settlement")));
     }
   });
+
+test("batch SETTLE validates the whole preview before commitment and resolves multiple Explore choices in order", () => {
+  let g = fixture();
+  const s = g.systems[0],
+    planets = s.planets.filter((p) => !p.home).slice(0, 2);
+  planets[0].explore = "otherSettlement";
+  planets[1].explore = "credit2";
+  const before = JSON.stringify(g),
+    bad = { [planets[0].id]: 3, [planets[1].id]: 3 };
+  assert.throws(() =>
+    step(g, {
+      type: "resolve",
+      system: s.id,
+      action: "settle",
+      settlements: bad,
+    }),
+  );
+  assert.equal(JSON.stringify(g), before);
+  g = step(g, {
+    type: "resolve",
+    system: s.id,
+    action: "settle",
+    settlements: { [planets[0].id]: 1, [planets[1].id]: 1 },
+  });
+  assert.equal(g.pending.kind, "explore");
+  assert.equal(
+    system(g, s.id).planets.find((p) => p.id === planets[1].id).explore,
+    "credit2",
+  );
+  g = step(g, { type: "explore", recipient: 1 });
+  assert.equal(g.pending, null);
+  assert.equal(g.players[0].credits, 2);
+  assert.equal(system(g, s.id).ships[0], 1);
+  assert.equal(g.players[0].used.includes("settle"), true);
+});
+
+test("departure black holes cause no loss; arrival loses at most one incoming Ship per destination black hole", () => {
+  let g = fixture();
+  for (const s of g.systems) s.revealed = true;
+  tech(g, 0, "agility");
+  const from = system(g, g.players[0].home),
+    target = g.systems.find(
+      (s) => canMove(g, 0, from, s) && blackHoles(s) === 0,
+    );
+  from.extraHoles = 3;
+  target.extraHoles = 0;
+  g.systems.forEach((s) => (s.tokens = []));
+  target.tokens = [0];
+  const homeShips = from.ships[0];
+  g = step(g, {
+    type: "resolve",
+    system: target.id,
+    action: "move",
+    sources: { [from.id]: 2 },
+  });
+  assert.equal(system(g, target.id).ships[0], 2);
+  assert.equal(system(g, from.id).ships[0], homeShips - 2);
+  assert.equal(g.players[0].credits, 0);
+  assert.doesNotMatch(
+    g.log.findLast((l) => l.text.startsWith("Moved")).text,
+    /lost|black hole/,
+  );
+  g.phase = "actions";
+  g.turn = 0;
+  g.players[0].used = [];
+  g.players[0].investedActions = [];
+  system(g, from.id).tokens = [0];
+  system(g, from.id).extraHoles = 3;
+  g = step(g, {
+    type: "resolve",
+    system: from.id,
+    action: "move",
+    sources: { [target.id]: 2 },
+  });
+  assert.equal(g.players[0].credits, 2);
+  assert.match(
+    g.log.findLast((l) => l.text.startsWith("Moved")).text,
+    /2 lost/,
+  );
+});

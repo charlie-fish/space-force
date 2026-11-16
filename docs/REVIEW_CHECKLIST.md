@@ -1,8 +1,10 @@
 # Designer review, reminders, and next steps
 
-Updated 15 November 2026 · Local prototype v0.8
+Updated 16 November 2026 · Local prototype v0.9
 
 The [local prototype](PROTOTYPE.md) implements normal turns, the Family Tech preset and simpler Events for two to seven people sharing a device. Review a complete game on desktop and phone. Remote play and full card coverage remain later milestones. These checks do not reopen resolved R01–R08 or the confirmed original-hex versions.
+
+Implemented feedback: [prototype 0.9 changes](PLAYTEST_CHANGES_0.9.md).
 
 ## Check next
 

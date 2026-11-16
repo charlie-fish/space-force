@@ -17,6 +17,7 @@ export interface ArtPlanet {
   radiusX: number;
   radiusY: number;
   home: boolean;
+  settlementSlots: { x: number; y: number }[];
 }
 export interface TileArt {
   id: string;
@@ -28,8 +29,8 @@ export interface TileArt {
   planets: ArtPlanet[];
   homePlanetIndex: number | null;
   blockedEdges: number[];
-  fixedBlackHoles: unknown[];
-  fixedWarps: unknown[];
+  fixedBlackHoles: { x: number; y: number; radiusX: number; radiusY: number }[];
+  fixedWarps: { x: number; y: number; radiusX: number; radiusY: number }[];
 }
 // Relative URLs let the same build run at a domain root or a repository subpath.
 for (const section of [
@@ -37,16 +38,31 @@ for (const section of [
   artData.cards,
   artData.aids,
   artData.backs,
+  artData.features,
 ]) {
   for (const item of Object.values(section)) item.image = `.${item.image}`;
 }
 artData.cover.image = `.${artData.cover.image}`;
+artData.firstPlayer.image = `.${artData.firstPlayer.image}`;
 export const ART = artData as unknown as {
   systems: Record<string, TileArt>;
   cards: Record<string, { image: string }>;
   cover: { image: string };
   aids: Record<string, { image: string }>;
   backs: Record<string, { image: string }>;
+  firstPlayer: {
+    image: string;
+    width: number;
+    height: number;
+    stages: {
+      id: string;
+      label: string;
+      region: { x: number; y: number; width: number; height: number };
+    }[];
+  };
+  features: {
+    planet: { image: string; settlementSlots: { x: number; y: number }[] };
+  };
 };
 export const CARDS = [...cardData.techs, ...cardData.events] as Card[];
 export const CARD_MAP = Object.fromEntries(CARDS.map((c) => [c.id, c]));
