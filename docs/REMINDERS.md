@@ -14,11 +14,12 @@ Review priorities and next steps: [REVIEW_CHECKLIST.md](REVIEW_CHECKLIST.md).
 ## Project work to retain
 
 - [x] Build local Board/Techs/Event/Actions and Supply/Player Aid navigation with persistent Reserve/Credits, touch camera/view gestures, and desktop shortcuts.
-- [x] Implement both designer playtest batches, including Status history/S, compact legal-chip rings, explicit PLAN confirmation, Explore pauses/redistribution, Reserve warnings, allocation balancing and final-state views. See the [0.10 checklist](PLAYTEST_CHANGES_0.10.md).
-- [ ] Complete visual desktop/phone and accessibility playtests of the local prototype; see [PROTOTYPE.md](PROTOTYPE.md#validation).
+- [x] Implement all three designer playtest batches, including Status history/S, compact legal-chip rings, explicit PLAN confirmation, Explore pauses/redistribution, Reserve warnings, allocation balancing and final-state views. See the [0.11 checklist](PLAYTEST_CHANGES_0.11.md).
+- [ ] Complete formal browser/phone and accessibility playtests. The designer has tested desktop/narrow-window layouts; a real Safari phone run remains outstanding. See [phone instructions](PHONE_TESTING.md) and [validation](PROTOTYPE.md#validation).
 - [ ] Implement the confirmed five-minute majority-removal core with reviewed phase handling, skipped turns, audit records, and automatic last-player victory.
 
 - [ ] Complete the personal first-play tutorial in [TUTORIAL.md](TUTORIAL.md). An initial skippable/replayable local phase guide is implemented. Reminder issue #1 stays closed; per-seat progress and later multiplayer teaching remain outstanding.
+- [ ] Implement [asynchronous play](ASYNCHRONOUS_PLAY.md), including protected resume, catch-up history and its own agreed response/grace/removal-vote policy. Do not apply live five-minute inactivity.
 - [ ] Build the public/private lobby and the 4+ player simultaneous-mode recommendation, with explicit host choice, readiness, and fair reconnect handling.
 - [ ] Prepare approved component images/models from the TTS references, verify their versions against the PDFs/rulings, and create optimised self-hosted web assets. The ZIP contains a preview, not the full linked art/model files.
 
@@ -28,7 +29,7 @@ Review priorities and next steps: [REVIEW_CHECKLIST.md](REVIEW_CHECKLIST.md).
 - [ ] Validate silhouette/colour mapping and final chip/board proportions against the forthcoming STLs and device playtests.
 
 - [x] Implement and test complete local normal-turn Family/simpler-Events games, including all ten Family Techs, scoring, draft Undo, autosave/resume and deterministic record export.
-- [x] Prepare 83 optimised self-hosted PDF assets, including both aid faces, Economy/Planet Nine tokens and circular black-hole artwork. Archive of the original inline PNG remains outstanding.
+- [x] Prepare 85 optimised self-hosted PDF assets, including both aid faces, Economy/Planet Nine tokens circular black-hole artwork and the original asteroid-belt/warp feature tokens. Archive of the original inline PNG remains outstanding.
 
 ## Recorded and settled
 

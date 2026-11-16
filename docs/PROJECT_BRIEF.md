@@ -1,6 +1,6 @@
 # Space Force: project brief
 
-Version 0.6 · 15 November 2026 · Planning baseline with gameplay navigation and confirmed idle-removal core
+Updated 16 November 2026 · Product specification with local, live and asynchronous play
 
 ## Intended result
 
@@ -18,7 +18,7 @@ The user's message defines the software requirements. Attached documents supply 
 | Setup | Support all player counts from 2 to 7, the correct layouts, random content selection, and documented Tech presets. Exclude unused home designs from hidden tiles. Use Asimov only as the six-player centre and Adams only as the seven-player centre/home; neither enters random pools. Replace variant-excluded preset Techs with random legal value-2/3 Techs. Record the selected variables. |
 | Rules | Enforce legal actions, action-token stacks, limited rocket supply, sealed auctions, Tech/Event effects, end conditions, scoring, and ties. |
 | Multiplayer | Synchronise accepted actions and phase changes; preserve hidden information; reject duplicate, stale, out-of-turn, or unauthorised commands. |
-| Recovery | Save games durably and protect seat resumption. After five minutes of qualifying inactivity, a majority of the other active players can approve removal; skip all remaining turns of that participant and award a win if only one non-removed player remains. See the reviewed/proposed details in [DROPOUTS.md](DROPOUTS.md). |
+| Recovery | Save games durably and protect seat resumption. In live games, the confirmed five-minute majority-removal policy applies. Asynchronous games need a separate response/deadline policy; ordinary offline waiting is expected. Approved removal skips remaining turns and a sole non-removed player wins. See [DROPOUTS.md](DROPOUTS.md) and [asynchronous play](ASYNCHRONOUS_PLAY.md). |
 | Navigation | Reach Board, Techs, Event, Actions, and Player Aid through visible controls; keep Reserve/Credits accessible. Support phone pinch/pan/swipe and safe desktop shortcuts with non-gesture alternatives. |
 | Undo | Allow correction only before a move is committed and only if no hidden information has been revealed. No post-commit Undo or table-vote override. |
 | Guidance | Highlight legal choices, explain unavailable actions/current effects, preview consequences, and provide Help plus the required skippable first-play tutorial in [TUTORIAL.md](TUTORIAL.md). |
@@ -26,6 +26,8 @@ The user's message defines the software requirements. Attached documents supply 
 | News | Offer a separate, optional publication-news sign-up with affirmative consent and an accessible privacy notice. |
 
 Normal turns and the simultaneous-actions variant are distinct settings. Both allow up to seven people to be connected concurrently. The designer has confirmed **normal turns first, then the selectable variant**. Once available, recommend simultaneous play for four or more actual seated players, without silently changing the host's choice. In the variant, only token/slot choices are secret; after reveal, any player can declare a dependency and switch all participants to ordered resolution. See [DECISIONS.md](DECISIONS.md).
+
+Support **local pass-and-play, live online play and asynchronous online play**. Asynchronous participants can leave between decisions and resume later; its timing policy is separate from action-resolution mode. Show pending games, required decisions, deadlines and catch-up history. Fix the agreed asynchronous removal policy at match start; the live five-minute timeout must never apply. Numerical response/grace/vote windows remain to be agreed before implementing that option. See [ASYNCHRONOUS_PLAY.md](ASYNCHRONOUS_PLAY.md).
 
 The seven-player supply is 280 rockets, 28 action chips, seven individual action boards, plus one shared two-sided player aid. Existing shared card/token supplies remain unchanged. Reuse the twelve-tile outer layout for six/seven players, adding Asimov or Adams respectively at the centre. Adams supplies the seventh home planet. The designer has confirmed that the original system artwork is current. [game-configuration.json](../catalog/game-configuration.json) records quantities and count-specific setup.
 
@@ -112,7 +114,7 @@ Run multiplayer integration tests with seven independent browser contexts, inclu
 
 ## Current implementation
 
-Prototype 0.10 provides a local normal-turn game for two to seven people on one device, using the official Family Tech preset and simpler Events variant. The five views through the final state, pre-commit editing, pending-choice autosave/resume, all ten Family Techs, complete Economy/scoring and command-record replay are implemented and tested. Both designer playtest batches are incorporated, including decision history, explicit PLAN confirmation, compact chips, Explore redistribution and Reserve-shortfall acknowledgements. All 60 card faces/reference texts are prepared; the other card effects are not selectable. Visual browser/device QA remains pending. This implements the first rules/UI slice without claiming the server, full card content, or production features. See [PROTOTYPE.md](PROTOTYPE.md) for exact scope and validation.
+Prototype 0.11 provides a local normal-turn game for two to seven people on one device, using the official Family Tech preset and simpler Events variant. The five views through the final state, pre-commit editing, pending-choice autosave/resume, all ten Family Techs, complete Economy/scoring and command-record replay are implemented and tested. All three designer playtest batches are incorporated, including decision history, explicit PLAN confirmation, compact chips, Explore redistribution and Reserve-shortfall acknowledgements. All 60 card faces/reference texts are prepared; the other card effects are not selectable. Visual browser/device QA remains pending. This implements the first rules/UI slice without claiming the server, full card content, or production features. See [PROTOTYPE.md](PROTOTYPE.md) for exact scope and validation.
 
 ## Delivery stages
 

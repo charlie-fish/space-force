@@ -10,6 +10,9 @@ export interface Space extends Point {
   radiusY: number;
 }
 export const HEX_WIDTH = Math.sqrt(3) * 100;
+export const WARP_WIDTH = 36;
+export const WARP_HEIGHT =
+  (WARP_WIDTH * ART.features.warp.height) / ART.features.warp.width;
 export function rotatePoint(x: number, y: number, rotation: number): Point {
   const angle = (rotation * Math.PI) / 3,
     px = (x - 0.5) * HEX_WIDTH,
@@ -36,9 +39,6 @@ export function obstacles(s: System): Space[] {
     })),
     ...(art.fixedWarps as Space[]),
     { x: 0.5, y: 0.085, radiusX: 0.4, radiusY: 0.04 },
-    ...(s.extraWarp
-      ? [{ x: 0.24, y: 0.21, radiusX: 0.15, radiusY: 0.04 }]
-      : []),
   ];
 }
 export function findOpenSpace(
@@ -76,20 +76,76 @@ export function findOpenSpace(
   return best;
 }
 export function fleetPositions(s: System): Point[] {
-  const occupied: Space[] = blackHolePositions(s).map((p) => ({
+  const layout = featureLayout(s);
+  const fleetKey = s.ships.map((n) => Number(n > 0)).join("");
+  if (layout.fleetKey === fleetKey) return layout.fleets;
+  const holes = layout.holes;
+  const occupied: Space[] = holes.map((p) => ({
     ...p,
     radiusX: p.radius / HEX_WIDTH,
     radiusY: p.radius / 200,
   }));
-  return s.ships.map((n) => {
+  const warp = layout.warp;
+  if (warp)
+    occupied.push({
+      ...warp,
+      radiusX: WARP_WIDTH / 2 / HEX_WIDTH,
+      radiusY: WARP_HEIGHT / 400,
+    });
+  layout.fleets = s.ships.map((n) => {
     if (!n) return { x: 0, y: 0 };
     const p = findOpenSpace(s, 0.19, 0.1, occupied);
     occupied.push({ ...p, radiusX: 0.105, radiusY: 0.06 });
     return p;
   });
+  layout.fleetKey = fleetKey;
+  return layout.fleets;
+}
+
+export function warpPosition(s: System): Point | null {
+  return featureLayout(s).warp;
 }
 
 export function blackHolePositions(s: System): (Point & { radius: number })[] {
+  return featureLayout(s).holes;
+}
+
+interface Layout {
+  key: string;
+  holes: (Point & { radius: number })[];
+  warp: Point | null;
+  fleetKey: string | null;
+  fleets: Point[];
+}
+const layoutCache = new WeakMap<System, Layout>();
+function featureLayout(s: System): Layout {
+  // Coordinates/features determine free space. Settlement ownership and rotation do not.
+  const key = JSON.stringify([
+    s.template,
+    s.extraHoles,
+    s.extraWarp,
+    s.planets.map((p) => [p.x, p.y, p.blocked]),
+  ]);
+  const cached = layoutCache.get(s);
+  if (cached?.key === key) return cached;
+  const holes = calculateBlackHoles(s);
+  const warp = s.extraWarp
+    ? findOpenSpace(
+        s,
+        WARP_WIDTH / HEX_WIDTH,
+        WARP_HEIGHT / 200,
+        holes.map((p) => ({
+          ...p,
+          radiusX: p.radius / HEX_WIDTH,
+          radiusY: p.radius / 200,
+        })),
+      )
+    : null;
+  const layout: Layout = { key, holes, warp, fleetKey: null, fleets: [] };
+  layoutCache.set(s, layout);
+  return layout;
+}
+function calculateBlackHoles(s: System): (Point & { radius: number })[] {
   const art = ART.systems[s.template];
   const fixed = art.fixedBlackHoles.map((p) => ({
     x: p.x,

@@ -17,6 +17,7 @@ import {
   purchaseReason,
   reinforceCount,
   reinforceAllowance,
+  isFinalRound,
   sinceLastDecision,
   scoreGame,
   seedFrom,
@@ -28,6 +29,9 @@ import {
   fleetPositions,
   rotatePoint,
   blackHolePositions,
+  warpPosition,
+  WARP_WIDTH,
+  WARP_HEIGHT,
 } from "./geometry.js";
 import { restoreGame } from "./persistence.js";
 import type { Action, Command, Game, System } from "./types.js";
@@ -85,30 +89,35 @@ const SHAPES = [
 ];
 export function rocket(style: number, size = 22, horizontal = false): string {
   const color = STYLES[style].color;
-  return `<svg aria-hidden="true" class="rocket" width="${size}" height="${size}" viewBox="-22 -22 44 44"><path d="${SHAPES[style]}" fill="${color}" fill-rule="evenodd" stroke="#f4ebd3" stroke-width="1.5" ${horizontal ? 'transform="rotate(90)"' : ""}/></svg>`;
+  return `<svg aria-hidden="true" class="rocket" width="${size}" height="${size}" viewBox="-22 -22 44 44"><path d="${SHAPES[style]}" fill="${color}" fill-rule="evenodd" stroke="${style === 5 ? "#352d42" : "#f4ebd3"}" stroke-width="1.5" ${horizontal ? 'transform="rotate(90)"' : ""}/></svg>`;
 }
+const CHIP_MOTIFS = [
+  '<circle r="1.5" fill="currentColor"/>',
+  '<path d="M-3 0H3" stroke="currentColor" stroke-width="2"/>',
+  '<path d="M-2-2V2M2-2V2" stroke="currentColor" stroke-width="1.5"/>',
+  '<path d="M-2-2L0 1L2-2" fill="none" stroke="currentColor" stroke-width="1.5"/>',
+  '<path d="M-2-2H0V0H-2ZM0 0H2V2H0Z" fill="currentColor"/>',
+  '<path d="M-3 1Q-1-3 1 0T4-1" fill="none" stroke="currentColor" stroke-width="1.5"/>',
+  '<path d="M0-2L2 2H-2Z" fill="currentColor"/>',
+];
+
+const CHIP_RIMS = STYLES.map((style, index) => {
+  const rim = Array.from(
+    { length: 12 },
+    (_, i) =>
+      `<g transform="rotate(${i * 30}) translate(0 -22)">${CHIP_MOTIFS[index]}</g>`,
+  ).join("");
+  return `<circle cy="2" r="26" fill="${style.color}"/><circle r="26" fill="${style.color}"/><g style="color:#f5e9cc">${rim}</g><circle r="18.5" fill="none" stroke="#352d4266"/>`;
+});
 function chipFace(
   style: number,
   x: number,
   y: number,
   radius: number,
   face = true,
+  reusable = false,
 ): string {
-  const motifs = [
-    '<circle r="1.5" fill="currentColor"/>',
-    '<path d="M-3 0H3" stroke="currentColor" stroke-width="2"/>',
-    '<path d="M-2-2V2M2-2V2" stroke="currentColor" stroke-width="1.5"/>',
-    '<path d="M-2-2L0 1L2-2" fill="none" stroke="currentColor" stroke-width="1.5"/>',
-    '<path d="M-2-2H0V0H-2ZM0 0H2V2H0Z" fill="currentColor"/>',
-    '<path d="M-3 1Q-1-3 1 0T4-1" fill="none" stroke="currentColor" stroke-width="1.5"/>',
-    '<path d="M0-2L2 2H-2Z" fill="currentColor"/>',
-  ];
-  const rim = Array.from(
-    { length: 12 },
-    (_, i) =>
-      `<g transform="rotate(${i * 30}) translate(0 -22)">${motifs[style]}</g>`,
-  ).join("");
-  return `<g transform="translate(${x} ${y}) scale(${radius / 26})"><circle cy="2" r="26" fill="${STYLES[style].color}" stroke="#352d42"/><circle r="26" fill="${STYLES[style].color}" stroke="#352d42" stroke-width="1.2"/><g style="color:#f5e9cc">${rim}</g><circle r="18.5" fill="none" stroke="#352d4266"/>${face ? `<path d="${SHAPES[style]}" transform="scale(.72)" fill="#352d42" fill-rule="evenodd" stroke="#f5e9cc" stroke-width=".8"/>` : ""}</g>`;
+  return `<g transform="translate(${x} ${y}) scale(${radius / 26})">${reusable ? `<use href="#chip-rim-${style}"/>` : CHIP_RIMS[style]}${face ? `<path d="${SHAPES[style]}" transform="scale(.72)" fill="#352d42" fill-rule="evenodd" stroke="#f5e9cc" stroke-width=".8"/>` : ""}</g>`;
 }
 
 export function mountApp(
@@ -126,7 +135,15 @@ export function mountApp(
     revision: number;
   } | null = null;
   let rosterOpen = false;
-  let historyOpen = false;
+  let planTap: {
+    system: string;
+    actor: number;
+    revision: number;
+    time: number;
+    x: number;
+    y: number;
+    source: string;
+  } | null = null;
   let snapSystem: string | null = null;
   let placementDrag: {
     id: number;
@@ -186,6 +203,7 @@ export function mountApp(
   }
   function setView(next: View) {
     cancelPlacement();
+    planTap = null;
     scrollView = view;
     previousScroll = root.querySelector(".main-panel")?.scrollTop ?? 0;
     view = next;
@@ -195,7 +213,7 @@ export function mountApp(
       ?.focus({ preventScroll: true });
     const panel = root.querySelector<HTMLElement>("#game-panel");
     if (panel) {
-      panel.style.scrollMarginTop = `${(root.querySelector(".game-header")?.getBoundingClientRect().height ?? 80) + 8}px`;
+      panel.style.scrollMarginTop = `calc(${(root.querySelector(".game-header")?.getBoundingClientRect().height ?? 80) + 8}px + 2cm)`;
       panel.scrollIntoView?.({ block: "start", behavior: "auto" });
     }
   }
@@ -222,8 +240,9 @@ export function mountApp(
     confirmation = null;
     try {
       game = applyCommand(game, game.turn, command, revision);
+      planTap = null;
       snapSystem = command.type === "plan" ? command.system : null;
-      if (command.type === "plan") selected = null;
+      if (game.phase === "plan") selected = null;
       error = "";
       draft = freshDraft();
       selectedPlanet = null;
@@ -390,7 +409,7 @@ export function mountApp(
     return `<aside class="guide" aria-label="Learn as you play"><div><span class="eyebrow">Learn as you play</span><p>${escape(g.pending ? instruction(g) : tips[g.phase])}</p></div>${button("Hide guide", "guide-off", "", false, "quiet")}</aside>`;
   }
   function landing() {
-    return `<main class="landing"><div class="landing-art"><img src="${ART.cover.image}" width="562" height="768" alt="Space Force cover: rocket fleets above a ringed planet"/><span class="cover-credit">A game by Charlie Fish</span></div><section class="landing-copy"><div class="eyebrow">Local pass-and-play · Prototype 0.10</div><h1>Claim your<br/><span>corner of space.</span></h1><p class="lead">Plan your moves. Explore new systems. Settle the galaxy.</p><div class="scope-note"><strong>This build: Family Techs + simpler Events.</strong><span>A complete local game for 2–7 players on one device. Event cards count rounds; their effects and auctions are disabled. Remote rooms and the wider card set follow later.</span></div><form id="setup-form"><fieldset><legend>How many players?</legend><div class="player-counts">${Array.from({ length: 6 }, (_, i) => button(String(i + 2), "count", `data-count="${i + 2}" aria-pressed="${count === i + 2}"`, false, count === i + 2 ? "selected" : "")).join("")}</div></fieldset><div class="name-grid">${names
+    return `<main class="landing"><div class="landing-art"><img src="${ART.cover.image}" width="562" height="768" alt="Space Force cover: rocket fleets above a ringed planet"/><span class="cover-credit">A game by Charlie Fish</span></div><section class="landing-copy"><div class="eyebrow">Local pass-and-play · Prototype 0.11</div><h1>Claim your<br/><span>corner of space.</span></h1><p class="lead">Plan your moves. Explore new systems. Settle the galaxy.</p><div class="scope-note"><strong>This build: Family Techs + simpler Events.</strong><span>A complete local game for 2–7 players on one device. Event cards count rounds; their effects and auctions are disabled. Remote rooms and the wider card set follow later.</span></div><form id="setup-form"><fieldset><legend>How many players?</legend><div class="player-counts">${Array.from({ length: 6 }, (_, i) => button(String(i + 2), "count", `data-count="${i + 2}" aria-pressed="${count === i + 2}"`, false, count === i + 2 ? "selected" : "")).join("")}</div></fieldset><div class="name-grid">${names
       .slice(0, count)
       .map(
         (name, i) =>
@@ -409,7 +428,7 @@ export function mountApp(
     angle = 0,
     ghost = false,
   ) {
-    return `<g class="${ghost ? "settlement-draft" : "settlement-piece"}" transform="translate(${x} ${y}) rotate(${angle}) scale(${size / 40})" ${ghost ? 'opacity=".48"' : ""}><path d="${SHAPES[id]}" fill="${STYLES[id].color}" fill-rule="evenodd" stroke="#f4ebd3" stroke-width="2"/></g>`;
+    return `<g class="${ghost ? "settlement-draft" : "settlement-piece"}" transform="translate(${x} ${y}) rotate(${angle}) scale(${size / 40})" ${ghost ? 'opacity=".48"' : ""}><path d="${SHAPES[id]}" fill="${STYLES[id].color}" fill-rule="evenodd" stroke="${id === 5 ? "#352d42" : "#f4ebd3"}" stroke-width="2"/></g>`;
   }
   function slotsFor(s: System, index: number) {
     const p = s.planets[index],
@@ -522,7 +541,7 @@ export function mountApp(
           s.tokens
             .map(
               (owner, i) =>
-                `<g class="stack-chip ${eligible && i === s.tokens.length - 1 ? "selectable-chip" : ""} ${snapSystem === s.id && i === s.tokens.length - 1 ? "new-chip" : ""}" data-owner="${owner}" data-stack-position="${i}" data-chip-rise="${step * i}">${chipFace(owner, sun.x, sun.y - step * i, radius, i === s.tokens.length - 1)}</g>`,
+                `<g class="stack-chip ${eligible && i === s.tokens.length - 1 ? "selectable-chip" : ""} ${snapSystem === s.id && i === s.tokens.length - 1 ? "new-chip" : ""}" data-owner="${owner}" data-stack-position="${i}" data-chip-rise="${step * i}">${chipFace(owner, sun.x, sun.y - step * i, radius, i === s.tokens.length - 1, true)}</g>`,
             )
             .join("");
         const holes = !s.revealed
@@ -533,15 +552,23 @@ export function mountApp(
                 return `<g class="black-hole-token"><title>Black hole: destroys one incoming Ship, returned as a Credit</title><circle cx="${p.x}" cy="${p.y}" r="${h.radius}" fill="#10121a"/><image href="${ART.features.blackHole.image}" x="${p.x - h.radius}" y="${p.y - h.radius}" width="${h.radius * 2}" height="${h.radius * 2}"/></g>`;
               })
               .join("");
-        const ghost = legal
-          ? `<g class="plan-preview" pointer-events="none">${chipFace(g.turn, sun.x, sun.y - 8, s.revealed ? Math.min(28, art.sun.radiusX * W) : 25)}</g>`
-          : "";
+        const ghost =
+          legal && selected === s.id
+            ? `<g class="plan-preview" pointer-events="none">${chipFace(g.turn, sun.x, sun.y - step * s.tokens.length, s.revealed ? Math.min(28, art.sun.radiusX * W) : 25, true, true)}</g>`
+            : "";
         const extraEdges = s.extraEdges
           .map(
             (e) =>
-              `<line x1="${W / 2}" y1="-50" x2="${W / 2}" y2="50" transform="rotate(${e * 60})" stroke="#e4bd7b" stroke-width="8" stroke-dasharray="5 4"/>`,
+              `<g class="asteroid-belt-token" data-edge="${e}" transform="rotate(${e * 60})"><image href="${ART.features.asteroidBelt.image}" x="${W / 2 - (50 * ART.features.asteroidBelt.width) / ART.features.asteroidBelt.height}" y="-50" width="${(100 * ART.features.asteroidBelt.width) / ART.features.asteroidBelt.height}" height="100"/></g>`,
           )
           .join("");
+        const warpAnchor = s.revealed ? warpPosition(s) : null;
+        const warpToken = warpAnchor
+          ? (() => {
+              const point = rotatePoint(warpAnchor.x, warpAnchor.y, rotation);
+              return `<g class="warp-token" data-x="${warpAnchor.x}" data-y="${warpAnchor.y}"><title>Artificial Warp</title><image href="${ART.features.warp.image}" x="${point.x - WARP_WIDTH / 2}" y="${point.y - WARP_HEIGHT / 2}" width="${WARP_WIDTH}" height="${WARP_HEIGHT}" transform="rotate(${rotation * 60} ${point.x} ${point.y})"/></g>`;
+            })()
+          : "";
         const edgeTargets = feature
           .filter((o) => o.system === s.id)
           .map(
@@ -549,12 +576,26 @@ export function mountApp(
               `<line data-system="${s.id}" data-edge="${o.edge}" role="button" tabindex="0" aria-label="Edge ${o.edge! + 1} of ${attrs(nameOf(s))}" class="edge-target ${selected === s.id && selectedEdge === o.edge ? "selected-edge" : ""}" x1="${W / 2}" y1="-50" x2="${W / 2}" y2="50" transform="rotate(${o.edge! * 60})"/>`,
           )
           .join("");
-        return `<g transform="translate(${x} ${y})" class="system ${selected === s.id ? "chosen" : ""} ${eligible ? "eligible" : ""} ${legal ? "legal-placement" : ""}" data-system="${s.id}" role="button" tabindex="0" aria-label="${attrs(nameOf(s))}${s.tokens.length ? `, stack bottom to top: ${s.tokens.map((id) => attrs(player(g, id).name)).join(", ")}` : ""}"><g transform="rotate(${s.revealed ? rotation * 60 : 0})"><image href="${s.revealed ? art.image : ART.backs.system.image}" x="${-W / 2}" y="-100" width="${W}" height="200" clip-path="url(#hex-clip)"/></g>${!s.revealed ? '<circle class="blank-sun" cx="0" cy="0" r="25"/>' : ""}<polygon points="0,-100 ${W / 2},-50 ${W / 2},50 0,100 ${-W / 2},50 ${-W / 2},-50" class="hex-outline"/>${extraEdges}${planets}${holes}${fleets}${chips}${ghost}<rect x="-67" y="-95" width="134" height="19" rx="5" fill="#211d32" fill-opacity=".88"/><text x="0" y="-82" class="system-name">${escape(s.revealed ? nameOf(s) : "?")}</text>${s.extraWarp ? '<text x="-64" y="-58" class="feature-label">↔ Warp</text>' : ""}${edgeTargets}</g>`;
+        return `<g transform="translate(${x} ${y})" class="system ${selected === s.id ? "chosen" : ""} ${eligible ? "eligible" : ""} ${legal ? "legal-placement" : ""}" data-system="${s.id}" role="button" tabindex="0" aria-label="${attrs(nameOf(s))}${
+          s.tokens.length
+            ? `, stack top to bottom: ${s.tokens
+                .slice()
+                .reverse()
+                .map((id) => attrs(player(g, id).name))
+                .join(", ")}`
+            : ""
+        }"><g transform="rotate(${s.revealed ? rotation * 60 : 0})"><image href="${s.revealed ? art.image : ART.backs.system.image}" x="${-W / 2}" y="-100" width="${W}" height="200" clip-path="url(#hex-clip)"/></g>${!s.revealed ? '<circle class="blank-sun" cx="0" cy="0" r="25"/>' : ""}<polygon points="0,-100 ${W / 2},-50 ${W / 2},50 0,100 ${-W / 2},50 ${-W / 2},-50" class="hex-outline"/>${extraEdges}${planets}${holes}${fleets}${chips}${ghost}${warpToken}${edgeTargets}</g>`;
       })
+      .join("");
+    const labels = centers
+      .map(
+        ({ s, x, y }) =>
+          `<g class="system-label" data-label-system="${s.id}" transform="translate(${x} ${y})"><rect class="system-name-bar" x="-8" y="-95" width="16" height="19" rx="3" fill="#211d32" fill-opacity=".88"/><text x="0" y="-82" class="system-name">${escape(s.revealed ? nameOf(s) : "?")}</text></g>`,
+      )
       .join("");
     snapSystem = null;
     const cursorSvg = `<svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="-29 -29 58 60"><g opacity=".65">${chipFace(g.turn, 0, 0, 24)}</g></svg>`;
-    return `<section class="map-wrap ${g.phase === "plan" ? "plan-mode" : ""}" aria-label="Galaxy board"><div class="map-toolbar"><span>${g.phase === "plan" ? "Select a system, then Place chip here" : "Select a system to inspect"}</span><div class="camera-controls">${button("←", "pan-left", 'aria-label="Pan left"')}${button("↑", "pan-up", 'aria-label="Pan up"')}${button("↓", "pan-down", 'aria-label="Pan down"')}${button("→", "pan-right", 'aria-label="Pan right"')}${button("−", "zoom-out", 'aria-label="Zoom out"')}${button("Reset View", "fit", 'aria-label="Reset View"')}${button("+", "zoom-in", 'aria-label="Zoom in"')}</div></div><div class="map-viewport" tabindex="0" aria-label="Galaxy map; arrow keys pan, plus and minus zoom" ${g.phase === "plan" ? `style="cursor:url(&quot;data:image/svg+xml,${encodeURIComponent(cursorSvg)}&quot;) 24 24,pointer"` : ""}><svg id="galaxy" role="group" aria-label="Space Force galaxy" viewBox="${vx} ${vy} ${vw} ${vh}"><defs><clipPath id="hex-clip"><polygon points="0,-100 ${W / 2},-50 ${W / 2},50 0,100 ${-W / 2},50 ${-W / 2},-50"/></clipPath></defs>${tiles}</svg></div></section>`;
+    return `<section class="map-wrap ${g.phase === "plan" ? "plan-mode" : ""}" aria-label="Galaxy board"><div class="map-toolbar"><span>${g.phase === "plan" ? "Select a system, then confirm; double-click or double-tap to place" : "Select a system to inspect"}</span><div class="camera-controls">${button("←", "pan-left", 'aria-label="Pan left"')}${button("↑", "pan-up", 'aria-label="Pan up"')}${button("↓", "pan-down", 'aria-label="Pan down"')}${button("→", "pan-right", 'aria-label="Pan right"')}${button("−", "zoom-out", 'aria-label="Zoom out"')}${button("+", "zoom-in", 'aria-label="Zoom in"')}${button("Reset View", "fit", 'aria-label="Reset View"')}</div></div><div class="map-viewport" tabindex="0" aria-label="Galaxy map; arrow keys pan, plus and minus zoom" ${g.phase === "plan" && selected && canPlan(g, system(g, selected)) ? `style="cursor:url(&quot;data:image/svg+xml,${encodeURIComponent(cursorSvg)}&quot;) 24 24,pointer"` : ""}><svg id="galaxy" role="group" aria-label="Space Force galaxy" viewBox="${vx} ${vy} ${vw} ${vh}"><defs><clipPath id="hex-clip"><polygon points="0,-100 ${W / 2},-50 ${W / 2},50 0,100 ${-W / 2},50 ${-W / 2},-50"/></clipPath>${g.players.map((p) => `<g id="chip-rim-${p.style}">${CHIP_RIMS[p.style]}</g>`).join("")}</defs>${tiles}<g class="system-labels" aria-hidden="true" pointer-events="none">${labels}</g></svg></div></section>`;
   }
 
   function cameraBox() {
@@ -591,6 +632,26 @@ export function mountApp(
         : 1;
     const font = Math.max(40 / 3, 40 / 3 / scale);
     svg.style.setProperty("--board-text-size", `${font}px`);
+    const labels = [...svg.querySelectorAll<SVGGElement>(".system-label")].map(
+      (label) => {
+        const text = label.querySelector<SVGTextElement>("text")!;
+        const bounds = text.getBBox?.();
+        return {
+          rect: label.querySelector("rect")!,
+          x: bounds?.x ?? -(text.textContent?.length ?? 1) * font * 0.3,
+          y: bounds?.y ?? -82 - font * 0.8,
+          width: bounds?.width ?? (text.textContent?.length ?? 1) * font * 0.6,
+          height: bounds?.height ?? font,
+          pad: 3 / scale,
+        };
+      },
+    );
+    for (const label of labels) {
+      label.rect.setAttribute("x", String(label.x - label.pad));
+      label.rect.setAttribute("y", String(label.y - label.pad));
+      label.rect.setAttribute("width", String(label.width + label.pad * 2));
+      label.rect.setAttribute("height", String(label.height + label.pad * 2));
+    }
     svg.querySelectorAll<SVGGElement>(".explore-token").forEach((g) => {
       const c = g.querySelector("circle");
       if (c) {
@@ -847,6 +908,7 @@ export function mountApp(
       return `<section class="console"><div class="eyebrow">Economy · Event</div><h2>${g.finalEconomy ? "Final Economy" : "Event cards drawn"}</h2><p>${g.finalEconomy ? "The Event deck is empty. Complete Tech purchases, then score; there are no reinforcements." : "This prototype uses the simpler Events variant: the pair counts rounds. Effects and bidding are disabled."}</p>${button("Continue to Tech", "continue-event", "", false, "primary")}${view !== "event" ? button("View Event pair", "to-event", "", false, "secondary") : ""}</section>`;
     if (g.phase === "tech")
       return `<section class="console"><div class="eyebrow">Economy · Buy Tech</div><h2>${player(g).credits} Credits available</h2><p>Buy one Tech or pass. The purchase cost returns to Reserve, and one rocket marks ownership.</p>${view !== "techs" ? button("View Techs", "to-techs", "", false, "primary") : ""}${button("Pass this purchase", "pass-tech", "", false, "secondary")}</section>`;
+    if (!s && g.phase === "finished") return "";
     if (!s)
       return `<section class="console empty-console"><span class="eyebrow">${phaseLabel(g)}</span><h2>${g.phase === "plan" ? "Place your next chip." : "Select a system."}</h2><p>${escape(instruction(g))}</p></section>`;
     const explore = s.revealed ? s.planets.filter((p) => p.explore).length : 0;
@@ -878,10 +940,10 @@ export function mountApp(
     else if (g.phase === "plan")
       controls = `<p>${canPlan(g, s) ? "Select any system to change your mind, then confirm with Place chip here." : "Disruptor blocks your placement here this round."}</p>${button("Place chip here", "place-chip", "", !canPlan(g, s), "primary")}`;
     else if (g.phase === "actions" && s.tokens[s.tokens.length - 1] === g.turn)
-      controls = `<div class="action-grid">${(Object.keys(ACTION_LABELS) as Action[]).map((action) => button(ACTION_LABELS[action], "select-action", `data-kind="${action}" aria-pressed="${draft.action === action}"`, player(g).used.includes(action), draft.action === action ? "selected" : "")).join("")}</div>${draft.action ? `${actionForm(g, s)}${!draft.invest && hasTech(g, g.turn, "banking") ? `<label class="check-row"><input type="checkbox" data-check="bank" ${draft.bank ? "checked" : ""}/>Banking: also Invest if Reserve allows</label>` : ""}<label class="check-row invest-choice"><input type="checkbox" data-check="invest" ${draft.invest ? "checked" : ""}/>Invest instead of acting</label><div class="commit-row">${button("Commit action", "commit-action", "", false, "primary")}</div><small>Change your selection freely before Commit. Hidden reveals and committed moves stay locked.</small>` : "<p>Select an unused action slot.</p>"}`;
+      controls = `<div class="action-grid">${(Object.keys(ACTION_LABELS) as Action[]).map((action) => button(ACTION_LABELS[action], "select-action", `data-kind="${action}" aria-pressed="${draft.action === action}"`, player(g).used.includes(action), draft.action === action ? "selected" : "")).join("")}</div>${draft.action ? `${actionForm(g, s)}${!draft.invest && hasTech(g, g.turn, "banking") ? `<label class="check-row"><input type="checkbox" data-check="bank" ${draft.bank ? "checked" : ""}/>Banking: also Invest if Reserve allows</label>` : ""}<label class="check-row invest-choice"><input type="checkbox" data-check="invest" ${draft.invest ? "checked" : ""}/><strong>Invest instead of acting</strong></label><div class="commit-row">${button("Commit action", "commit-action", "", false, "primary")}</div><small>Change your selection freely before Commit. Hidden reveals and committed moves stay locked.</small>` : "<p>Select an unused action slot.</p>"}`;
     else if (g.phase === "actions")
-      controls = "<p>Select a highlighted chip with your colour on top.</p>";
-    return `<section class="console"><span class="eyebrow">System status</span><h2>${escape(nameOf(s))}</h2>${info}${stackOrder(g, s)}${controls}</section>`;
+      controls = "<p>Select a highlighted stack with your colour on top.</p>";
+    return `<section id="system-status" class="console"><span class="eyebrow">System status</span><h2>${escape(nameOf(s))}</h2>${info}${stackOrder(g, s)}${controls}</section>`;
   }
 
   function scrollToStatus() {
@@ -893,7 +955,14 @@ export function mountApp(
   function stackOrder(g: Game, s: System) {
     return !s.tokens.length
       ? ""
-      : `<div class="system-stack-order"><strong>Stack order · bottom to top</strong><ol>${s.tokens.map((id, i) => `<li data-stack-index="${i}" data-owner="${id}"><span>${i + 1}.</span>${badge(id, player(g, id).name)}${i === s.tokens.length - 1 ? "<strong>Top</strong>" : ""}</li>`).join("")}</ol></div>`;
+      : `<div class="system-stack-order"><strong>Stack order · top to bottom</strong><ol>${s.tokens
+          .slice()
+          .reverse()
+          .map(
+            (id, i) =>
+              `<li data-stack-index="${i}" data-owner="${id}"><span>${i + 1}.</span>${badge(id, player(g, id).name)}${i === 0 ? "<strong>Top</strong>" : ""}</li>`,
+          )
+          .join("")}</ol></div>`;
   }
   function adjustAllocation(g: Game, id: string | "credits", value: number) {
     const invest = g.phase === "investments",
@@ -1009,7 +1078,7 @@ export function mountApp(
         const card = CARD_MAP[id];
         const reason = purchaseReason(g, id);
         const owners = g.players.filter((p) => p.techs.includes(id));
-        return `<article class="tech-card" data-tech-id="${id}" data-tech-value="${techValue(id)}"><button class="card-art-button" data-action="card" data-card="${id}" aria-label="Read ${attrs(card.title)}"><img src="${ART.cards[id].image}" width="240" height="388" loading="lazy" alt="${attrs(card.title)} original card artwork"/></button><div class="tech-body"><div class="tech-title"><h3>${escape(card.title)}</h3><span class="cost">${card.cost} <small>Credits</small></span></div><p>${escape(card.text)}</p>${featureUsed(g, id) ? `<p class="token-used">${featureUsed(g, id)} token already on the board. Buying this Tech has no token effect.</p>` : ""}<div class="ownership">${owners.length ? owners.map((p) => badge(p.style, p.name)).join("") : '<span class="muted">No owners yet</span>'}</div>${g.phase === "tech" && !g.pending ? `${button(reason ?? `Buy for ${card.cost} Credits`, "buy", `data-tech="${id}"`, Boolean(reason), "primary")}` : ""}</div></article>`;
+        return `<article class="tech-card" data-tech-id="${id}" data-tech-value="${techValue(id)}"><button class="card-art-button" data-action="card" data-card="${id}" aria-label="Read ${attrs(card.title)}"><img src="${ART.cards[id].image}" width="240" height="388" loading="lazy" alt="${attrs(card.title)} original card artwork"/></button><div class="tech-body"><div class="tech-title"><h3>${escape(card.title)}</h3><span class="cost">${card.cost} <small>Credits</small></span></div><p>${escape(card.text)}</p>${id === "tech.disruptor" && isFinalRound(g) ? '<p class="token-used">Disruptor has no effect in the last round. It still scores 1 point.</p>' : ""}${featureUsed(g, id) ? `<p class="token-used">${featureUsed(g, id)} token already on the board. Buying this Tech has no token effect.</p>` : ""}<div class="ownership">${owners.length ? owners.map((p) => badge(p.style, p.name)).join("") : '<span class="muted">No owners yet</span>'}</div>${g.phase === "tech" && !g.pending ? `${button(reason ?? `Buy for ${card.cost} Credits`, "buy", `data-tech="${id}"`, Boolean(reason), "primary")}` : ""}</div></article>`;
       })
       .join("")}</div></section>`;
   }
@@ -1020,7 +1089,7 @@ export function mountApp(
     return `<section class="aid-view"><div class="section-heading"><span class="eyebrow">One shared player aid · both faces</span><h2>Keep the essentials in view.</h2><p>Both faces are below: side by side on wide screens and stacked on phones. This prototype uses normal turns, the Family preset, and simpler Events.</p></div><div class="aid-faces"><article><h3>Actions</h3><img src="${ART.aids.actions.image}" width="530" height="810" loading="lazy" alt="Player aid Actions face"/><dl><dt>Move into</dt><dd>Bring Ships from adjacent systems. Warps connect; asteroid belts block unless you have Agility. Each destination black hole destroys one incoming Ship, returned as a Credit.</dd><dt>Settle</dt><dd>Convert Ships into Settlements within capacity; resolve Explore tokens first.</dd><dt>Produce</dt><dd>One Ship or Credit per planet you settle, plus one for each such planet that is full.</dd><dt>Attack</dt><dd>Each sacrificed Ship destroys up to two opposing Ships or one Settlement. All casualties become Credits. You cannot attack Settlements on a planet you share.</dd></dl></article><article><h3>Play sequence & scoring</h3><img src="${ART.aids.sequence.image}" width="530" height="810" loading="lazy" alt="Player aid play sequence and scoring face"/><dl><dt>Plan</dt><dd>Place all four chips in player order.</dd><dt>Actions</dt><dd>Resolve top chips into unused slots, acting or Investing. Turns without an eligible top chip are skipped.</dd><dt>Economy</dt><dd>Cash Investments, draw Events, buy one Tech, reinforce, and pass first player. This build uses Events only as a round tracker.</dd><dt>Score</dt><dd>One point per settled planet, system with your Ships, and owned Tech. Credits break ties; remaining ties share victory.</dd><dt>Undo</dt><dd>Draft only, before commitment and before any hidden-information reveal.</dd></dl></article></div></section>`;
   }
   function finalScores(g: Game) {
-    return `<section class="final-scores"><div class="eyebrow">Expedition complete</div><h1>${g.winners.map((id) => escape(player(g, id).name)).join(" & ")}<br/><span>${g.winners.length > 1 ? "share the galaxy." : "claims the galaxy."}</span></h1><p>Credits break points ties. A remaining tie is a shared victory.</p><div class="score-table-wrap"><table><thead><tr><th>Player</th><th>Planets</th><th>Systems</th><th>Techs</th><th>Total</th><th>Credits</th></tr></thead><tbody>${g.scores
+    return `<section class="final-scores"><div class="eyebrow">Expedition complete</div><h1>${g.winners.map((id) => escape(player(g, id).name)).join(" & ")}<br/><span>${g.winners.length > 1 ? "share the galaxy." : "rules the galaxy."}</span></h1><p>Credits break points ties. A remaining tie is a shared victory.</p><div class="score-table-wrap"><table><thead><tr><th>Players</th><th>Planets Settled</th><th>Systems Patrolled</th><th>Techs Owned</th><th>Total Score</th><th>Credits</th></tr></thead><tbody>${g.scores
       .slice()
       .sort((a, b) => b.total - a.total || b.credits - a.credits)
       .map(
@@ -1036,7 +1105,7 @@ export function mountApp(
       return `<div class="modal-scrim"><section class="modal" role="dialog" aria-modal="true" aria-label="Confirm decision"><h2>Check this decision</h2><p>${escape(confirmation.message)}</p><div class="commit-row">${button("Go back", "cancel-confirmation", "", false, "secondary")}${button("Confirm and commit", "confirm-command", "", false, "primary")}</div></section></div>`;
     if (activeCard) {
       const card = CARD_MAP[activeCard];
-      return `<div class="modal-scrim"><section class="modal card-modal" role="dialog" aria-modal="true" aria-label="${attrs(card.title)}">${button("Close ×", "close-overlay", "", false, "quiet close")}<img src="${ART.cards[activeCard].image}" width="240" height="388" alt="${attrs(card.title)}"/><div><span class="eyebrow">${card.type === "tech" ? `${card.cost} Credits` : "Event reference"}</span><h2>${escape(card.title)}</h2><p>${escape(card.text)}</p>${card.type === "event" ? '<p class="scope-note">Effects are disabled in the simpler Events prototype.</p>' : ""}</div></section></div>`;
+      return `<div class="modal-scrim"><section class="modal card-modal" role="dialog" aria-modal="true" aria-label="${attrs(card.title)}">${button("Close ×", "close-overlay", "", false, "quiet close")}<img src="${ART.cards[activeCard].image}" width="240" height="388" alt="${attrs(card.title)}"/><div><span class="eyebrow">${card.type === "tech" ? `${card.cost} Credits` : "Event reference"}</span><h2>${escape(card.title)}</h2><p>${escape(card.text)}</p>${activeCard === "tech.disruptor" && game && isFinalRound(game) ? '<p class="token-used">Disruptor has no effect in the last round. It still scores 1 point.</p>' : ""}${card.type === "event" ? '<p class="scope-note">Effects are disabled in the simpler Events prototype.</p>' : ""}</div></section></div>`;
     }
     if (!showHelp) return "";
     return `<div class="modal-scrim"><section class="modal" role="dialog" aria-modal="true" aria-label="Rules and prototype scope">${button("Close ×", "close-overlay", "", false, "quiet close")}<span class="eyebrow">Space Force · Charlie Fish</span><h2>One galaxy. Plenty of possibilities.</h2><p>This is a local pass-and-play prototype for two to seven people sharing one device. It implements normal turns, the official ten-Tech Family preset, and the rulebook's simpler Events variant. There are no remote rooms, full Event effects/auctions, simultaneous turns, newsletter forms, or private admin service in this build.</p><p>Use Board, Techs, Event, Actions and Supply, and Player Aid. The aid shows both faces together. Select chips in PLAN; later resolve top chips into each of four action slots, or Invest. Complete Economy between rounds.</p><h3>Undo and secrets</h3><p>Reset drafts before Commit. A committed move or hidden reveal cannot be undone. This trusted-device prototype stores the full game locally; authoritative remote privacy will be added with the server.</p><h3>Keyboard</h3><p>S Status Box (scroll to top) · B Board · T Techs · E Event · A Actions and Supply · P Player aid. View shortcuts scroll to the chosen view. With the map focused: R resets the view, +/− zoom, arrows pan. Escape closes details; ? opens Help. Shortcuts ignore editable fields and browser modifiers.</p><label class="check-row"><input type="checkbox" data-check="shortcuts" ${shortcuts ? "checked" : ""}/>Enable character shortcuts while the game has focus</label><div class="commit-row">${button(guide ? "Restart contextual guide" : "Show contextual guide", "guide-on", "", false, "secondary")}${game ? button("Export local game", "export", "", false, "quiet") : ""}</div><p class="muted">Public/private rooms, the wider card set, simultaneous mode, server-owned idle votes, and private administration remain later milestones. Rocket art is provisional and replaceable.</p></section></div>`;
@@ -1054,7 +1123,7 @@ export function mountApp(
     const p = player(g),
       scores = scoreGame(g),
       history = sinceLastDecision(g);
-    return `<section id="status-box" class="status-box" tabindex="-1" aria-label="Status Box"><div class="status-overview"><h2 class="status-title"><button data-action="to-status">Status Box<span class="shortcut-hint"> (S)</span></button></h2><div class="eyebrow status-phase">${phaseLabel(g)}</div><div class="turn-bar" tabindex="-1" aria-live="polite">${badge(p.style, p.name)}<strong class="turn-title">${g.phase === "finished" ? "Game complete" : `${escape(p.name)}’s turn`}</strong><span class="turn-instruction">${escape(instruction(g))}</span></div><div class="status-supply resource-pills"><span><small>Reserve</small><strong>${p.reserve}</strong></span><span><small>Credits</small><strong>${p.credits}</strong></span></div><details class="player-roster" ${rosterOpen ? "open" : ""}><summary>Players & supply</summary><ul>${g.players.map((other) => `<li>${badge(other.style, other.name)}<span>${other.reserve} Reserve</span><span>${other.credits} Credits</span><span>${other.techs.length} Techs</span><strong>${scores.find((s) => s.player === other.id)!.total} points${g.phase === "finished" ? "" : " currently"}</strong><span>${other.used.length}/4 slots used</span></li>`).join("")}</ul></details>${economyTracker(g)}</div><div class="status-decision">${error ? `<div class="error" role="alert">${escape(error)}</div>` : ""}<details class="since-last-turn" ${historyOpen ? "open" : ""}><summary>Since your last turn</summary>${history.length ? `<ol>${history.map((l) => `<li data-log-revision="${l.revision}"><span>Round ${l.round}</span> ${l.player === null ? "" : `<strong>${escape(player(g, l.player).name)}:</strong> `}${escape(l.text)}</li>`).join("")}</ol>` : "<p>No actions have happened since your previous decision.</p>"}</details>${inspector(g)}</div></section>`;
+    return `<section id="status-box" class="status-box" tabindex="-1" aria-label="Status Box"><div class="status-overview"><h2 class="status-title"><button data-action="to-status">Status Box<span class="shortcut-hint"> (S)</span></button></h2><div class="eyebrow status-phase">${phaseLabel(g)}</div><div class="turn-bar" tabindex="-1" aria-live="polite">${badge(p.style, p.name)}<span class="turn-instruction">${escape(instruction(g))}</span></div><div class="status-supply resource-pills"><span><small>Reserve</small><strong>${p.reserve}</strong></span><span><small>Credits</small><strong>${p.credits}</strong></span></div><details class="player-roster" ${rosterOpen ? "open" : ""}><summary>Players & supply</summary><ul>${g.players.map((other) => `<li>${badge(other.style, other.name)}<span>${other.reserve} Reserve</span><span>${other.credits} Credits</span><span>${other.techs.length} Techs</span><strong>${scores.find((s) => s.player === other.id)!.total} points${g.phase === "finished" ? "" : " currently"}</strong><span>${other.used.length}/4 slots used</span></li>`).join("")}</ul></details>${economyTracker(g)}</div><div class="status-decision">${error ? `<div class="error" role="alert">${escape(error)}</div>` : ""}<details class="since-last-turn"><summary>Since your last turn</summary>${history.length ? `<ol>${history.map((l) => `<li data-log-revision="${l.revision}"><span>Round ${l.round}</span> ${l.player === null ? "" : `<strong>${escape(player(g, l.player).name)}:</strong> `}${escape(l.text)}</li>`).join("")}</ol>` : "<p>No actions have happened since your previous decision.</p>"}</details>${inspector(g)}</div></section>`;
   }
 
   function render() {
@@ -1069,8 +1138,6 @@ export function mountApp(
       top: el.scrollTop,
       left: el.scrollLeft,
     }));
-    const history = root.querySelector<HTMLDetailsElement>(".since-last-turn");
-    if (history) historyOpen = history.open;
     const roster = root.querySelector<HTMLDetailsElement>(".player-roster");
     if (roster) rosterOpen = roster.open;
     if (!game) root.innerHTML = landing() + overlay();
@@ -1164,7 +1231,7 @@ export function mountApp(
       [
         JSON.stringify(
           {
-            application: "Space Force local prototype 0.10.0",
+            application: "Space Force local prototype 0.11.0",
             exportedAt: new Date().toISOString(),
             game,
           },
@@ -1213,8 +1280,9 @@ export function mountApp(
             : "board",
     );
   }
-  function selectLocation(target: Element, place = false) {
+  function selectLocation(target: Element) {
     if (!game) return;
+    planTap = null;
     const tile = target.closest<SVGElement>("[data-system]");
     if (!tile) return;
     const id = tile.dataset.system!;
@@ -1233,6 +1301,48 @@ export function mountApp(
     )
       adjustAllocation(game, id, (draft.allocation[id] ?? 0) + 1);
     render();
+  }
+  function selectPlanSystem(id: string, source: string, x: number, y: number) {
+    if (!game || game.phase !== "plan" || !canPlan(game, system(game, id))) {
+      planTap = null;
+      return;
+    }
+    const time = Date.now(),
+      previous = planTap;
+    if (
+      previous &&
+      previous.system === id &&
+      previous.actor === game.turn &&
+      previous.revision === game.revision &&
+      previous.source === source &&
+      time >= previous.time &&
+      time - previous.time <= 450 &&
+      Math.hypot(x - previous.x, y - previous.y) <= 24
+    ) {
+      perform({ type: "plan", system: id });
+      suppressClickUntil = time + 350;
+      return;
+    }
+    planTap = {
+      system: id,
+      actor: game.turn,
+      revision: game.revision,
+      time,
+      source,
+      x,
+      y,
+    };
+    selected = id;
+    selectedPlanet = null;
+    selectedEdge = null;
+    error = "";
+    render();
+  }
+  function scrollToSystemStatus() {
+    const section = root.querySelector<HTMLElement>("#system-status");
+    if (!section) return;
+    section.style.scrollMarginTop = `${(root.querySelector(".game-header")?.getBoundingClientRect().height ?? 80) + 8}px`;
+    section.scrollIntoView?.({ block: "start", behavior: "auto" });
   }
   function requestConfirmation(message: string, command: Command) {
     if (!game) return;
@@ -1290,10 +1400,20 @@ export function mountApp(
     }
     const control = target.closest<HTMLElement>("[data-action]");
     if (!control && !dragged) {
-      if (target.closest("[data-system]")) selectLocation(target);
+      const tile = target.closest<SVGElement>("#galaxy [data-system]");
+      if (tile && game?.phase === "plan") {
+        const pointer = event as MouseEvent;
+        selectPlanSystem(
+          tile.dataset.system!,
+          "mouse",
+          pointer.clientX,
+          pointer.clientY,
+        );
+      } else if (target.closest("[data-system]")) selectLocation(target);
       return;
     }
     if (!control || (control as HTMLButtonElement).disabled) return;
+    planTap = null;
     const data = control.dataset,
       action = data.action;
     if (action === "count") {
@@ -1485,6 +1605,7 @@ export function mountApp(
       else if (el.dataset.check === "invest") draft.invest = el.checked;
       else if (el.dataset.check === "bank") draft.bank = el.checked;
       render();
+      if (el.dataset.check === "invest") scrollToSystemStatus();
       return;
     }
     if (!el.dataset.number || !game) return;
@@ -1685,6 +1806,7 @@ export function mountApp(
       return;
     }
     if (placementDrag && placementDrag.id !== event.pointerId) {
+      planTap = null;
       pointerPositions.set(placementDrag.id, {
         x: placementDrag.x,
         y: placementDrag.y,
@@ -1801,6 +1923,7 @@ export function mountApp(
       panY += before.y - after.y;
     }
     if (dragged) {
+      planTap = null;
       event.preventDefault();
       root.setPointerCapture?.(event.pointerId);
       suppressClickUntil = Date.now() + 350;
@@ -1815,6 +1938,7 @@ export function mountApp(
       if (root.hasPointerCapture?.(event.pointerId))
         root.releasePointerCapture(event.pointerId);
       if (placement.moved) {
+        planTap = null;
         suppressClickUntil = Date.now() + 350;
         if (
           event.type !== "pointercancel" &&
@@ -1827,6 +1951,15 @@ export function mountApp(
           selected = id;
           render();
         }
+      } else if (
+        event.type !== "pointercancel" &&
+        game &&
+        game.turn === placement.actor &&
+        game.revision === placement.revision &&
+        id
+      ) {
+        selectPlanSystem(id, "touch", event.clientX, event.clientY);
+        suppressClickUntil = Date.now() + 350;
       }
       return;
     }
@@ -1886,6 +2019,8 @@ export function mountApp(
     setGame: (value: Game) => {
       assertInvariants(value);
       game = value;
+      planTap = null;
+      selected = null;
       if (value.pending?.kind === "orient")
         orientation = value.pending.rotations[0];
       render();

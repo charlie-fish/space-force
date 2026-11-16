@@ -1,5 +1,5 @@
 {
-  "schema_version": 2,
+  "schema_version": 3,
   "policy_id": "online-idle-removal-003",
   "status": "specification_not_implemented",
   "core_status": "confirmed_by_designer_2026-11-15",
@@ -82,5 +82,8 @@
       "position_points_determine_forfeit_winner": false
     }
   },
-  "all_details_confirmed": true
+  "all_details_confirmed": true,
+  "scope": "live_online_play",
+  "asynchronous_policy_reference": "../docs/ASYNCHRONOUS_PLAY.md",
+  "live_timeout_applies_to_asynchronous": false
 }

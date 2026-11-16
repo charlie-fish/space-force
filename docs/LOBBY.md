@@ -1,12 +1,14 @@
 # Lobby, rooms, and mode recommendations
 
-Version 0.6 · 15 November 2026 · Specification, not implemented
+Updated 16 November 2026 · Specification, not implemented
 
 ## Confirmed scope
 
 The lobby lets players join a private room, browse and join public games waiting for more players, and create either a private room or a public game. The current limit is two to seven players. Keep guest access simple: a display name and available player identity, with no compulsory newsletter sign-up or permanent account.
 
 Normal turns are implemented first; the simultaneous-actions variant follows as a selectable mode. **Recommend the simultaneous variant when there are four or more players**, while allowing the host to choose normal turns. The recommendation is guidance, not a rule change or a forced switch.
+
+Offer live and [asynchronous online play](ASYNCHRONOUS_PLAY.md), labelled separately from normal/simultaneous action resolution. Public listings should expose/filter the pacing and show the agreed response/removal policy. An asynchronous game can be resumed between visits; its participants need not remain connected, and its removal policy does not use the live five-minute clock. The existing shared-device build remains local pass-and-play.
 
 ## Lobby and room flow
 
@@ -34,6 +36,8 @@ While only normal turns have been implemented, do not offer an unusable mode sel
 
 Seat allocation and start are authoritative server operations. Two users requesting the final seat cannot both succeed. The unsuccessful user receives a clear room-full result and an updated directory. Expired reservations are released, while a disconnected player's valid seat-resume credential remains distinct from a new join request.
 
+For asynchronous rooms, readiness means the reviewed roster/settings/policy were accepted; simultaneous connection is not required.
+
 Reset ready flags after material settings or roster changes, including mode, presets, Event variant, starting count, or visibility. Start against the exact roster/settings revision everyone reviewed. Disable double submission while a start is pending. If someone leaves or the roster changes during start, return to a reviewable waiting state rather than creating a partially joined game.
 
 Record visibility, initial host, mode, settings, actual starting roster/count, and the configuration/version used. A host is a room-management role, not an administrator with access to private bids or other players' secrets.
@@ -44,7 +48,7 @@ The server owns the room and game state. A host's browser closing must not delet
 
 Hide stale public listings when no connected participant can host them, and expire empty waiting rooms after a configurable idle period; proposed initial value: 30 minutes. Treat these as lobby cleanup policies, not rules for abandoning an active match.
 
-In an active match, reserve disconnected seats and allow recovery until the reviewed removal policy applies. The designer confirmed **five minutes** and **majority approval by the other active players**: offer an explicit removal option, skip the removed player's remaining turns, and award a win to a sole remaining participant. This is not an automatic kick or an ordinary enforced turn clock. Do not grant the seat to a stranger. [DROPOUTS.md](DROPOUTS.md) specifies server validation and confirmed P02–P05 for stack cleanup, remaining components, delegated choices, bids, and scoring; P01 eligibility details are also confirmed. The waiting-room 120-second grace and empty-room expiry above are separate proposed policies.
+In an active live match, reserve disconnected seats and allow recovery until the reviewed removal policy applies. The designer confirmed **five minutes** and **majority approval by the other active players**: offer an explicit removal option, skip the removed player's remaining turns, and award a win to a sole remaining participant. This is not an automatic kick or an ordinary enforced turn clock. Do not grant the seat to a stranger. [DROPOUTS.md](DROPOUTS.md) specifies server validation and confirmed P02–P05 for stack cleanup, remaining components, delegated choices, bids, and scoring; P01 eligibility details are also confirmed. The waiting-room 120-second grace and empty-room expiry above are separate proposed policies.
 
 Provide plain-text display names/titles, bounded creation/join attempts, host kick controls before start, and a report action routed to the private admin area. Keep public visibility and abuse handling explicit. Public discovery does not require ranked matchmaking or global chat.
 

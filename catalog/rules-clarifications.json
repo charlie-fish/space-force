@@ -1,6 +1,6 @@
 {
   "schema_version": 3,
-  "clarification_id": "designer-clarifications-004",
+  "clarification_id": "designer-clarifications-005",
   "date": "2026-11-16",
   "authority": "Designer follow-up messages in the project conversation, including seven-player extension and playtest corrections",
   "printed_rules_version": "1.80",
@@ -160,8 +160,15 @@
       "at_least_one_ship_must_enter_after_reveal": true,
       "original_entry_route_must_remain_legal": true,
       "empty_unrevealing_action_still_allowed_under_R04": true
+    },
+    "final_round_disruptor": {
+      "source": "Designer playtest feedback, 2026-11-16",
+      "has_placement_effect": false,
+      "requires_placement_decision": false,
+      "ownership_still_scores": true,
+      "explain_on_card": true
     }
   },
-  "supersedes": "designer-clarifications-003",
+  "supersedes": "designer-clarifications-004",
   "configuration_reference": "game-configuration.json"
 }

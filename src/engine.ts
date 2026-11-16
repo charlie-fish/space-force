@@ -19,7 +19,13 @@ import type {
   Continuation,
   SettlementResume,
 } from "./types.js";
-import { findOpenSpace, blackHolePositions } from "./geometry.js";
+import {
+  findOpenSpace,
+  blackHolePositions,
+  warpPosition,
+  WARP_WIDTH,
+  WARP_HEIGHT,
+} from "./geometry.js";
 
 const clone = <T>(value: T): T => JSON.parse(JSON.stringify(value));
 function requireRule(test: unknown, message: string): asserts test {
@@ -82,8 +88,8 @@ export function createGame(
     "Space Force supports two to seven players.",
   );
   const g: Game = {
-    schema: 3,
-    engine: "0.10.0",
+    schema: 4,
+    engine: "0.11.0",
     content: "family-simple-events-1",
     seed: seed >>> 0,
     rng: seed >>> 0,
@@ -428,6 +434,9 @@ function passFirst(g: Game) {
 }
 export function reinforceAllowance(g: Game, id = g.turn) {
   return hasTech(g, id, "assembly-line") ? 4 : 3;
+}
+export function isFinalRound(g: Game) {
+  return g.finalEconomy || g.round >= (g.players.length <= 3 ? 6 : 5);
 }
 export function reinforceCount(g: Game, id = g.turn) {
   return Math.min(player(g, id).reserve, reinforceAllowance(g, id));
@@ -776,7 +785,7 @@ function settlePlanet(
       player(g).reserve -= amount;
       player(g).credits += amount;
       messages.push(
-        `Explore +${wanted} Credits: gained ${amount} Credit${amount === 1 ? "" : "s"} from Reserve.`,
+        `+${wanted} Credits: gained ${amount} Credit${amount === 1 ? "" : "s"} from Reserve.`,
       );
       if (amount < wanted)
         messages.push(reserveWarning("Explore Credits", wanted, available));
@@ -856,6 +865,7 @@ export function featureOptions(
   tech: string,
 ): { system: string; planet?: string; edge?: number }[] {
   const options: { system: string; planet?: string; edge?: number }[] = [];
+  if (tech === "tech.disruptor" && isFinalRound(g)) return options;
   for (const s of g.systems) {
     if (tech === "tech.disruptor") {
       if (
@@ -904,6 +914,11 @@ function buy(g: Game, tech: string | null) {
   p.reserve += cost - 1;
   p.techs.push(tech);
   log(g, `Bought ${CARD_MAP[tech].title} for ${cost} Credits.`);
+  if (tech === "tech.disruptor" && isFinalRound(g))
+    log(
+      g,
+      "Disruptor has no effect in the last round; its ownership still scores 1 point.",
+    );
   const options = featureOptions(g, tech);
   if (tech === "tech.genesis" && options.length)
     g.pending = { kind: "genesis" };
@@ -981,16 +996,23 @@ function chooseFeature(
     g.features.blackHole = true;
   }
   if (tech === "tech.planet-nine") {
-    const { x, y } = findOpenSpace(
-      s,
-      0.18,
-      0.156,
-      blackHolePositions(s).map((p) => ({
+    const warp = warpPosition(s);
+    const { x, y } = findOpenSpace(s, 0.18, 0.156, [
+      ...blackHolePositions(s).map((p) => ({
         ...p,
         radiusX: p.radius / Math.sqrt(3) / 100,
         radiusY: p.radius / 200,
       })),
-    );
+      ...(warp
+        ? [
+            {
+              ...warp,
+              radiusX: WARP_WIDTH / 2 / Math.sqrt(3) / 100,
+              radiusY: WARP_HEIGHT / 400,
+            },
+          ]
+        : []),
+    ]);
     s.planets.push({
       id: `${s.id}.extra`,
       capacity: 1,
@@ -1354,8 +1376,8 @@ export function sinceLastDecision(g: Game) {
 
 export function assertInvariants(g: Game) {
   requireRule(
-    g.schema === 3 &&
-      g.engine === "0.10.0" &&
+    g.schema === 4 &&
+      g.engine === "0.11.0" &&
       g.content === "family-simple-events-1",
     "Unsupported saved-game version.",
   );

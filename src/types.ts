@@ -125,8 +125,8 @@ export interface Score {
   total: number;
 }
 export interface Game {
-  schema: 3;
-  engine: "0.10.0";
+  schema: 4;
+  engine: "0.11.0";
   content: "family-simple-events-1";
   seed: number;
   rng: number;

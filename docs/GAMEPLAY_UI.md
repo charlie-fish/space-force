@@ -1,6 +1,6 @@
 # In-game navigation and controls
 
-Version 0.10 · 16 November 2026 · Local prototype implemented; remote requirements retained
+Version 0.11 · 16 November 2026 · Local prototype implemented; remote requirements retained
 
 The designer requires easy access to Board, Techs, Event, Actions and Supply, and Player Aid. Actions and Supply contains the player's action board with Reserve and Credits; Player Aid contains one shared two-sided reference visible to all players. Phone gestures and desktop shortcuts complement visible controls. Bindings and the local interactions below are implemented; visual browser/device validation remains pending. Remote-only controls remain planned.
 
@@ -16,7 +16,7 @@ The designer requires easy access to Board, Techs, Event, Actions and Supply, an
 
 Always show a compact current-turn/phase indicator, waiting/pending-action status, and the player's Reserve/Credits totals. Keep those two resource counts accessible while inspecting Techs or the Event. Actions and Supply expands them into the corresponding supply areas using the player's rocket silhouette and colour. Explain the other rocket roles through a supply breakdown so all forty rockets remain understandable.
 
-Use a labelled bottom navigation bar or equivalent on phones. Place the Status Box above the board/views, with its own heading line. Highlight both the player/rocket badge and the possessive turn title, then put the next-step prompt immediately below in clear black text. Always include Players & supply, Reserve and Credits; show current scores in the expandable supply summary. Put the selected system, numbered chip-stack order, Explore counts and required decision here. A “Since your last turn” toggle lists actions/outcomes since the active player's preceding required decision; consecutive decisions by the same player each count. This replaces the previous-action box.
+Use a labelled bottom navigation bar or equivalent on phones. Place the Status Box above the board/views, with its own heading line. Highlight the player/rocket badge and put the next-step prompt immediately below in clear black text. Do not repeat the player name in a possessive turn title. Always include Players & supply, Reserve and Credits; show current scores in the expandable supply summary. Put the selected system, numbered top-to-bottom chip-stack order (1 is the top), Explore counts and required decision here. A “Since your last turn” toggle lists actions/outcomes since the active player's preceding required decision; consecutive decisions by the same player each count. It renders collapsed even after a preceding expansion. This replaces the previous-action box.
 
 During Economy, show the supplied first-player token with its current stage highlighted. Investments and reinforcement controls use the Board. Pass the first-player marker/start the next round automatically after reinforcement; the final Economy still ends after Tech. Use “Actions” as the phase name and “Actions and Supply” as the view name. All five views remain available below the completed-game results. Provide obvious close/back controls and a Return to required action button when a decision is waiting in another view.
 
@@ -25,7 +25,7 @@ Preserve map pan/zoom, selected system, card scroll position, and keyboard focus
 ## Phone and tablet controls
 
 - Pinch/spread on the board zooms around the gesture focus. One-finger dragging on the board background pans it.
-- During PLAN, desktop hover shows a translucent chip cursor/legal target. Clicking a system selects a changeable preview; only “Place chip here” commits it. Touch can tap, or drag a translucent chip over systems and release to select the preview; releasing off a legal target cancels the drag. Outside PLAN, select systems/planets/chips to inspect or prepare a draft.
+- During PLAN, hover highlights legal targets, but no translucent chip appears before selection. Clicking a system selects a changeable preview; “Place chip here” or double-clicking/double-tapping the same legal system commits it. Touch can tap, or drag a translucent chip over systems and release to select the preview; releasing off a legal target cancels the drag. Outside PLAN, select systems/planets/chips to inspect or prepare a draft.
 - Swipe between detail views through a dedicated header/handle area. Panning the board or scrolling a card must not unexpectedly switch destinations.
 - Provide visible zoom-in, zoom-out, Reset View, destination tabs, and accessible directional/detail controls so multi-touch or swiping is never required.
 - Keep zoomed-board controls and touch hit areas usable without changing the specified visual chip/sun/cutout proportions. Provide a detail/list alternative where pieces are crowded.
@@ -43,11 +43,11 @@ There is **one shared player aid**, not one supply copy per player. Both faces a
 | Key | Result |
 | --- | --- |
 | S | Scroll to Status Box at the top of the document |
-| B | Board, scrolling its panel to the top |
-| T | Techs, scrolling its panel to the top |
-| E | Event, scrolling its panel to the top |
-| A | Actions and Supply, scrolling its panel to the top |
-| P | Player aid, scrolling its panel to the top |
+| B | Board, scrolling above its panel with about 2cm of extra Status Box context |
+| T | Techs, scrolling above its panel with about 2cm of extra Status Box context |
+| E | Event, scrolling above its panel with about 2cm of extra Status Box context |
+| A | Actions and Supply, scrolling above its panel with about 2cm of extra Status Box context |
+| P | Player aid, scrolling above its panel with about 2cm of extra Status Box context |
 | R | Reset board camera |
 | + / − | Zoom board in/out while the board has focus |
 | Arrow keys | Pan while the board has focus |
@@ -60,13 +60,13 @@ Focus-scoped/disableable character shortcuts follow [W3C guidance on character-k
 
 ## Designer playtest refinements
 
-Condense stacks with owner-coloured chip rims so all chips remain visible at twelve or more high. Put a thin opaque legal-top-chip ring behind the entire stack; desktop hover changes its colour without covering lower chips. Move numbered order into System status. Double the Settlement rocket size at the measured capacity anchors, retain a blank sun on system backs, and place fleet labels/Planet Nine in empty space where possible. Render every black hole with the circular Explore art; Le Guin has none by default. Show asteroid edge counts rather than edge indices.
+Condense stacks with owner-coloured chip rims so all chips remain visible at twelve or more high. Remove grey chip-edge outlines and put a 2.5px opaque legal-top-chip ring behind the entire stack; desktop hover changes its colour without covering lower chips. Move numbered order into System status, top to bottom. Give Ivory rockets a dark outline. Render system names in the final board layer; measure each name bar to its text plus a few pixels of padding. Double the Settlement rocket size at the measured capacity anchors, retain a blank sun on system backs, and place fleet labels/Planet Nine in empty space where possible. Render every black hole with the circular Explore art; Le Guin has none by default. Show asteroid edge counts rather than edge indices.
 
-Show linked production quantities vertically, Ships then Credits, and explain Reserve-limited output. Keep Invest directly above Commit. Empty Attack targets default to Invest, as do the previously specified impossible-action cases; the player may override this. Allow target-first combat, raising sacrifices automatically to the cost within available Ships; show chosen sacrifices / needed sacrifices and preserve the target scroller while editing. Ask before excess sacrifices or buying Genesis without a valid empty planet. SETTLE allocations and clockwise/anti-clockwise 60-degree orientation previews remain editable until their respective Commit. Reveal and orient a newly explored system before choosing Ship quantities, then require at least one Ship via an original legal entry route.
+Show linked production quantities vertically, Ships then Credits, and explain Reserve-limited output. Keep bold Invest directly above Commit; changing the checkbox scrolls System status to the top below the sticky header. Empty Attack targets default to Invest, as do the previously specified impossible-action cases; the player may override this. Allow target-first combat, raising sacrifices automatically to the cost within available Ships; show chosen sacrifices / needed sacrifices and preserve the target scroller while editing. Ask before excess sacrifices or buying Genesis without a valid empty planet. SETTLE allocations and clockwise/anti-clockwise 60-degree orientation previews remain editable until their respective Commit. Reveal and orient a newly explored system before choosing Ship quantities, then require at least one Ship via an original legal entry route.
 
 Investments default to Board, rebalance the topmost other allocation when an edit exceeds the full allocation, and support board-click placement. Reinforcements also support board clicks, cannot exceed availability, and ask before leaving usable allowance unallocated. Show token-used indicators on the four token Techs in dark text and confirm before finalising an ineffective token-Tech purchase. Sort Techs low-to-high, with Sabotage last. Board-selected Tech planets/systems/Kessler edges become the first chooser option and reset its horizontal scroll to the far left.
 
-Non-choice Explore outcomes require Ok before continuing. If an opponent's reward displaces a committed Settlement, allow only that displaced amount to be reallocated or kept as Ships; already committed placements cannot be reduced. Pause and warn the active player whenever Reserve limits prevent the requested effect from completing in full. Use “returned as Credits” for losses. See the [complete 0.10 checklist](PLAYTEST_CHANGES_0.10.md) and [historical 0.9 checklist](PLAYTEST_CHANGES_0.9.md).
+Non-choice Explore outcomes require Ok before continuing. If an opponent's reward displaces a committed Settlement, allow only that displaced amount to be reallocated or kept as Ships; already committed placements cannot be reduced. Pause and warn the active player whenever Reserve limits prevent the requested effect from completing in full. Use “returned as Credits” for losses. Use the supplied additional feature art for new asteroid belts (edge-rotated) and warps (in open space where possible). Disruptor has no final-round placement effect and explains this on its card/details. Use the requested final table headings and “rules the galaxy” for a sole winner. See the [complete 0.11 checklist](PLAYTEST_CHANGES_0.11.md), with [0.10](PLAYTEST_CHANGES_0.10.md) and [0.9](PLAYTEST_CHANGES_0.9.md) retained as history.
 
 ## Commit and Undo
 
@@ -74,7 +74,7 @@ There is no redundant Undo draft button: selecting another action or editing qua
 
 ## Idle warnings and recovery
 
-Show a pending decision and any inactivity warning in every destination. Reading Techs must not hide a warning that a required response is outstanding. Provide an explicit I'm still here acknowledgement; camera movement need not be recorded as player activity. A warning appears after four minutes, before the confirmed five-minute removal threshold. Server state decides eligibility; browser timers only display it. See [DROPOUTS.md](DROPOUTS.md).
+Show a pending decision and any inactivity warning in every destination. Reading Techs must not hide a warning that a required response is outstanding. Provide an explicit I'm still here acknowledgement; camera movement need not be recorded as player activity. For live online play, a warning appears after four minutes, before the confirmed five-minute removal threshold. Asynchronous play requires its [separate policy](ASYNCHRONOUS_PLAY.md), with offline waiting expected. Server state decides eligibility; browser timers only display it. See [DROPOUTS.md](DROPOUTS.md).
 
 On reconnect, restore the interface context after synchronising authoritative game state. An invalidated draft receives a clear explanation and fresh legal choices. A removed player's old controls cannot submit actions.
 

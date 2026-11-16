@@ -2126,11 +2126,6 @@ svg.poker-chip {
   opacity: 0;
   transition: opacity 0.12s;
 }
-.plan-mode .legal-placement:hover > .plan-preview,
-.plan-mode .legal-placement:focus > .plan-preview,
-.plan-mode .drop-target > .plan-preview {
-  opacity: 0.48;
-}
 .plan-mode .legal-placement:hover > .hex-outline,
 .plan-mode .drop-target > .hex-outline {
   stroke: #fff1ac;
@@ -2141,9 +2136,6 @@ svg.poker-chip {
   stroke: #f5df9f;
   stroke-width: 2;
   stroke-dasharray: 3 3;
-}
-.selectable-chip {
-  filter: drop-shadow(0 0 4px #fff2b5);
 }
 .stack-index {
   font-size: max(10pt, 6px);
@@ -2346,8 +2338,7 @@ svg.poker-chip {
 .status-phase {
   grid-column: 1/-1;
 }
-.status-overview .turn-bar > .player-badge,
-.status-overview .turn-bar > .turn-title {
+.status-overview .turn-bar > .player-badge {
   color: #17121a;
   background: #e7b663;
   border: 1px solid #96703b;
@@ -2363,9 +2354,6 @@ svg.poker-chip {
 }
 .status-overview .turn-bar > .player-badge {
   order: 1;
-}
-.status-overview .turn-bar > .turn-title {
-  order: 2;
 }
 .status-box .since-last-turn {
   color: #302939;
@@ -2459,7 +2447,7 @@ svg.poker-chip {
 }
 .system .selection-ring {
   stroke: #f0bd4a;
-  stroke-width: 1.25;
+  stroke-width: 2.5;
   stroke-opacity: 1;
   vector-effect: non-scaling-stroke;
   pointer-events: stroke;
@@ -2541,10 +2529,6 @@ svg.poker-chip {
 }
 .status-overview .turn-bar > .player-badge > span {
   min-width: 0;
-}
-.status-overview .turn-title {
-  max-width: 100%;
-  overflow-wrap: anywhere;
 }
 
 .view-tabs button > .shortcut-hint {

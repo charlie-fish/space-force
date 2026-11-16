@@ -256,6 +256,45 @@ def extract_black_hole(cardboard):
                        'description': 'Left circular black-hole Explore token, including its original blue rim. The print sheet slightly compresses its height; normalized to a circular 192-pixel image.'}}
 
 
+def extract_space_features(cardboard):
+    """Extract the additional asteroid belt and warp with their source clips."""
+    page = cardboard[6]
+    images = page.get_image_info(xrefs=True)
+    definitions = [
+        ('asteroidBelt', 'asteroid-belt.webp', 64, 'y', 90,
+         lambda rect: 35 < rect.width < 55 and 200 < rect.height < 245,
+         'Original additional asteroid-belt token, preserving the printed vertical orientation. The long axis follows image y; rotate about center to match the chosen edge. Its native JPEG is horizontal, but the source PDF rotates and clips it to the printed vertical capsule.'),
+        ('warp', 'warp.webp', 240, 'x', 0,
+         lambda rect: 113 < rect.width < 123 and 86 < rect.height < 99,
+         'Original additional warp token, preserving the printed landscape hexagon and original PDF clipping paths and image soft mask.'),
+    ]
+    result = {}
+    for feature_id, filename, width, long_axis, angle, matches, description in definitions:
+        candidates = [info for info in images if matches(fitz.Rect(info['bbox']))]
+        assert len(candidates) == 1, (feature_id, candidates)
+        info = candidates[0]
+        rect = fitz.Rect(info['bbox'])
+        height = round(width * rect.height / rect.width)
+        # Render the whole PDF composition with alpha, rather than extracting
+        # the JPEG alone: the capsule/hexagon cuts are source clipping paths.
+        scale = width * 2 / rect.width
+        pixmap = page.get_pixmap(matrix=fitz.Matrix(scale, scale), clip=rect, alpha=True)
+        image = Image.open(io.BytesIO(pixmap.tobytes('png'))).convert('RGBA')
+        image = image.resize((width, height), Image.Resampling.LANCZOS)
+        result[feature_id] = {
+            **save_webp(image, OUTPUT/'public/art'/filename, quality=82),
+            'center': {'x': .5, 'y': .5},
+            'orientation': {'longAxis': long_axis, 'angleDegrees': angle},
+            'source': {
+                'filename': 'Space Force A4 Cardboard 1.40.pdf', 'page': 7,
+                'crop': [round(coordinate, 3) for coordinate in rect],
+                'nativeImageDimensions': {'width': info['width'], 'height': info['height']},
+                'description': description,
+            },
+        }
+    return result
+
+
 def extract_tile(row, document):
     page = document[int(row['source_pdf_page']) - 1]
     images = page.get_image_info(xrefs=True)
@@ -327,7 +366,8 @@ if __name__ == '__main__':
     cards=fitz.open(source_file(args.source_dir,'SpaceForce Cards v1.80.pdf'))
     manifest['firstPlayer']=extract_first_player(cards)
     manifest['features']={'planet':extract_planet_nine(docs['pdf.cardboard']),
-                          'blackHole':extract_black_hole(docs['pdf.cardboard'])}
+                          'blackHole':extract_black_hole(docs['pdf.cardboard']),
+                          **extract_space_features(docs['pdf.cardboard'])}
     with (OUTPUT/'catalog/cards.csv').open(newline='') as handle:
         for row in csv.DictReader(handle):
             slug=row['card_id'].split('.',1)[1]

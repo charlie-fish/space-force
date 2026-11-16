@@ -87,3 +87,7 @@ The seven-player limit, separate rocket silhouettes, chip face/rim identity, sna
 | 2026-11-15 | Designer confirmed P01. All known rule clarifications are settled and implementation can start with provisional art. |
 
 No hosting provider, paid service, final privacy text, or application deployment has been selected in this planning stage.
+
+## Before implementing asynchronous removal
+
+Asynchronous online play is required alongside live and local play. Agree its response window, grace period, removal-vote deadline/electorate and reminder policy before implementing that mode. These do not inherit the confirmed live five-minute rule. See [ASYNCHRONOUS_PLAY.md](ASYNCHRONOUS_PLAY.md).

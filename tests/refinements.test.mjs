@@ -215,7 +215,7 @@ test("Since your last turn starts at the previous decision, including consecutiv
 
 test("completed genuine 0.9 game migrates to the same scores and winners with the new pauses inserted", () => {
   const g = restoreGame(oldGame);
-  assert.equal(g.engine, "0.10.0");
+  assert.equal(g.engine, "0.11.0");
   assert.equal(g.phase, "finished");
   assert.deepEqual(g.scores, oldGame.expected.scores);
   assert.deepEqual(g.winners, oldGame.expected.winners);
@@ -243,7 +243,7 @@ test("Status heading and S shortcut scroll to the top; view shortcuts scroll the
   }
   assert.equal(
     h.root.querySelector(".turn-instruction").previousElementSibling.className,
-    "turn-title",
+    "player-badge",
   );
   h.close();
 });

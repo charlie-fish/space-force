@@ -1,5 +1,14 @@
 # Change log
 
+## 0.11.0 — 2026-11-16
+
+- Applied the third designer playtest batch: selected-only PLAN previews, guarded double-click/double-tap confirmation, top-first stack numbering, clearer chip rims/legal rings, dark Ivory rocket outlines and names drawn above all system art.
+- Simplified Status Box turn text, collapsed history by default, made Invest bold with a System-status scroll target, retained more Status Box context during view changes and revised final-score labels/winner wording.
+- Added the original asteroid-belt/warp feature-token artwork, rotated edge belts and open-space warp placement. Disruptor now has no final-round placement effect, with card/detail notice and compatible old-save recovery.
+- Added iPhone HTTP/Safari testing instructions and a loading/help fallback for HTML previews. Specified asynchronous play with a separate removal-policy requirement; the live five-minute timeout does not apply.
+- Cached unchanged geometry and reused board-chip SVG rims without adding dependencies. All 96 tests and production/portable checks pass; 85 self-hosted assets are included. Real-phone and formal cross-browser visual verification remain pending.
+- See the [complete 0.11 feedback checklist](docs/PLAYTEST_CHANGES_0.11.md).
+
 ## 0.10.0 — 2026-11-16
 
 - Applied the second designer playtest batch: separate Status Box heading/S shortcut, highlighted turn and prompt, decision-based “Since your last turn” history, score summaries, 10pt live text, destination scrolling and mobile-specific labels.

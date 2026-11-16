@@ -2869,6 +2869,64 @@
         ],
         "description": "Left circular black-hole Explore token, including its original blue rim. The print sheet slightly compresses its height; normalized to a circular 192-pixel image."
       }
+    },
+    "asteroidBelt": {
+      "image": "/art/asteroid-belt.webp",
+      "width": 64,
+      "height": 322,
+      "bytes": 6176,
+      "center": {
+        "x": 0.5,
+        "y": 0.5
+      },
+      "orientation": {
+        "longAxis": "y",
+        "angleDegrees": 90
+      },
+      "source": {
+        "filename": "Space Force A4 Cardboard 1.40.pdf",
+        "page": 7,
+        "crop": [
+          486.746,
+          243.322,
+          532.106,
+          471.562
+        ],
+        "nativeImageDimensions": {
+          "width": 228,
+          "height": 45
+        },
+        "description": "Original additional asteroid-belt token, preserving the printed vertical orientation. The long axis follows image y; rotate about center to match the chosen edge. Its native JPEG is horizontal, but the source PDF rotates and clips it to the printed vertical capsule."
+      }
+    },
+    "warp": {
+      "image": "/art/warp.webp",
+      "width": 240,
+      "height": 182,
+      "bytes": 11406,
+      "center": {
+        "x": 0.5,
+        "y": 0.5
+      },
+      "orientation": {
+        "longAxis": "x",
+        "angleDegrees": 0
+      },
+      "source": {
+        "filename": "Space Force A4 Cardboard 1.40.pdf",
+        "page": 7,
+        "crop": [
+          80.629,
+          409.191,
+          199.629,
+          499.191
+        ],
+        "nativeImageDimensions": {
+          "width": 119,
+          "height": 90
+        },
+        "description": "Original additional warp token, preserving the printed landscape hexagon and original PDF clipping paths and image soft mask."
+      }
     }
   }
 }

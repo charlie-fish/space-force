@@ -12,8 +12,9 @@ export function restoreGame(value: unknown): Game {
     players: { name: string }[];
     commands: { actor: number; command: Command }[];
   };
-  if (stored.engine === "0.8.0" || stored.engine === "0.9.0") {
-    const expected = stored.engine === "0.8.0" ? 1 : 2;
+  if (["0.8.0", "0.9.0", "0.10.0"].includes(stored.engine)) {
+    const expected =
+      stored.engine === "0.8.0" ? 1 : stored.engine === "0.9.0" ? 2 : 3;
     if (
       stored.schema !== expected ||
       stored.content !== "family-simple-events-1" ||
@@ -28,6 +29,7 @@ export function restoreGame(value: unknown): Game {
       stored.players.map((p) => p.name),
     );
     const advanceAddedPauses = () => {
+      if (stored.engine === "0.10.0") return;
       for (let i = 0; i < 100; i++) {
         if (game.pending?.kind === "ack")
           game = applyCommand(game, game.turn, { type: "acknowledge" });
@@ -43,8 +45,17 @@ export function restoreGame(value: unknown): Game {
       }
       throw Error("Legacy resolution could not complete.");
     };
+    let obsoleteDisruptorChoice = false;
     for (const record of stored.commands) {
       advanceAddedPauses();
+      if (obsoleteDisruptorChoice && record.command.type === "feature") {
+        obsoleteDisruptorChoice = false;
+        continue;
+      }
+      obsoleteDisruptorChoice =
+        record.command.type === "buy" &&
+        record.command.tech === "tech.disruptor" &&
+        (game.finalEconomy || game.round >= (game.players.length <= 3 ? 6 : 5));
       if (record.command.type === "nextRound" && game.phase === "plan")
         continue;
       game = applyCommand(game, record.actor, record.command);

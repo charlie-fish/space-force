@@ -48,10 +48,10 @@ test("Plan has a blank sun and touch drag previews a placement until confirmed",
     target = g.systems.find((s) => !s.revealed),
     id = target.id;
   assert.ok(h.root.querySelector(".blank-sun"));
-  assert.ok(h.root.querySelector(".plan-preview"));
-  assert.match(
+  assert.equal(h.root.querySelector(".plan-preview"), null);
+  assert.equal(
     h.root.querySelector(".map-viewport").getAttribute("style"),
-    /data:image/,
+    null,
   );
   h.window.document.elementFromPoint = () =>
     h.root.querySelector(`[data-system="${id}"][role="button"]`);
@@ -691,7 +691,7 @@ test("game export downloads a versioned JSON record with setup, commands, and cu
     h.click('[data-action="export"]');
     const record = JSON.parse(await blob.text());
     assert.match(download, /^space-force-/);
-    assert.equal(record.game.engine, "0.10.0");
+    assert.equal(record.game.engine, "0.11.0");
     assert.equal(record.game.content, "family-simple-events-1");
     assert.equal(record.game.commands.length, record.game.revision);
     assert.equal(record.game.seed, h.app.getGame().seed);

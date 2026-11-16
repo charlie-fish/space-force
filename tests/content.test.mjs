@@ -21,7 +21,7 @@ test("all self-hosted artwork references exist and system hit areas remain insid
     manifest.firstPlayer,
     manifest.cover,
   ];
-  assert.equal(items.length, 83);
+  assert.equal(items.length, 85);
   for (const item of items) {
     const file = new URL(`../public${item.image}`, import.meta.url);
     assert.equal(statSync(file).size, item.bytes, item.image);
