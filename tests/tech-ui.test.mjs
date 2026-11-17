@@ -47,11 +47,11 @@ function confirm(h) {
   h.click('[data-action="confirm-command"]');
 }
 
-test("setup defaults to New Techs, permits Family/mixed, and labels the optional five-Tech scenario", () => {
+test("setup defaults to the last ten Techs, permits Family/mixed, and labels the optional five-Tech scenario", () => {
   const h = harness();
   assert.equal(
     h.root.querySelector('[data-setting="tech-preset"]').value,
-    "chains",
+    "remaining",
   );
   assert.match(
     h.root.querySelector('[data-check="chain-scenario"]').parentElement
@@ -69,6 +69,7 @@ test("setup defaults to New Techs, permits Family/mixed, and labels the optional
   assert.deepEqual(h.app.getGame().config, {
     techPreset: "mixed",
     scenario: "five-tech-chain",
+    events: "simpler",
   });
   assert.deepEqual(h.app.getGame().players[0].techs, CHAIN_TECHS);
   assert.equal(h.app.getGame().players[0].reserve, 35);
@@ -84,6 +85,7 @@ test("setup defaults to New Techs, permits Family/mixed, and labels the optional
   assert.deepEqual(family.app.getGame().config, {
     techPreset: "family",
     scenario: "standard",
+    events: "simpler",
   });
   family.close();
 });

@@ -4,6 +4,8 @@ import {
   reinforceCount,
   system,
   beforeActionHooks,
+  attackCost,
+  movementLosses,
 } from "./engine.js";
 import type { Command, Game } from "./types.js";
 
@@ -39,7 +41,10 @@ export function intentWarnings(game: Game, command: Command): string[] {
     if (
       command.action === "settle" &&
       command.settlements &&
-      !total(command.settlements)
+      !total(command.settlements) &&
+      !Object.values(command.replacements ?? {}).some(
+        (targets) => total(targets) > 0,
+      )
     )
       messages.push(
         "No Settlements are selected. Use your SETTLE action without settling any Ships?",
@@ -51,12 +56,14 @@ export function intentWarnings(game: Game, command: Command): string[] {
           "No Ships are selected to sacrifice. Use your ATTACK action without attacking any Ships?",
         );
       else {
-        const needed =
-          Math.ceil(total(command.attack?.ships) / 2) +
+        const needed = attackCost(
+          game,
+          total(command.attack?.ships),
           Object.values(command.attack?.settlements ?? {}).reduce(
             (n, targets) => n + total(targets),
             0,
-          );
+          ),
+        );
         if (sacrifice > needed)
           messages.push(
             `You chose to sacrifice ${sacrifice} Ships, but these targets need only ${needed}. The ${sacrifice - needed} extra Ship${sacrifice - needed === 1 ? "" : "s"} will also be destroyed and become your Credits. Are you sure?`,
@@ -75,9 +82,16 @@ export function intentWarnings(game: Game, command: Command): string[] {
       incoming = total(command.sources);
     if (target.revealed && incoming && blackHoles(target)) {
       const holes = blackHoles(target),
-        lost = Math.min(incoming, holes);
+        losses = movementLosses(
+          game,
+          target,
+          command.sources ?? {},
+          command.carried,
+          command.passengerLosses,
+        ),
+        lost = losses.total;
       messages.push(
-        `You are sending ${incoming} Ship${incoming === 1 ? "" : "s"} into ${nameOf(target)}, which has ${holes} black hole${holes === 1 ? "" : "s"}. ${lost} incoming Ship${lost === 1 ? "" : "s"} will be destroyed and returned as Credits.`,
+        `You are sending ${incoming} Ship${incoming === 1 ? "" : "s"} into ${nameOf(target)}, which has ${holes} black hole${holes === 1 ? "" : "s"}. ${lost} incoming Ship${lost === 1 ? "" : "s"} will be destroyed and returned as Credits.${losses.carried.some((n) => n > 0) ? ` Gravity Drive casualties: ${losses.own} of your Ships and ${losses.passengers.reduce((n, v) => n + v, 0)} carried opponent Ships.` : ""}`,
       );
     }
   }

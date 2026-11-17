@@ -52,9 +52,9 @@ function finishChain(game, choose = botCommand) {
   return { g, checkpoints };
 }
 
-test("three ten-card displays expose exactly twenty implemented Techs and scenario markers come from Reserve", () => {
+test("ten-card displays expose all thirty implemented Techs and scenario markers come from Reserve", () => {
   assert.equal(NEW_TECHS.length, 10);
-  assert.equal(new Set(IMPLEMENTED_TECHS).size, 20);
+  assert.equal(new Set(IMPLEMENTED_TECHS).size, 30);
   for (const techPreset of Object.keys(TECH_PRESETS)) {
     const g = setup(7, 4, { techPreset, scenario: "five-tech-chain" });
     assert.equal(g.market.length, 10);
@@ -64,7 +64,7 @@ test("three ten-card displays expose exactly twenty implemented Techs and scenar
       assert.deepEqual(p.techs, CHAIN_TECHS);
       assert.equal(p.reserve, 29);
     }
-    assert.match(g.log[0].text, /Designer test scenario/);
+    assert.ok(g.log.some((l) => /Designer test scenario/.test(l.text)));
   }
   assert.throws(() =>
     createGame(2, 1, [], { techPreset: "all", scenario: "standard" }),
@@ -515,11 +515,12 @@ test("a Government free MOVE may reveal/orient a system and then return to the c
 
 test("genuine 0.11 records retain max-Credit defaults and final scores during migration", () => {
   const restored = restoreGame(oldCompleted);
-  assert.equal(restored.engine, "0.14.0");
+  assert.equal(restored.engine, "0.15.0");
   assert.deepEqual(restored.scores, oldCompleted.scores);
   assert.deepEqual(restored.config, {
     techPreset: "family",
     scenario: "standard",
+    events: "simpler",
   });
   for (const checkpoint of oldCompleted.checkpoints.filter(
     (_, i) => i % 8 === 0,

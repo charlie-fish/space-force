@@ -91,3 +91,7 @@ No hosting provider, paid service, final privacy text, or application deployment
 ## Before implementing asynchronous removal
 
 Asynchronous online play is required alongside live and local play. Agree its response window, grace period, removal-vote deadline/electorate and reminder policy before implementing that mode. These do not inherit the confirmed live five-minute rule. See [ASYNCHRONOUS_PLAY.md](ASYNCHRONOUS_PLAY.md).
+
+## New Tech implementation conventions (17 November 2026)
+
+All thirty Tech effects are implemented in local prototype 0.15. Confirmed R01–R08 remain unchanged. [C01–C04](PLAYTEST_CHANGES_0.15.md#provisional-rule-interpretations-to-review) separately record provisional choices for Gravity Drive origins/casualties, Eminent Domain order and ACTIONS-only Banking, Soylent eligibility timing/blocked planets, and mandatory Sabotage targets. These are available for designer review and do not block the playable test build. Owners choose Mercenaries/Rapid Advance order. The nonstandard Foresight test is explicitly labelled; normal simpler Events exclude that card and apply R08 replacement.

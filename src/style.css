@@ -303,6 +303,49 @@ small {
   align-items: flex-start;
   line-height: 1.5;
 }
+.tech-effect-preview {
+  margin: 12px 0;
+  padding: 12px 14px;
+  border-left: 4px solid #9b5a25;
+  border-radius: 4px;
+  color: #242034;
+  background: #f4dfb7;
+}
+.tech-effect-preview p {
+  margin: 5px 0;
+}
+.gravity-controls,
+.soylent-controls,
+.sabotage-controls {
+  margin-top: 14px;
+  padding-top: 12px;
+  border-top: 1px solid #66533a55;
+}
+.owner-options,
+.sabotage-targets {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 12px 0;
+}
+.sabotage-targets {
+  max-height: 220px;
+  overflow-y: auto;
+}
+.foresight-cards {
+  display: flex;
+  gap: 12px;
+}
+.foresight-cards figure {
+  flex: 1;
+  min-width: 0;
+  margin: 0;
+}
+.foresight-cards img {
+  display: block;
+  width: 100%;
+  height: auto;
+}
 .landing legend {
   font-weight: 700;
   font-size: max(10pt, 0.85rem);

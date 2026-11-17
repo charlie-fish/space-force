@@ -6,7 +6,7 @@ import {
   system,
   player,
 } from "./engine.js";
-import type { Command, Game } from "./types.js";
+import type { Command, Game, GameConfig } from "./types.js";
 
 /** Replay compatible older records, accepting only the newly added pauses. */
 export function restoreGame(value: unknown): Game {
@@ -18,7 +18,28 @@ export function restoreGame(value: unknown): Game {
     seed: number;
     players: { name: string }[];
     commands: { actor: number; command: Command }[];
+    config?: GameConfig;
   };
+  if (stored.engine === "0.14.0") {
+    if (
+      stored.schema !== 5 ||
+      stored.content !== "tech-chains-simple-events-2" ||
+      !Array.isArray(stored.commands) ||
+      stored.commands.length !== stored.revision ||
+      !Array.isArray(stored.players) ||
+      !stored.config
+    )
+      throw Error("Invalid legacy save.");
+    let game = createGame(
+      stored.players.length,
+      stored.seed,
+      stored.players.map((p) => p.name),
+      stored.config,
+    );
+    for (const record of stored.commands)
+      game = applyCommand(game, record.actor, record.command);
+    return game;
+  }
   if (["0.8.0", "0.9.0", "0.10.0", "0.11.0"].includes(stored.engine)) {
     const expected =
       stored.engine === "0.8.0"

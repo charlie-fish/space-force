@@ -8,6 +8,7 @@ export type Phase =
   | "tech"
   | "reinforce"
   | "pass"
+  | "endgame"
   | "finished";
 export type Explore =
   | "credit1"
@@ -58,6 +59,14 @@ export interface Player {
 }
 export interface MovePayload {
   sources: Record<string, number>;
+  carried?: Record<string, Record<string, number>>;
+  passengerLosses?: Record<string, number>;
+}
+export type Replacements = Record<string, Record<string, number>>;
+export interface SettlementPlacement {
+  planet: string;
+  count: number;
+  replace?: Record<string, number>;
 }
 export interface AttackPayload {
   sacrifice: number;
@@ -69,13 +78,15 @@ export interface ActionContext {
   system: string;
   kind: Action;
   bank: boolean;
-  settlementQueue?: { planet: string; count: number }[];
+  settlementQueue?: SettlementPlacement[];
+  replacement?: Record<string, number>;
   parent?: ActionContext;
   source?: string;
   stage?: "before" | "body" | "after";
   beforeHooks?: string[];
   afterHooks?: string[];
   bankDone?: boolean;
+  afterOrderChosen?: boolean;
 }
 export type SettlementResume = "settle" | "genesis" | "rapid";
 export type Continuation =
@@ -84,6 +95,7 @@ export type Continuation =
   | { kind: "allocationDone" }
   | { kind: "beforeHooks" }
   | { kind: "afterHooks" }
+  | { kind: "insuranceNext"; after: number; remaining: number }
   | {
       kind: "place";
       system: string;
@@ -94,6 +106,11 @@ export type Continuation =
     }
   | { kind: "settlementNext"; system: string; resume: SettlementResume };
 export type Pending =
+  | { kind: "filibuster"; remaining: number[] }
+  | { kind: "insurance"; after: number; remaining: number }
+  | { kind: "eminent" }
+  | { kind: "mercenaries"; system: string }
+  | { kind: "afterOrder"; system: string }
   | {
       kind: "action";
       system: string;
@@ -115,12 +132,14 @@ export type Pending =
       sources: Record<string, number>;
       rotations: number[];
       entrySources?: string[];
+      carried?: MovePayload["carried"];
     }
   | {
       kind: "move";
       system: string;
       sources: Record<string, number>;
       entrySources: string[];
+      carried?: MovePayload["carried"];
     }
   | { kind: "settle"; system: string }
   | {
@@ -143,9 +162,9 @@ export interface Score {
   total: number;
 }
 export interface Game {
-  schema: 5;
-  engine: "0.14.0";
-  content: "tech-chains-simple-events-2";
+  schema: 6;
+  engine: "0.15.0";
+  content: "all-techs-event-tracker-3";
   config: GameConfig;
   seed: number;
   rng: number;
@@ -181,10 +200,21 @@ export interface Game {
   decisions: { player: number; revision: number }[];
   scores: Score[];
   winners: number[];
+  endgameQueue: number[];
 }
 export interface GameConfig {
-  techPreset: "family" | "chains" | "mixed";
+  techPreset:
+    | "family"
+    | "chains"
+    | "mixed"
+    | "remaining"
+    | "aggressive"
+    | "cunning"
+    | "economic"
+    | "peaceful"
+    | "random";
   scenario: "standard" | "five-tech-chain";
+  events?: "simpler" | "foresight-test";
 }
 export interface ActionChoices {
   bank?: boolean;
@@ -193,11 +223,20 @@ export interface ActionChoices {
   attack?: AttackPayload;
   settlements?: Record<string, number>;
   reveal?: boolean;
+  carried?: MovePayload["carried"];
+  passengerLosses?: MovePayload["passengerLosses"];
+  replacements?: Replacements;
 }
 export type Command =
   | { type: "home"; system: string }
   | { type: "plan"; system: string }
   | { type: "planPass" }
+  | { type: "filibuster"; system?: string; index?: number; skip?: boolean }
+  | { type: "insurance"; system?: string }
+  | { type: "eminent"; use: boolean }
+  | { type: "mercenaries"; count: number }
+  | { type: "orderAfter"; tech: string }
+  | { type: "returnCredits"; count: number }
   | ({ type: "act" } & ActionChoices)
   | { type: "rapid"; planet?: string; skip?: boolean }
   | ({
@@ -207,17 +246,32 @@ export type Command =
       invest?: boolean;
     } & ActionChoices)
   | { type: "orient"; rotation: number }
-  | { type: "move"; sources: Record<string, number> }
+  | ({ type: "move" } & MovePayload)
   | { type: "settle"; planet: string; count: number }
   | { type: "finishSettle" }
-  | { type: "settleBatch"; settlements: Record<string, number> }
+  | {
+      type: "settleBatch";
+      settlements: Record<string, number>;
+      replacements?: Replacements;
+    }
   | { type: "continueEvent" }
   | { type: "acknowledge" }
-  | { type: "redistribute"; ships: number; settlements: Record<string, number> }
+  | {
+      type: "redistribute";
+      ships: number;
+      settlements: Record<string, number>;
+      replacements?: Replacements;
+    }
   | { type: "nextRound" }
   | { type: "explore"; recipient: number }
   | { type: "allocate"; credits: number; ships: Record<string, number> }
-  | { type: "buy"; tech: string | null; fullPrice?: boolean }
+  | {
+      type: "buy";
+      tech: string | null;
+      fullPrice?: boolean;
+      value?: number;
+      target?: { player: number; tech: string };
+    }
   | {
       type: "feature";
       system?: string;

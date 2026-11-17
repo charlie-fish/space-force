@@ -4,7 +4,7 @@
   "date": "2026-11-16",
   "authority": "Designer follow-up messages in the project conversation, including seven-player extension and playtest corrections",
   "printed_rules_version": "1.80",
-  "status": "confirmed_specification_family_subset_implemented",
+  "status": "confirmed_specification_all_techs_local_event_effects_pending",
   "delivery_order": [
     "normal_turns",
     "selectable_simultaneous_actions_variant"

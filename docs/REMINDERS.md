@@ -14,9 +14,11 @@ Review priorities and next steps: [REVIEW_CHECKLIST.md](REVIEW_CHECKLIST.md).
 ## Project work to retain
 
 - [x] Build local Board/Techs/Event/Actions and Supply/Player Aid navigation with persistent Reserve/Credits, touch camera/view gestures, and desktop shortcuts.
-- [x] Implement all six designer playtest batches, including Status history/S, compact legal-chip rings, explicit PLAN confirmation, Explore pauses/redistribution, Reserve warnings, allocation balancing and final-state views. See the [0.14 checklist](PLAYTEST_CHANGES_0.14.md).
-- [x] Add ten more Techs and selectable displays, with the R01 starting-Tech scenario, nested free-action checkpoints, shared Arcologies space, Patrol protection, Research Lab prices and Strategic Stall. Twenty Tech effects are now implemented.
-- [ ] Complete the remaining ten Tech effects, Event effects/auctions and printed presets; test their interactions.
+- [x] Implement all seven designer playtest batches, including Status history/S, compact legal-chip rings, explicit PLAN confirmation, Explore pauses/redistribution, Reserve warnings, allocation balancing and final-state views. See the [0.15 checklist](PLAYTEST_CHANGES_0.15.md).
+- [x] Add ten more Techs and selectable displays, with the R01 starting-Tech scenario, nested free-action checkpoints, shared Arcologies space, Patrol protection, Research Lab prices and Strategic Stall. The subsequent release completes all thirty Tech effects.
+- [x] Implement the last ten Techs, printed/random displays, before/after previews and results scrolling. Foresight is available in a labelled nonstandard test and excluded with legal replacement from normal simpler Events.
+- [ ] Review provisional C01–C04 conventions in [the 0.15 guide](PLAYTEST_CHANGES_0.15.md). These do not reopen confirmed R01–R08.
+- [ ] Complete Event effects/auctions and remaining interactions; test their remote/simultaneous behaviour.
 - [ ] Complete formal browser/phone and accessibility playtests. The designer has tested desktop/narrow-window layouts; a real Safari phone run remains outstanding. See [phone instructions](PHONE_TESTING.md) and [validation](PROTOTYPE.md#validation).
 - [ ] Implement the confirmed five-minute majority-removal core with reviewed phase handling, skipped turns, audit records, and automatic last-player victory.
 

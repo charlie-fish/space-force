@@ -1,8 +1,12 @@
+import { CARD_MAP } from "../work/compiled/content.js";
 import {
   applyCommand,
   assertInvariants,
   availableSystems,
   canMove,
+  canSoylent,
+  hasTech,
+  sabotageTargets,
   canPlan,
   createGame,
   eligibleTokens,
@@ -24,6 +28,7 @@ export {
   LAYOUTS,
   CHAIN_TECHS,
   NEW_TECHS,
+  REMAINING_TECHS,
   TECH_PRESETS,
   IMPLEMENTED_TECHS,
 } from "../work/compiled/content.js";
@@ -72,12 +77,49 @@ export function tech(g, id, name) {
   g.players[id].techs.push(`tech.${name}`);
 }
 
+function settleChoices(g, s, spread = false) {
+  let remaining = s.ships[g.turn];
+  const settlements = Object.fromEntries(
+    s.revealed
+      ? s.planets.map((p) => {
+          const n = Math.min(remaining, settlementSpace(g, p), spread ? 1 : 40);
+          remaining -= n;
+          return [p.id, n];
+        })
+      : [],
+  );
+  const replacements = {};
+  if (canSoylent(g, s, g.turn, settlements))
+    for (const p of s.planets)
+      for (const owner of g.players.filter((p) => p.id !== g.turn)) {
+        const n = Math.min(remaining, p.owners[owner.id]);
+        if (n) {
+          replacements[p.id] ??= {};
+          replacements[p.id][owner.id] = n;
+          remaining -= n;
+        }
+      }
+  return { settlements, replacements };
+}
+
 // A deterministic test driver, not a solo player shipped in the application.
 export function botCommand(g) {
   if (g.phase === "event") return { type: "continueEvent" };
   if (g.phase === "pass") return { type: "nextRound" };
   const p = player(g),
     pending = g.pending;
+  if (pending?.kind === "filibuster") {
+    const s = g.systems.find((s) => s.tokens.includes(g.turn));
+    return s
+      ? { type: "filibuster", system: s.id, index: s.tokens.indexOf(g.turn) }
+      : { type: "filibuster", skip: true };
+  }
+  if (pending?.kind === "insurance") return { type: "insurance" };
+  if (pending?.kind === "mercenaries")
+    return { type: "mercenaries", count: Math.min(3, p.credits) };
+  if (pending?.kind === "afterOrder")
+    return { type: "orderAfter", tech: "mercenaries" };
+  if (pending?.kind === "eminent") return { type: "eminent", use: true };
   if (pending?.kind === "ack") return { type: "acknowledge" };
   if (pending?.kind === "redistribute")
     return { type: "redistribute", ships: pending.amount, settlements: {} };
@@ -88,18 +130,8 @@ export function botCommand(g) {
   if (pending?.kind === "action") {
     const active = system(g, pending.system);
     const command = { type: "act", bank: true };
-    if (pending.action === "settle") {
-      let remaining = active.ships[g.turn];
-      command.settlements = Object.fromEntries(
-        active.revealed
-          ? active.planets.map((planet) => {
-              const n = Math.min(remaining, settlementSpace(g, planet));
-              remaining -= n;
-              return [planet.id, n];
-            })
-          : [],
-      );
-    }
+    if (pending.action === "settle")
+      Object.assign(command, settleChoices(g, active));
     return command;
   }
   if (pending?.kind === "rapid") {
@@ -176,7 +208,7 @@ export function botCommand(g) {
         (s) =>
           s.revealed &&
           s.ships[p.id] &&
-          s.planets.some((p) => settlementSpace(g, p)),
+          (s.planets.some((p) => settlementSpace(g, p)) || canSoylent(g, s)),
       );
       if (s)
         return {
@@ -184,12 +216,7 @@ export function botCommand(g) {
           action: "settle",
           system: s.id,
           bank: true,
-          settlements: Object.fromEntries(
-            s.planets
-              .filter((p) => settlementSpace(g, p))
-              .slice(0, s.ships[g.turn])
-              .map((p) => [p.id, 1]),
-          ),
+          ...settleChoices(g, s, true),
         };
     }
     if (!p.used.includes("produce")) {
@@ -212,9 +239,23 @@ export function botCommand(g) {
     // Mix acquisition effects and passive Techs across seeds and seats.
     const index = (g.seed + g.round + g.turn) % g.market.length;
     const order = [...g.market.slice(index), ...g.market.slice(0, index)];
+    const target = sabotageTargets(g)[0],
+      value = target ? Number(CARD_MAP[target.tech].cost) : 0;
+    const selected =
+      order.find(
+        (t) =>
+          !purchaseReason(
+            g,
+            t,
+            g.turn,
+            false,
+            t === "tech.sabotage" ? value : undefined,
+          ),
+      ) ?? null;
     return {
       type: "buy",
-      tech: order.find((t) => !purchaseReason(g, t)) ?? null,
+      tech: selected,
+      ...(selected === "tech.sabotage" ? { value, target } : {}),
     };
   }
   if (g.phase === "reinforce")

@@ -1,5 +1,15 @@
 # Change log
 
+## 0.15.0 — 2026-11-17
+
+- Implement the final ten Techs: Death Sun, Gravity Drive, Soylent Green, Mercenaries, Filibuster, Insurance, Eminent Domain, Sabotage, Flexible Economy and Foresight. All thirty Tech effects now work for local normal turns; all printed presets and Random are selectable.
+- Add carried-Ship/casualty controls, shared attack-cost calculations, full-planet replacements including Explore displacement, selectable after-MOVE ordering, exact-token lifts, skipped-turn rewards and free SETTLE chains before scoring. Sabotage distinguishes nominal value from discounted/full payment and returns the removed ownership marker; ongoing powers support off-turn transfers and owner handoffs.
+- Keep Foresight excluded from normal simpler Events with legal R08 replacement. The clearly labelled nonstandard Foresight test permits private peeks while Event effects/auctions remain disabled.
+- Preview before/after/chained Tech effects before Commit, remove the intended-outcome question from committed interrupts without Go back, and scroll/focus Expedition results automatically on completion/resume without disrupting later view navigation.
+- Upgrade saves to engine 0.15.0/schema 6 with serialized new decision checkpoints and compatible replay of genuine older 0.8–0.11/0.14 records. Document provisional C01–C04 interpretations separately from designer-confirmed rulings.
+- Validate 175 rules/DOM/replay tests, including 126 complete seeded games, and production/portable packaging. The bundle remains about 61 KB compressed JavaScript with 85 self-hosted assets. Real-browser/phone visual verification remains pending.
+- See the [0.15 guide and rule interpretations](docs/PLAYTEST_CHANGES_0.15.md).
+
 ## 0.14.0 — 2026-11-17
 
 - Default PRODUCE to maximum Ships, retain blocked PLAN systems for inspection with disabled placement, and apply the four requested wording changes.

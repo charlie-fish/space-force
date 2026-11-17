@@ -20,6 +20,12 @@ import {
   player,
   production,
   beforeActionHooks,
+  afterActionHooks,
+  attackCost,
+  canSoylent,
+  movementLosses,
+  sabotageTargets,
+  peekEvents,
   settlementSpace,
   purchaseCost,
   patrolBlocks,
@@ -48,7 +54,15 @@ import {
   reserveNotice,
   revealsHiddenInformation,
 } from "./intent.js";
-import type { Action, Command, Game, System, GameConfig } from "./types.js";
+import type {
+  Action,
+  Command,
+  Game,
+  System,
+  GameConfig,
+  Replacements,
+  MovePayload,
+} from "./types.js";
 
 type View = "board" | "techs" | "event" | "actions" | "player_aid";
 interface Draft {
@@ -63,6 +77,13 @@ interface Draft {
   colonies: Record<string, Record<string, number>>;
   allocation: Record<string, number>;
   settlements: Record<string, number>;
+  replacements: Replacements;
+  carried: NonNullable<MovePayload["carried"]>;
+  passengerLosses?: Record<string, number>;
+  techCount: number;
+  tokenIndex?: number;
+  sabotageValue?: number;
+  sabotageTarget?: { player: number; tech: string };
 }
 const freshDraft = (): Draft => ({
   action: null,
@@ -74,6 +95,9 @@ const freshDraft = (): Draft => ({
   colonies: {},
   allocation: {},
   settlements: {},
+  replacements: {},
+  carried: {},
+  techCount: 0,
 });
 const escape = (value: unknown): string =>
   String(value ?? "").replace(
@@ -195,7 +219,12 @@ export function mountApp(
   let draft = freshDraft();
   let error = "";
   let count = 2;
-  let techPreset: GameConfig["techPreset"] = "chains";
+  let techPreset: GameConfig["techPreset"] = "remaining";
+  let eventMode: NonNullable<GameConfig["events"]> = "foresight-test";
+  let utilityOwner: number | null = null;
+  let privatePeek = false;
+  let utilityAmount = 0;
+  let displayedFinishedGame: Game | null = null;
   let scenario: GameConfig["scenario"] = "standard";
   let names = Array.from({ length: 7 }, (_, i) => `Player ${i + 1}`);
   let mapCode = "SPACE FORCE";
@@ -259,6 +288,8 @@ export function mountApp(
   }
   function closeOverlay() {
     showHelp = false;
+    utilityOwner = null;
+    privatePeek = false;
     activeCard = null;
     confirmation = null;
     render();
@@ -278,12 +309,24 @@ export function mountApp(
     command: Command,
     revision = game?.revision,
     accepted?: { intent: boolean; reserve: boolean },
+    actor = game?.turn,
   ) {
     if (!game) return;
     const old = game;
     confirmation = null;
     try {
-      let next = applyCommand(game, game.turn, command, revision);
+      let next = applyCommand(game, actor!, command, revision);
+      if (command.type === "returnCredits") {
+        game = next;
+        utilityAmount = 0;
+        privatePeek = false;
+        error = "";
+        if (game.pending?.kind === "mercenaries")
+          draft.techCount = Math.min(draft.techCount, player(game).credits);
+        save();
+        render();
+        return;
+      }
       const reserve = reserveNotice(next);
       const predictable =
         reserve &&
@@ -325,6 +368,11 @@ export function mountApp(
           "redistribute",
           "action",
           "rapid",
+          "mercenaries",
+          "afterOrder",
+          "filibuster",
+          "insurance",
+          "eminent",
         ].includes(game.pending.kind)
       ) {
         view = "board";
@@ -336,8 +384,10 @@ export function mountApp(
       else if (game.phase === "investments") view = "board";
       else if (game.phase !== old.phase || game.turn !== old.turn)
         view = "board";
-      if (game.pending?.kind === "move")
+      if (game.pending?.kind === "move") {
         draft.sources = { ...game.pending.sources };
+        draft.carried = { ...game.pending.carried };
+      }
       if (game.pending?.kind === "action") {
         draft.action = game.pending.action;
         draft.bank = game.context?.bank ?? false;
@@ -346,7 +396,9 @@ export function mountApp(
       render();
       (
         root.querySelector<HTMLElement>(".modal button") ??
-        root.querySelector<HTMLElement>(".turn-bar")
+        (game.phase === "finished"
+          ? root.querySelector<HTMLElement>("#expedition-results")
+          : root.querySelector<HTMLElement>(".turn-bar"))
       )?.focus({ preventScroll: true });
     } catch (e) {
       error =
@@ -358,6 +410,7 @@ export function mountApp(
     game = createGame(count, seedFrom(mapCode || String(Date.now())), names, {
       techPreset,
       scenario,
+      events: eventMode,
     });
     selected = null;
     draft = freshDraft();
@@ -382,8 +435,10 @@ export function mountApp(
             ? "board"
             : "board";
       draft = freshDraft();
-      if (loaded.pending?.kind === "move")
+      if (loaded.pending?.kind === "move") {
         draft.sources = { ...loaded.pending.sources };
+        draft.carried = { ...loaded.pending.carried };
+      }
       if (loaded.pending?.kind === "orient")
         orientation = loaded.pending.rotations[0];
       if (loaded.pending && "system" in loaded.pending)
@@ -434,10 +489,21 @@ export function mountApp(
       tech: "Buy Tech",
       reinforce: "Reinforce",
       finished: "Final scores",
+      endgame: "Before final scoring",
     }[g.phase];
   }
   function instruction(g: Game) {
     const pending = g.pending;
+    if (pending?.kind === "filibuster")
+      return "Filibuster: lift one of your tokens to the top of its stack, or pass.";
+    if (pending?.kind === "insurance")
+      return "Insurance: choose a Credit or a Ship for this skipped turn.";
+    if (pending?.kind === "eminent")
+      return "Eminent Domain: choose whether to SETTLE at home before scoring.";
+    if (pending?.kind === "mercenaries")
+      return "Mercenaries: convert up to three Credits into Ships.";
+    if (pending?.kind === "afterOrder")
+      return "Choose the order of your after-MOVE Techs.";
     if (pending?.kind === "action")
       return `${pending.source}: choose the ${ACTION_LABELS[pending.action]} effect in ${nameOf(system(g, pending.system))}, then commit.`;
     if (pending?.kind === "rapid")
@@ -469,7 +535,9 @@ export function mountApp(
       pass: "Pass the first-player token, then begin the next PLAN phase.",
       tech: "Buy one shared Tech or pass. Cards stay in the market.",
       reinforce: `Place ${reinforceCount(g)} Ships at home or where you have a Settlement.`,
-      finished: "One point per settled planet, ship system, and owned Tech.",
+      finished:
+        "One point per settled planet, patrolled system, and owned Tech.",
+      endgame: "Resolve Eminent Domain before scoring.",
     }[g.phase];
   }
   function tutorial(g: Game) {
@@ -494,7 +562,7 @@ export function mountApp(
     return `<aside class="guide" aria-label="Learn as you play"><div><span class="eyebrow">Learn as you play</span><p>${escape(g.pending ? instruction(g) : tips[g.phase])}</p></div>${button("Hide guide", "guide-off", "", false, "quiet")}</aside>`;
   }
   function landing() {
-    return `<main class="landing"><div class="landing-art"><img src="${ART.cover.image}" width="562" height="768" alt="Space Force cover: rocket fleets above a ringed planet"/><span class="cover-credit">A game by Charlie Fish</span></div><section class="landing-copy"><div class="eyebrow">Local pass-and-play · Prototype 0.14</div><h1>Claim your<br/><span>corner of space.</span></h1><p class="lead">Plan your moves. Explore new systems. Settle the galaxy.</p><div class="scope-note"><strong>This build: ${TECH_PRESETS[techPreset].label} + simpler Events.</strong><span>A complete local game for 2–7 players on one device. Event cards count rounds; their effects and auctions are disabled. Remote rooms and the wider card set follow later.</span></div><form id="setup-form"><fieldset><legend>How many players?</legend><div class="player-counts">${Array.from({ length: 6 }, (_, i) => button(String(i + 2), "count", `data-count="${i + 2}" aria-pressed="${count === i + 2}"`, false, count === i + 2 ? "selected" : "")).join("")}</div></fieldset><fieldset class="setup-options"><legend>Tech display</legend><label>Preset <select data-setting="tech-preset">${Object.entries(
+    return `<main class="landing"><div class="landing-art"><img src="${ART.cover.image}" width="562" height="768" alt="Space Force cover: rocket fleets above a ringed planet"/><span class="cover-credit">A game by Charlie Fish</span></div><section class="landing-copy"><div class="eyebrow">Local pass-and-play · Prototype 0.15</div><h1>Claim your<br/><span>corner of space.</span></h1><p class="lead">Plan your moves. Explore new systems. Settle the galaxy.</p><div class="scope-note"><strong>This build: ${TECH_PRESETS[techPreset].label} · ${eventMode === "foresight-test" ? "Tech playtest Events" : "simpler Events"}.</strong><span>A complete local game for 2–7 players on one device. Event cards count rounds; their effects and auctions are disabled. Remote rooms and full Event effects follow later.</span></div><form id="setup-form"><fieldset><legend>How many players?</legend><div class="player-counts">${Array.from({ length: 6 }, (_, i) => button(String(i + 2), "count", `data-count="${i + 2}" aria-pressed="${count === i + 2}"`, false, count === i + 2 ? "selected" : "")).join("")}</div></fieldset><fieldset class="setup-options"><legend>Tech display</legend><label>Preset <select data-setting="tech-preset">${Object.entries(
       TECH_PRESETS,
     )
       .map(
@@ -503,7 +571,7 @@ export function mountApp(
       )
       .join(
         "",
-      )}</select></label><label class="check-row"><input type="checkbox" data-check="chain-scenario" ${scenario === "five-tech-chain" ? "checked" : ""}/>R01 chain test: each player starts with the five chain Techs (five Reserve markers). This is a designer scenario.</label></fieldset><div class="name-grid">${names
+      )}</select></label><label class="check-row"><input type="checkbox" data-check="chain-scenario" ${scenario === "five-tech-chain" ? "checked" : ""}/>R01 chain test: each player starts with the five chain Techs (five Reserve markers). This is a designer scenario.</label><label class="check-row"><input type="checkbox" data-check="foresight-test" ${eventMode === "foresight-test" ? "checked" : ""}/>Foresight test (nonstandard): keep Foresight to test private peeks. Event effects and auctions remain disabled. Uncheck for normal simpler Events and legal preset replacements.</label></fieldset><div class="name-grid">${names
       .slice(0, count)
       .map(
         (name, i) =>
@@ -592,7 +660,8 @@ export function mountApp(
     const top = s.tokens[s.tokens.length - 1],
       eligible =
         !miniature && g.phase === "actions" && !g.pending && top === g.turn;
-    const legal = !miniature && g.phase === "plan" && canPlan(g, s);
+    const legal =
+      !miniature && g.phase === "plan" && !g.pending && canPlan(g, s);
     const planets = !s.revealed
       ? ""
       : s.planets
@@ -730,7 +799,7 @@ export function mountApp(
       .join("");
     snapSystem = null;
     const cursorSvg = `<svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="-29 -29 58 60"><g opacity=".65">${chipFace(g.turn, 0, 0, 24)}</g></svg>`;
-    return `<section class="map-wrap ${g.phase === "plan" ? "plan-mode" : ""}" aria-label="Galaxy board"><div class="map-toolbar"><span>${g.phase === "plan" ? "Select a system, then confirm; double-click or double-tap to place" : "Select a system to inspect"}</span><div class="camera-controls">${button("←", "pan-left", 'aria-label="Pan left"')}${button("↑", "pan-up", 'aria-label="Pan up"')}${button("↓", "pan-down", 'aria-label="Pan down"')}${button("→", "pan-right", 'aria-label="Pan right"')}${button("−", "zoom-out", 'aria-label="Zoom out"')}${button("+", "zoom-in", 'aria-label="Zoom in"')}${button("Reset View", "fit", 'aria-label="Reset View"')}</div></div><div class="map-viewport" tabindex="0" aria-label="Galaxy map; arrow keys pan, plus and minus zoom" ${g.phase === "plan" && selected && canPlan(g, system(g, selected)) ? `style="cursor:url(&quot;data:image/svg+xml,${encodeURIComponent(cursorSvg)}&quot;) 24 24,pointer"` : ""}><svg id="galaxy" role="group" aria-label="Space Force galaxy" viewBox="${vx} ${vy} ${vw} ${vh}">${tiles}<g class="system-labels" aria-hidden="true" pointer-events="none">${labels}</g></svg></div></section>`;
+    return `<section class="map-wrap ${g.phase === "plan" ? "plan-mode" : ""}" aria-label="Galaxy board"><div class="map-toolbar"><span>${g.phase === "plan" && !g.pending ? "Select a system, then confirm; double-click or double-tap to place" : "Select a system to inspect"}</span><div class="camera-controls">${button("←", "pan-left", 'aria-label="Pan left"')}${button("↑", "pan-up", 'aria-label="Pan up"')}${button("↓", "pan-down", 'aria-label="Pan down"')}${button("→", "pan-right", 'aria-label="Pan right"')}${button("−", "zoom-out", 'aria-label="Zoom out"')}${button("+", "zoom-in", 'aria-label="Zoom in"')}${button("Reset View", "fit", 'aria-label="Reset View"')}</div></div><div class="map-viewport" tabindex="0" aria-label="Galaxy map; arrow keys pan, plus and minus zoom" ${g.phase === "plan" && !g.pending && selected && canPlan(g, system(g, selected)) ? `style="cursor:url(&quot;data:image/svg+xml,${encodeURIComponent(cursorSvg)}&quot;) 24 24,pointer"` : ""}><svg id="galaxy" role="group" aria-label="Space Force galaxy" viewBox="${vx} ${vy} ${vw} ${vh}">${tiles}<g class="system-labels" aria-hidden="true" pointer-events="none">${labels}</g></svg></div></section>`;
   }
 
   function cameraBox() {
@@ -844,6 +913,113 @@ export function mountApp(
     };
   }
 
+  function moveTarget() {
+    if (!game) return null;
+    const id =
+      game.pending &&
+      "system" in game.pending &&
+      ["action", "move"].includes(game.pending.kind)
+        ? game.pending.system
+        : selected;
+    return id ? system(game, id) : null;
+  }
+  function currentPassengerLosses() {
+    const target = moveTarget();
+    if (!game || !target) return {};
+    const losses = movementLosses(
+      game,
+      target,
+      draft.sources,
+      draft.carried,
+      draft.passengerLosses,
+    );
+    return Object.fromEntries(
+      losses.passengers.map((n, id) => [String(id), n]),
+    );
+  }
+  function normalizePassengerLosses() {
+    const target = moveTarget();
+    if (!game || !target || !draft.passengerLosses) return;
+    const base = movementLosses(game, target, draft.sources, draft.carried);
+    let total = 0;
+    for (let id = 0; id < game.players.length; id++) {
+      const n = Math.min(base.carried[id], draft.passengerLosses[id] ?? 0);
+      draft.passengerLosses[id] = n;
+      total += n;
+    }
+    let excess = Math.max(0, total - base.total);
+    for (let id = game.players.length - 1; id >= 0; id--) {
+      const n = Math.min(excess, draft.passengerLosses[id]);
+      draft.passengerLosses[id] -= n;
+      excess -= n;
+    }
+    total = sumOwners(Object.values(draft.passengerLosses));
+    let needed = Math.max(0, base.total - base.incoming - total);
+    for (let id = 0; id < game.players.length; id++) {
+      const n = Math.min(needed, base.carried[id] - draft.passengerLosses[id]);
+      draft.passengerLosses[id] += n;
+      needed -= n;
+    }
+  }
+  function gravityControls(
+    g: Game,
+    target: System,
+    values: Record<string, number>,
+  ) {
+    if (!hasTech(g, g.turn, "gravity-drive")) return "";
+    const origins = g.systems.filter(
+      (s) => (values[s.id] ?? 0) > 0 && canMove(g, g.turn, s, target),
+    );
+    const carry = origins
+      .map((s) => {
+        const total = sumOwners(Object.values(draft.carried[s.id] ?? {}));
+        const owners = g.players.filter(
+          (p) => p.id !== g.turn && s.ships[p.id] > 0,
+        );
+        if (!owners.length) return "";
+        return `<div class="passenger-origin"><h4>${escape(nameOf(s))} · ${values[s.id]} carriers</h4>${owners
+          .map((p) => {
+            const n = draft.carried[s.id]?.[p.id] ?? 0;
+            return numberControl(
+              `Carry ${escape(p.name)} Ships`,
+              "carried",
+              n,
+              Math.min(s.ships[p.id], values[s.id] - total + n),
+              `data-origin="${s.id}" data-id="${p.id}"`,
+            );
+          })
+          .join("")}</div>`;
+      })
+      .join("");
+    const losses = movementLosses(
+        g,
+        target,
+        values,
+        draft.carried,
+        draft.passengerLosses,
+      ),
+      count = sumOwners(losses.carried),
+      lost = sumOwners(losses.passengers);
+    return `<div class="gravity-controls"><h3>Gravity Drive · carried Ships</h3><p>Each incoming Ship can carry one opponent Ship from its own origin. Transported Ships follow the carrier's legal route.</p>${carry || "<p>No opponent passengers are available for the selected incoming Ships.</p>"}${
+      count && losses.total
+        ? `<h4>Choose black-hole casualties</h4><p>${losses.total} incoming Ships will be destroyed: ${losses.own} yours and ${lost} passengers. All losses become their owners' Credits.</p>${g.players
+            .filter((p) => losses.carried[p.id] > 0)
+            .map((p) =>
+              numberControl(
+                `Lose ${escape(p.name)} passenger Ships`,
+                "passenger-loss",
+                losses.passengers[p.id],
+                Math.min(
+                  losses.carried[p.id],
+                  losses.total - lost + losses.passengers[p.id],
+                ),
+                `data-id="${p.id}"`,
+              ),
+            )
+            .join("")}`
+        : ""
+    }</div>`;
+  }
   function movementControls(
     g: Game,
     target: System,
@@ -852,7 +1028,7 @@ export function mountApp(
     const origins = g.systems.filter(
       (s) => s.ships[g.turn] > 0 && canMove(g, g.turn, s, target),
     );
-    return origins.length
+    const html = origins.length
       ? origins
           .map((s) =>
             numberControl(
@@ -865,18 +1041,19 @@ export function mountApp(
           )
           .join("")
       : '<p class="muted">No Ships have a legal route here. An empty MOVE INTO is allowed.</p>';
+    return html + gravityControls(g, target, values);
   }
   function settlementControls(g: Game, s: System) {
     if (!s.revealed)
       return "<p>This system is unexplored. No planets can be settled until a MOVE INTO reveals it.</p>";
-    const total = sumOwners(Object.values(draft.settlements)),
+    const total = settlementDraftTotal(),
       remaining = Math.max(0, s.ships[g.turn] - total);
     return `<div class="settlement-controls"><p>Preview Settlements with + and −. <strong>${total}</strong> selected; <strong>${remaining}</strong> Ships will remain. Commit reveals any Explore tokens before placing your Settlements.</p><div class="planet-options">${s.planets
       .map((p, i) => {
         const value = draft.settlements[p.id] ?? 0;
         return `<div class="planet-choice ${selectedPlanet === p.id ? "highlight" : ""}">${planetIllustration(s, i)}<div>${numberControl(`Settlements · ${sumOwners(p.owners)}/${p.capacity} printed capacity${hasTech(g, g.turn, "arcologies") ? " · +1 shared Arcologies space" : ""}${p.explore ? " · Explore token" : ""}`, "settlement", value, Math.min(settlementSpace(g, p), remaining + value), `data-planet="${p.id}"`)}${p.blocked ? "<small>Blocked by a black hole</small>" : ""}</div></div>`;
       })
-      .join("")}</div></div>`;
+      .join("")}</div>${replacementControls(g, s, remaining)}</div>`;
   }
   function attackTotals() {
     return {
@@ -886,17 +1063,50 @@ export function mountApp(
       ),
     };
   }
+  function attackLimit(
+    g: Game,
+    s: System,
+    kind: "ships" | "settlements",
+    available: number,
+    value: number,
+  ) {
+    const totals = attackTotals();
+    let n = available;
+    while (
+      n > 0 &&
+      attackCost(
+        g,
+        totals.ships + (kind === "ships" ? n - value : 0),
+        totals.settlements + (kind === "settlements" ? n - value : 0),
+      ) > s.ships[g.turn]
+    )
+      n--;
+    return n;
+  }
   function trimAttack() {
-    let room = draft.sacrifice;
+    if (!game) return;
+    let ships = 0,
+      settlements = 0;
     for (const targets of Object.values(draft.colonies))
       for (const id of Object.keys(targets)) {
-        targets[id] = Math.min(targets[id], room);
-        room -= targets[id];
+        let n = targets[id];
+        while (
+          n > 0 &&
+          attackCost(game, ships, settlements + n) > draft.sacrifice
+        )
+          n--;
+        targets[id] = n;
+        settlements += n;
       }
-    room *= 2;
     for (const id of Object.keys(draft.targets)) {
-      draft.targets[id] = Math.min(draft.targets[id], room);
-      room -= draft.targets[id];
+      let n = draft.targets[id];
+      while (
+        n > 0 &&
+        attackCost(game, ships + n, settlements) > draft.sacrifice
+      )
+        n--;
+      draft.targets[id] = n;
+      ships += n;
     }
     trimPatrolTargets();
   }
@@ -932,6 +1142,147 @@ export function mountApp(
       );
     return s.ships[g.turn] === 0 && !beforeActionHooks(g, action).length;
   }
+  function settlementDraftTotal() {
+    return (
+      sumOwners(Object.values(draft.settlements)) +
+      sumOwners(
+        Object.values(draft.replacements).flatMap((targets) =>
+          Object.values(targets),
+        ),
+      )
+    );
+  }
+  function trimReplacementDraft() {
+    if (!game || !Object.keys(draft.replacements).length) return;
+    const id =
+      game.pending && "system" in game.pending ? game.pending.system : selected;
+    if (!id) return;
+    const additions = { ...draft.settlements };
+    if (game.pending?.kind === "redistribute")
+      for (const p of (game.context?.settlementQueue ?? []).filter(
+        (p) => !p.replace,
+      ))
+        additions[p.planet] = (additions[p.planet] ?? 0) + p.count;
+    if (!canSoylent(game, system(game, id), game.turn, additions)) {
+      draft.replacements = {};
+      if (game.pending?.kind === "redistribute")
+        draft.keptShips = game.pending.amount - settlementDraftTotal();
+    }
+  }
+  function replacementControls(
+    g: Game,
+    s: System,
+    remaining: number,
+    redistribution = false,
+  ) {
+    if (!hasTech(g, g.turn, "soylent-green")) return "";
+    const additions = { ...draft.settlements };
+    const queue = g.context?.settlementQueue ?? [];
+    if (redistribution)
+      for (const entry of queue.filter((p) => !p.replace))
+        additions[entry.planet] = (additions[entry.planet] ?? 0) + entry.count;
+    if (!canSoylent(g, s, g.turn, additions))
+      return '<p class="muted">Soylent Green: replacements become available when every unblocked planet in this system is full.</p>';
+    return `<div class="soylent-controls"><h3>Soylent Green · replace Settlements</h3><p>Each replacement uses one of your Ships. Opponent rockets are returned as Credits; this is SETTLE, so shared planets and Patrol do not prevent it.</p><div class="planet-options">${s.planets
+      .map((p, i) => {
+        const opponents = g.players.filter(
+          (owner) => owner.id !== g.turn && p.owners[owner.id] > 0,
+        );
+        if (p.blocked || !opponents.length) return "";
+        return `<div class="planet-choice">${planetIllustration(s, i)}<div>${opponents
+          .map((owner) => {
+            const n = draft.replacements[p.id]?.[owner.id] ?? 0;
+            const fixed = redistribution
+              ? sumOwners(
+                  queue
+                    .filter((q) => q.planet === p.id)
+                    .map((q) => q.replace?.[owner.id] ?? 0),
+                )
+              : 0;
+            return numberControl(
+              `${escape(owner.name)} Settlements`,
+              "replacement",
+              n,
+              Math.min(p.owners[owner.id] - fixed, remaining + n),
+              `data-planet="${p.id}" data-id="${owner.id}"`,
+            );
+          })
+          .join("")}</div></div>`;
+      })
+      .join("")}</div></div>`;
+  }
+  function techEffectPreview(g: Game) {
+    if (!draft.action || draft.invest) return "";
+    const source = g.pending?.kind === "action" ? g.context?.source : undefined;
+    const before =
+      g.pending?.kind === "action" ? [] : beforeActionHooks(g, draft.action);
+    const after = afterActionHooks(g, draft.action, source);
+    const nested = new Set<string>(),
+      seen = new Set<string>();
+    function visit(kind: Action, from?: string) {
+      const key = `${kind}:${from}`;
+      if (seen.has(key)) return;
+      seen.add(key);
+      for (const id of [
+        ...beforeActionHooks(g, kind),
+        ...afterActionHooks(g, kind, from),
+      ]) {
+        nested.add(id);
+        if (id === "government-incentives") visit("move", `tech.${id}`);
+        if (id === "population-explosion") visit("settle", `tech.${id}`);
+        if (id === "spice") visit("produce", "tech.spice");
+      }
+    }
+    if (g.pending?.kind === "action")
+      for (const id of after) {
+        if (id === "population-explosion") visit("settle", `tech.${id}`);
+        if (id === "spice") visit("produce", "tech.spice");
+      }
+    else visit(draft.action, source);
+    for (const id of [...before, ...after]) nested.delete(id);
+    const names = (ids: Iterable<string>) =>
+      [...ids].map((id) => escape(CARD_MAP[`tech.${id}`].title)).join(", ");
+    if (!before.length && !after.length && !nested.size) return "";
+    return `<aside class="tech-effect-preview" aria-label="Tech effects for this action"><strong>Tech effects</strong>${before.length ? `<p><strong>Before this action:</strong> ${names(before)}.</p>` : ""}${after.length ? `<p><strong>After this action:</strong> ${names(after)}.</p>` : ""}${nested.size ? `<p><strong>Through free actions:</strong> ${names(nested)}.</p>` : ""}<p>These effects still trigger if the main action is empty. Free actions use no additional token or action slot.</p></aside>`;
+  }
+  function ongoingButton(g: Game) {
+    return g.phase !== "finished" &&
+      g.players.some(
+        (p) =>
+          hasTech(g, p.id, "flexible-economy") || hasTech(g, p.id, "foresight"),
+      )
+      ? button("Tech powers", "ongoing-techs", "", false, "quiet")
+      : "";
+  }
+  function ongoingModal(g: Game) {
+    const owner = player(g, utilityOwner!);
+    const allowed = g.players.filter(
+      (p) =>
+        hasTech(g, p.id, "flexible-economy") || hasTech(g, p.id, "foresight"),
+    );
+    return `<div class="modal-scrim"><section class="modal ongoing-modal" role="dialog" aria-modal="true" aria-label="Ongoing Tech powers">${button("Close ×", "close-overlay", "", false, "quiet close")}<h2>Ongoing Tech powers</h2><p>These powers can be used between decisions, including on another player's turn. Pass the device to the selected owner before opening private information.</p><div class="owner-options">${allowed.map((p) => button(`${rocket(p.style)} ${escape(p.name)}`, "utility-owner", `data-owner="${p.id}" aria-pressed="${p.id === owner.id}"`, false, p.id === owner.id ? "selected" : "secondary")).join("")}</div><h3>${escape(owner.name)}</h3>${hasTech(g, owner.id, "flexible-economy") ? `<div><h3>Flexible Economy</h3><p>${owner.credits} Credits · ${owner.reserve} Reserve. Returning Credits is not an action and does not change the current turn.</p>${numberControl("Credits to return", "return-credits", Math.min(utilityAmount, owner.credits), owner.credits)}${button("Return to Reserve", "return-credits", "", utilityAmount <= 0 || utilityAmount > owner.credits, "primary")}</div>` : ""}${
+      hasTech(g, owner.id, "foresight")
+        ? `<div><h3>Foresight · private peek</h3>${
+            privatePeek
+              ? `<div class="foresight-cards">${
+                  peekEvents(g, owner.id)
+                    .map(
+                      (id, i) =>
+                        `<figure><img src="${ART.cards[id].image}" width="180" height="291" alt="${attrs(CARD_MAP[id].title)}"/><figcaption>${i + 1}. ${escape(CARD_MAP[id].title)}</figcaption></figure>`,
+                    )
+                    .join("") || "<p>No face-down Events remain.</p>"
+                }</div>${button("Hide private cards", "hide-peek", "", false, "secondary")}`
+              : button(
+                  `I am ${escape(owner.name)} · show top two Events`,
+                  "show-peek",
+                  "",
+                  false,
+                  "primary",
+                )
+          }<p>The peek is never copied into public history or the Status Box. This local prototype uses a trusted shared device.</p></div>`
+        : ""
+    }</section></div>`;
+  }
   function actionForm(g: Game, s: System) {
     const p = player(g);
     if (draft.invest)
@@ -941,11 +1292,7 @@ export function mountApp(
       g.pending?.kind !== "action" &&
       beforeActionHooks(g, draft.action).length
     )
-      return `<p>Before this action: ${beforeActionHooks(g, draft.action)
-        .map((id) => escape(CARD_MAP[`tech.${id}`].title))
-        .join(
-          ", ",
-        )}. Commit the action choice first; choose quantities after those effects finish.</p>`;
+      return `<p>Commit the action choice first; choose quantities after its before-effects finish.</p>`;
     if (draft.action === "move" && !s.revealed && defaultInvest(g, s, "move"))
       return "<p>No Ships can legally enter. An empty MOVE INTO can activate applicable Techs without revealing this system.</p>";
     if (draft.action === "move" && !s.revealed)
@@ -960,8 +1307,8 @@ export function mountApp(
     }
     if (draft.action === "attack") {
       const totals = attackTotals(),
-        used = totals.settlements + Math.ceil(totals.ships / 2);
-      return `<div class="attack-controls"><p>Each sacrificed Ship removes up to two opposing Ships <strong>or</strong> one Settlement. All casualties become Credits.</p>${numberControl(`Your Ships to sacrifice (out of ${s.ships[g.turn]})`, "sacrifice", draft.sacrifice, s.ships[g.turn])}<p class="attack-budget">${draft.sacrifice} / ${used} sacrifices needed by these targets.</p><div class="attack-columns"><div><h4>Opposing Ships</h4>${
+        used = attackCost(g, totals.ships, totals.settlements);
+      return `<div class="attack-controls"><p>Each sacrificed Ship removes up to two opposing Ships <strong>or</strong> one Settlement.${hasTech(g, g.turn, "death-sun") ? " Death Sun adds one extra opposing Ship or Settlement per sacrifice." : ""} All casualties become Credits.</p>${numberControl(`Your Ships to sacrifice (out of ${s.ships[g.turn]})`, "sacrifice", draft.sacrifice, s.ships[g.turn])}<p class="attack-budget">${draft.sacrifice} / ${used} sacrifices needed by these targets.</p><div class="attack-columns"><div><h4>Opposing Ships</h4>${
         g.players
           .filter((other) => other.id !== p.id && s.ships[other.id] > 0)
           .map((other) => {
@@ -970,15 +1317,7 @@ export function mountApp(
               `${rocket(other.style)} ${escape(other.name)}`,
               "target-ships",
               value,
-              Math.min(
-                s.ships[other.id],
-                Math.max(
-                  0,
-                  2 * (s.ships[g.turn] - totals.settlements) -
-                    totals.ships +
-                    value,
-                ),
-              ),
+              attackLimit(g, s, "ships", s.ships[other.id], value),
               `data-id="${other.id}"`,
             );
           })
@@ -1008,15 +1347,12 @@ export function mountApp(
                           draft.targets[String(other.id)] ?? 0,
                         )
                           ? 0
-                          : Math.min(
+                          : attackLimit(
+                              g,
+                              s,
+                              "settlements",
                               planet.owners[other.id],
-                              Math.max(
-                                0,
-                                s.ships[g.turn] -
-                                  Math.ceil(totals.ships / 2) -
-                                  totals.settlements +
-                                  value,
-                              ),
+                              value,
                             ),
                         `data-id="${other.id}" data-planet="${planet.id}"`,
                       );
@@ -1031,10 +1367,32 @@ export function mountApp(
   }
   function inspector(g: Game) {
     if (reserveNotice(g)) return "";
+    if (g.pending?.kind === "filibuster") {
+      const choices = g.systems.flatMap((s) =>
+        s.tokens.flatMap((owner, index) =>
+          owner === g.turn ? [{ s, index }] : [],
+        ),
+      );
+      return `<section class="console"><div class="eyebrow">After PLAN · Filibuster</div><h2>Move one of your tokens to the top</h2><p>Select the exact token to lift, or pass. Token numbers count from the top of each stack.</p><div class="feature-options">${choices.map(({ s, index }) => button(`${systemIllustration(g, s)}<span>${escape(nameOf(s))} · token #${s.tokens.length - index}</span>`, "filibuster-option", `data-system-id="${s.id}" data-index="${index}" aria-pressed="${selected === s.id && draft.tokenIndex === index}"`, false, `secondary system-target ${selected === s.id && draft.tokenIndex === index ? "selected" : ""}`)).join("")}</div>${button("Pass", "skip-filibuster", "", false, "quiet")}${button("Lift token to top", "commit-filibuster", "", !choices.some((o) => o.s.id === selected && o.index === draft.tokenIndex), "primary")}</section>`;
+    }
+    if (g.pending?.kind === "insurance") {
+      const p = player(g),
+        places = g.systems.filter((s) =>
+          s.planets.some((p) => p.owners[g.turn] > 0),
+        );
+      return `<section class="console"><div class="eyebrow">Insurance · skipped turn</div><h2>Gain one Credit or Ship</h2><p>No action token of yours was on top. Choose one reward from Reserve. ${p.reserve === 0 ? "Reserve is empty; Flexible Economy can return Credits before choosing, if you own it." : `${p.reserve} Reserve available.`}</p>${button("Take 1 Credit", "insurance-credit", "", false, "primary")}<div class="feature-options">${places.map((s) => button(`Take 1 Ship in ${escape(nameOf(s))}`, "insurance-ship", `data-system-id="${s.id}"`, false, "secondary")).join("")}</div></section>`;
+    }
+    if (g.pending?.kind === "eminent")
+      return `<section class="console"><div class="eyebrow">Eminent Domain · before scoring</div><h2>One last SETTLE at home?</h2><p>Resolve a free SETTLE in ${escape(nameOf(system(g, player(g).home!)))} with its applicable Tech effects. No action token or unused slot is required.</p>${button("Use free SETTLE", "use-eminent", "", false, "primary")}${button("Skip and continue", "skip-eminent", "", false, "quiet")}</section>`;
+    if (g.pending?.kind === "afterOrder")
+      return `<section class="console"><div class="eyebrow">After MOVE INTO</div><h2>Choose which Tech resolves first</h2><p>Mercenaries and Rapid Advance share this timing. Your choice can affect which Ships are available for conversion.</p>${g.context!.afterHooks!.map((id) => button(`Resolve ${escape(CARD_MAP[`tech.${id}`].title)} first`, "order-after", `data-tech="${id}"`, false, "primary")).join("")}</section>`;
+    if (g.pending?.kind === "mercenaries")
+      return `<section class="console"><div class="eyebrow">After MOVE INTO · Mercenaries</div><h2>Hire Ships in ${escape(nameOf(system(g, g.pending.system)))}</h2><p>Convert up to three existing Credits into Ships. These Ships are added directly and do not suffer black-hole entry losses.</p>${numberControl("Credits to convert", "mercenaries", draft.techCount, Math.min(3, player(g).credits))}${button("Confirm conversion", "commit-mercenaries", "", false, "primary")}</section>`;
+
     if (g.pending?.kind === "action") {
       const pending = g.pending,
         s = system(g, pending.system);
-      return `<section class="console"><div class="eyebrow">${escape(pending.source)}</div><h2>${pending.free ? "Free " : "Complete "}${ACTION_LABELS[pending.action]} · ${escape(nameOf(s))}</h2><p>${pending.free ? "No additional action token or slot is consumed. Perform this action, even if its main effect is empty." : "The action token is committed. Before-effects are complete; now choose its main effect."}</p>${actionForm(g, s)}${hasTech(g, g.turn, "banking") ? `<label class="check-row"><input type="checkbox" data-check="bank" ${draft.bank ? "checked" : ""}/>Banking: also Invest if Reserve allows</label>` : ""}${button("Commit effect", "commit-effect", "", false, "primary")}</section>`;
+      return `<section class="console"><div class="eyebrow">${escape(pending.source)}</div><h2>${pending.free ? "Free " : "Complete "}${ACTION_LABELS[pending.action]} · ${escape(nameOf(s))}</h2><p>${pending.free ? "No additional action token or slot is consumed. Perform this action, even if its main effect is empty." : "The action token is committed. Before-effects are complete; now choose its main effect."}</p>${techEffectPreview(g)}${actionForm(g, s)}${hasTech(g, g.turn, "banking") && g.phase === "actions" ? `<label class="check-row"><input type="checkbox" data-check="bank" ${draft.bank ? "checked" : ""}/>Banking: also Invest if Reserve allows</label>` : ""}${button("Commit effect", "commit-effect", "", false, "primary")}</section>`;
     }
     if (g.pending?.kind === "ack")
       return `<section class="console outcome-notice"><h2>${escape(g.pending.title)}</h2>${g.pending.messages.map((m) => `<p>${escape(m)}</p>`).join("")}<p>Review this outcome, then continue.</p>${button("Ok", "acknowledge", "", false, "primary")}</section>`;
@@ -1100,7 +1458,7 @@ export function mountApp(
     if (g.phase === "investments" || g.phase === "reinforce")
       return supplyAllocation(g);
     if (g.phase === "event")
-      return `<section class="console"><div class="eyebrow">Economy · Event</div><h2>${g.finalEconomy ? "Final Economy" : "Event cards drawn"}</h2><p>${g.finalEconomy ? "The Event deck is empty. Complete Tech purchases, then score; there are no reinforcements." : "This prototype uses the simpler Events variant: the pair counts rounds. Effects and bidding are disabled."}</p>${button("Continue to Tech", "continue-event", "", false, "primary")}${view !== "event" ? button("View Event pair", "to-event", "", false, "secondary") : ""}</section>`;
+      return `<section class="console"><div class="eyebrow">Economy · Event</div><h2>${g.finalEconomy ? "Final Economy" : "Event cards drawn"}</h2><p>${g.finalEconomy ? "The Event deck is empty. Complete Tech purchases, then score; there are no reinforcements." : "This Event pair counts rounds. Effects and bidding are disabled in this build."}</p>${button("Continue to Tech", "continue-event", "", false, "primary")}${view !== "event" ? button("View Event pair", "to-event", "", false, "secondary") : ""}</section>`;
     if (g.phase === "tech")
       return `<section class="console"><div class="eyebrow">Economy · Buy Tech</div><h2>${player(g).credits} Credits available</h2><p>Buy one Tech or pass. The purchase cost returns to Reserve, and one rocket marks ownership.</p>${view !== "techs" ? button("View Techs", "to-techs", "", false, "primary") : ""}${button("Pass this purchase", "pass-tech", "", false, "secondary")}</section>`;
     if (!s && g.phase === "finished") return "";
@@ -1135,7 +1493,7 @@ export function mountApp(
     else if (g.phase === "plan")
       controls = `<p>${canPlan(g, s) ? "Select any system to change your mind, then confirm with Place chip here." : "Disruptor blocks your placement here this round."}</p>${button("Place chip here", "place-chip", "", !canPlan(g, s), "primary")}`;
     else if (g.phase === "actions" && s.tokens[s.tokens.length - 1] === g.turn)
-      controls = `<div class="action-grid">${(Object.keys(ACTION_LABELS) as Action[]).map((action) => button(ACTION_LABELS[action], "select-action", `data-kind="${action}" aria-pressed="${draft.action === action}"`, player(g).used.includes(action), draft.action === action ? "selected" : "")).join("")}</div>${draft.action ? `${actionForm(g, s)}${!draft.invest && hasTech(g, g.turn, "banking") ? `<label class="check-row"><input type="checkbox" data-check="bank" ${draft.bank ? "checked" : ""}/>Banking: also Invest if Reserve allows</label>` : ""}<label class="check-row invest-choice"><input type="checkbox" data-check="invest" ${draft.invest ? "checked" : ""}/><strong>Invest instead of acting</strong></label><div class="commit-row">${button("Commit action", "commit-action", "", false, "primary")}</div><small>Change your selection freely before Commit. Hidden reveals and committed moves stay locked.</small>` : "<p>Select an unused action slot.</p>"}`;
+      controls = `<div class="action-grid">${(Object.keys(ACTION_LABELS) as Action[]).map((action) => button(ACTION_LABELS[action], "select-action", `data-kind="${action}" aria-pressed="${draft.action === action}"`, player(g).used.includes(action), draft.action === action ? "selected" : "")).join("")}</div>${draft.action ? `${techEffectPreview(g)}${actionForm(g, s)}${!draft.invest && hasTech(g, g.turn, "banking") && g.phase === "actions" ? `<label class="check-row"><input type="checkbox" data-check="bank" ${draft.bank ? "checked" : ""}/>Banking: also Invest if Reserve allows</label>` : ""}<label class="check-row invest-choice"><input type="checkbox" data-check="invest" ${draft.invest ? "checked" : ""}/><strong>Invest instead of acting</strong></label><div class="commit-row">${button("Commit action", "commit-action", "", false, "primary")}</div><small>Change your selection freely before Commit. Hidden reveals and committed moves stay locked.</small>` : "<p>Select an unused action slot.</p>"}`;
     else if (g.phase === "actions")
       controls = "<p>Select a stack with your colour on top.</p>";
     return `<section id="system-status" class="console"><span class="eyebrow">System status</span><h2>${escape(nameOf(s))}</h2>${info}${stackOrder(g, s)}${controls}</section>`;
@@ -1236,12 +1594,14 @@ export function mountApp(
   ) {
     const s = system(g, pending.system),
       queue = g.context?.settlementQueue ?? [],
-      allocated = sumOwners(Object.values(draft.settlements)),
+      allocated = settlementDraftTotal(),
       kept = draft.keptShips ?? pending.amount - allocated;
     return `<section class="console"><div class="eyebrow">Committed Settlements · displaced allocation</div><h2>Choose what to do with ${pending.amount} displaced rocket${pending.amount === 1 ? "" : "s"}</h2><p>Your opponent's Settlement took a space. Already placed Settlements and all other committed placements stay fixed. Allocate only the displaced rockets below, or keep them as Ships.</p>${numberControl("Keep as Ships", "redistribute-ships", kept, pending.amount)}<div class="planet-options">${s.planets
       .map((p, i) => {
         const reserved = sumOwners(
-            queue.filter((q) => q.planet === p.id).map((q) => q.count),
+            queue
+              .filter((q) => q.planet === p.id && !q.replace)
+              .map((q) => q.count),
           ),
           n = draft.settlements[p.id] ?? 0,
           max = Math.min(
@@ -1253,7 +1613,7 @@ export function mountApp(
       })
       .join(
         "",
-      )}</div><p>${kept + allocated} / ${pending.amount} displaced rockets assigned.</p>${button("Confirm displaced allocation", "commit-redistribute", "", kept + allocated !== pending.amount, "primary")}</section>`;
+      )}</div>${replacementControls(g, s, Math.max(0, pending.amount - allocated), true)}<p>${kept + allocated} / ${pending.amount} displaced rockets assigned.</p>${button("Confirm displaced allocation", "commit-redistribute", "", kept + allocated !== pending.amount, "primary")}</section>`;
   }
 
   function actionsView(g: Game) {
@@ -1261,8 +1621,37 @@ export function mountApp(
     const live = scoreGame(g).find((s) => s.player === p.id)!;
     return `<section class="actions-view"><div class="section-heading"><span class="eyebrow">Your action board</span><h2>${escape(p.name)}’s Actions</h2><p>Four action slots. You can do each action once per round.</p></div><div class="personal-board"><div class="supply reserve"><h3>Reserve</h3>${rocket(p.style, 68)}<strong>${p.reserve}</strong><span>Uncommitted rockets</span></div><div class="action-board">${(Object.keys(ACTION_LABELS) as Action[]).map((action) => `<div class="action-slot ${p.used.includes(action) ? "used" : ""}"><div class="receiving-slot">${p.used.includes(action) ? `<svg class="poker-chip" aria-hidden="true" viewBox="-29 -29 58 60">${chipFace(p.style, 0, 0, 26)}</svg>` : '<span class="empty-chip"></span>'}</div><strong>${ACTION_LABELS[action]}</strong><small>${p.investedActions.includes(action) ? `${rocket(p.style, 18)} Invested this round` : p.used.includes(action) ? "Used this round" : "Available"}</small></div>`).join("")}</div><div class="supply credits"><h3>Credits</h3>${rocket(p.style, 68)}<strong>${p.credits}</strong><span>Spend on Tech</span></div></div><div class="resource-breakdown"><span><strong>${p.invested}</strong> Invested${p.freeInvestments.length ? ` (${p.freeInvestments.length} from free actions)` : ""}</span><span><strong>${g.systems.reduce((n, s) => n + s.ships[p.id], 0)}</strong> Ships</span><span><strong>${g.systems.reduce((n, s) => n + s.planets.reduce((a, planet) => a + planet.owners[p.id], 0), 0)}</strong> Settlements</span><span><strong>${p.techs.length}</strong> Tech markers</span><span><strong>40</strong> Rockets total</span></div><p class="score-preview">Current position: ${live.planets} settled planets + ${live.systems} patrolled systems + ${live.techs} Techs = <strong>${live.total} points</strong></p><p class="muted">Resolve chips on the Board. Select a stack, assign an unused slot, then act or Invest.</p>${button("Return to Board", "to-board", "", false, "secondary")}</section>`;
   }
+  function purchaseButtons(g: Game, id: string) {
+    if (g.phase !== "tech" || g.pending) return "";
+    if (id === "tech.sabotage") {
+      const targets = sabotageTargets(g),
+        selectedTarget = targets.find(
+          (t) =>
+            t.player === draft.sabotageTarget?.player &&
+            t.tech === draft.sabotageTarget?.tech,
+        );
+      const value =
+        draft.sabotageValue ??
+        (selectedTarget ? Number(CARD_MAP[selectedTarget.tech].cost) : 0);
+      const targetReason = !selectedTarget
+        ? "Choose an opponent Tech"
+        : Number(CARD_MAP[selectedTarget.tech].cost) > value
+          ? "Increase the undiscounted value"
+          : null;
+      const reason =
+          targetReason ?? purchaseReason(g, id, g.turn, false, value),
+        fullReason = targetReason ?? purchaseReason(g, id, g.turn, true, value);
+      const cost = purchaseCost(g, id, g.turn, false, value);
+      return `<div class="sabotage-controls"><h4>Choose the Tech to remove</h4><div class="sabotage-targets">${targets.map((t) => button(`${escape(player(g, t.player).name)} · ${escape(CARD_MAP[t.tech].title)} (${CARD_MAP[t.tech].cost})`, "sabotage-target", `data-owner="${t.player}" data-tech="${t.tech}" aria-pressed="${t === selectedTarget}"`, false, t === selectedTarget ? "selected" : "secondary")).join("") || "<p>No legal opponent Tech is available.</p>"}</div>${numberControl("Undiscounted value (X)", "sabotage-value", value, hasTech(g, g.turn, "research-lab") ? 81 : 40)}<p>Remove a Tech of printed value up to X. Its ownership rocket returns to its owner's Reserve. Sabotage cannot target Sabotage or be bought in the last round.</p>${button(reason ?? `Buy Sabotage for ${cost} Credits${hasTech(g, g.turn, "research-lab") ? " · Research Lab" : ""}`, "buy", `data-tech="${id}"`, Boolean(reason), "primary")}${hasTech(g, g.turn, "research-lab") ? button(fullReason ?? `Pay full price · ${value} Credits`, "buy", `data-tech="${id}" data-full-price="true"`, Boolean(fullReason), "secondary") : ""}</div>`;
+    }
+    const card = CARD_MAP[id],
+      reason = purchaseReason(g, id),
+      cost = purchaseCost(g, id),
+      fullReason = purchaseReason(g, id, g.turn, true);
+    return `${button(reason ?? `Buy for ${cost} Credits${cost !== card.cost ? " · Research Lab" : ""}`, "buy", `data-tech="${id}"`, Boolean(reason), "primary")}${cost !== card.cost ? button(fullReason ?? `Pay full price · ${card.cost} Credits`, "buy", `data-tech="${id}" data-full-price="true"`, Boolean(fullReason), "secondary") : ""}`;
+  }
   function techView(g: Game) {
-    return `<section><div class="section-heading"><span class="eyebrow">${g.config.techPreset === "family" ? "Official Family preset" : `${TECH_PRESETS[g.config.techPreset].label} playtest preset`}</span><h2>Technology for a growing empire.</h2><p>Ten shared Techs. Multiple players can own a card; each purchase uses one Reserve rocket as its marker.</p>${g.phase === "tech" && !g.pending ? button("Pass this purchase", "pass-tech", "", false, "secondary") : '<span class="small-tag">Purchases happen during Economy</span>'}</div><div class="tech-grid">${g.market
+    return `<section><div class="section-heading"><span class="eyebrow">${escape(TECH_PRESETS[g.config.techPreset].label)} · shared Tech display</span><h2>Technology for a growing empire.</h2><p>Ten shared Techs. Multiple players can own a card; each purchase uses one Reserve rocket as its marker.</p>${g.phase === "tech" && !g.pending ? button("Pass this purchase", "pass-tech", "", false, "secondary") : '<span class="small-tag">Purchases happen during Economy</span>'}</div><div class="tech-grid">${g.market
       .slice()
       .sort(
         (a, b) =>
@@ -1270,23 +1659,20 @@ export function mountApp(
           CARD_MAP[a].title.localeCompare(CARD_MAP[b].title),
       )
       .map((id) => {
-        const card = CARD_MAP[id];
-        const reason = purchaseReason(g, id),
-          cost = purchaseCost(g, id),
-          fullReason = purchaseReason(g, id, g.turn, true);
-        const owners = g.players.filter((p) => p.techs.includes(id));
-        return `<article class="tech-card" data-tech-id="${id}" data-tech-value="${techValue(id)}"><button class="card-art-button" data-action="card" data-card="${id}" aria-label="Read ${attrs(card.title)}"><img src="${ART.cards[id].image}" width="240" height="388" loading="lazy" alt="${attrs(card.title)} original card artwork"/></button><div class="tech-body"><div class="tech-title"><h3>${escape(card.title)}</h3><span class="cost">${card.cost} <small>Credits</small></span></div><p>${escape(card.text)}</p>${id === "tech.disruptor" && isFinalRound(g) ? '<p class="token-used">Disruptor has no effect in the last round. It still scores 1 point.</p>' : ""}${featureUsed(g, id) ? `<p class="token-used">${featureUsed(g, id)} token already on the board. Buying this Tech has no token effect.</p>` : ""}<div class="ownership">${owners.length ? owners.map((p) => badge(p.style, p.name)).join("") : '<span class="muted">No owners yet</span>'}</div>${g.phase === "tech" && !g.pending ? `${button(reason ?? `Buy for ${cost} Credits${cost !== card.cost ? " · Research Lab" : ""}`, "buy", `data-tech="${id}"`, Boolean(reason), "primary")}${cost !== card.cost ? button(fullReason ?? `Pay full price · ${card.cost} Credits`, "buy", `data-tech="${id}" data-full-price="true"`, Boolean(fullReason), "secondary") : ""}` : ""}</div></article>`;
+        const card = CARD_MAP[id],
+          owners = g.players.filter((p) => p.techs.includes(id));
+        return `<article class="tech-card" data-tech-id="${id}" data-tech-value="${techValue(id)}"><button class="card-art-button" data-action="card" data-card="${id}" aria-label="Read ${attrs(card.title)}"><img src="${ART.cards[id].image}" width="240" height="388" loading="lazy" alt="${attrs(card.title)} original card artwork"/></button><div class="tech-body"><div class="tech-title"><h3>${escape(card.title)}</h3><span class="cost">${card.cost} <small>Credits</small></span></div><p>${escape(card.text)}</p>${id === "tech.disruptor" && isFinalRound(g) ? '<p class="token-used">Disruptor has no effect in the last round. It still scores 1 point.</p>' : ""}${id === "tech.sabotage" && isFinalRound(g) ? '<p class="token-used">Sabotage cannot be bought in the last round.</p>' : ""}${id === "tech.foresight" ? '<p class="token-used">Foresight test setup: use Tech powers for the owner’s private peek. Event effects and auctions remain disabled.</p>' : ""}${featureUsed(g, id) ? `<p class="token-used">${featureUsed(g, id)} token already on the board. Buying this Tech has no token effect.</p>` : ""}<div class="ownership">${owners.length ? owners.map((p) => badge(p.style, p.name)).join("") : '<span class="muted">No owners yet</span>'}</div>${purchaseButtons(g, id)}</div></article>`;
       })
       .join("")}</div></section>`;
   }
   function eventView(g: Game) {
-    return `<section class="event-view"><div class="section-heading"><span class="eyebrow">Rulebook’s simpler Events variant</span><h2>The galaxy keeps time.</h2><p>Event cards count rounds in this build. Their text has no effect and the sealed auction is skipped. This variant excludes Foresight; none of the current presets contain it.</p></div><div class="event-status"><strong>${g.events.length}</strong><span>cards remain in the draw pile</span><strong>${g.players.length <= 3 ? 6 : 5}</strong><span>rounds in this game</span></div>${g.revealedEvents.length ? `<h3>Latest round-tracker pair</h3><div class="event-pair">${g.revealedEvents.map((id) => `<button class="event-card" data-action="card" data-card="${id}"><img src="${ART.cards[id].image}" width="240" height="388" loading="lazy" alt="${attrs(CARD_MAP[id].title)}"/><span>${escape(CARD_MAP[id].title)}</span><small>Effect disabled in this variant</small></button>`).join("")}</div>` : '<div class="empty-state">No Event pair has been drawn yet, or the final Tech step is in progress.</div>'}<p class="muted">Drawing the last pair does not immediately end the game. Play continues until a later Economy cannot draw another pair; then complete Tech purchases and score.</p></section>`;
+    return `<section class="event-view"><div class="section-heading"><span class="eyebrow">${g.config.events === "foresight-test" ? "Tech playtest Events" : "Rulebook’s simpler Events variant"}</span><h2>The galaxy keeps time.</h2><p>Event cards count rounds in this build. Their text has no effect and the sealed auction is skipped. ${g.config.events === "foresight-test" ? "This nonstandard Tech test setup keeps Foresight so owners can test private peeks using Tech powers." : "The normal simpler Events variant excludes Foresight; preset replacements use random legal value-2/3 Techs."}</p></div><div class="event-status"><strong>${g.events.length}</strong><span>cards remain in the draw pile</span><strong>${g.players.length <= 3 ? 6 : 5}</strong><span>rounds in this game</span></div>${g.revealedEvents.length ? `<h3>Latest round-tracker pair</h3><div class="event-pair">${g.revealedEvents.map((id) => `<button class="event-card" data-action="card" data-card="${id}"><img src="${ART.cards[id].image}" width="240" height="388" loading="lazy" alt="${attrs(CARD_MAP[id].title)}"/><span>${escape(CARD_MAP[id].title)}</span><small>Effect disabled in this variant</small></button>`).join("")}</div>` : '<div class="empty-state">No Event pair has been drawn yet, or the final Tech step is in progress.</div>'}<p class="muted">Drawing the last pair does not immediately end the game. Play continues until a later Economy cannot draw another pair; then complete Tech purchases and score.</p></section>`;
   }
   function aidView() {
     return `<section class="aid-view"><div class="section-heading"><h2>Player aid</h2></div><div class="aid-faces"><article><h3>Actions</h3><img src="${ART.aids.actions.image}" width="530" height="810" loading="lazy" alt="Player aid Actions face"/><dl><dt>Move into</dt><dd>Bring Ships from adjacent systems. Warps connect; asteroid belts block unless you have Agility. Each destination black hole destroys one incoming Ship, returned as a Credit.</dd><dt>Settle</dt><dd>Convert Ships into Settlements within capacity; resolve Explore tokens first.</dd><dt>Produce</dt><dd>One Ship or Credit per planet you settle, plus one for each such planet that is full.</dd><dt>Attack</dt><dd>Each sacrificed Ship destroys up to two opposing Ships or one Settlement. All casualties become Credits. You cannot attack Settlements on a planet you share.</dd></dl></article><article><h3>Play sequence & scoring</h3><img src="${ART.aids.sequence.image}" width="530" height="810" loading="lazy" alt="Player aid play sequence and scoring face"/><dl><dt>Plan</dt><dd>Place all four chips in player order.</dd><dt>Actions</dt><dd>Resolve top chips into unused slots, acting or Investing. Turns without an eligible top chip are skipped.</dd><dt>Economy</dt><dd>Cash Investments, draw Events, buy one Tech, reinforce, and pass first player. This build uses Events only as a round tracker.</dd><dt>Score</dt><dd>One point per settled planet, system with your Ships, and owned Tech. Credits break ties; remaining ties share victory.</dd></dl></article></div></section>`;
   }
   function finalScores(g: Game) {
-    return `<section class="final-scores"><div class="eyebrow">Expedition complete</div><h1>${g.winners.map((id) => escape(player(g, id).name)).join(" & ")}<br/><span>${g.winners.length > 1 ? "share the galaxy." : "rules the galaxy."}</span></h1><p>Credits break points ties. A remaining tie is a shared victory.</p><div class="score-table-wrap"><table><thead><tr><th>Players</th><th>Planets Settled</th><th>Systems Patrolled</th><th>Techs Owned</th><th>Total Score</th><th>Credits</th></tr></thead><tbody>${g.scores
+    return `<section id="expedition-results" class="final-scores" tabindex="-1" aria-label="Expedition results"><div class="eyebrow">Expedition complete</div><h1>${g.winners.map((id) => escape(player(g, id).name)).join(" & ")}<br/><span>${g.winners.length > 1 ? "share the galaxy." : "rules the galaxy."}</span></h1><p>Credits break points ties. A remaining tie is a shared victory.</p><div class="score-table-wrap"><table><thead><tr><th>Players</th><th>Planets Settled</th><th>Systems Patrolled</th><th>Techs Owned</th><th>Total Score</th><th>Credits</th></tr></thead><tbody>${g.scores
       .slice()
       .sort((a, b) => b.total - a.total || b.credits - a.credits)
       .map(
@@ -1302,13 +1688,14 @@ export function mountApp(
       return `<div class="modal-scrim"><section class="modal" role="dialog" aria-modal="true" aria-label="${confirmation.reserveAccepted ? escape(confirmation.title) : "Confirm decision"}"><h2>${escape(confirmation.title)}</h2>${confirmation.reserveAccepted ? "<p>This is the expected outcome if you commit:</p>" : ""}${confirmation.messages.map((m) => `<p>${escape(m)}</p>`).join("")}<p>Is this what you intended?</p><div class="commit-row">${button("Go back", "cancel-confirmation", "", false, "secondary")}${button("Confirm and commit", "confirm-command", "", false, "primary")}</div></section></div>`;
     const reserve = game ? reserveNotice(game) : null;
     if (reserve)
-      return `<div class="modal-scrim"><section class="modal reserve-notice" role="dialog" aria-modal="true" aria-label="${escape(reserve.title)}"><h2>${escape(reserve.title)}</h2>${reserve.messages.map((m) => `<p>${escape(m)}</p>`).join("")}<p>Is this the outcome you intended? Confirm this committed outcome to continue. Committed moves and hidden reveals cannot be undone.</p>${button("Confirm outcome", "acknowledge", "", false, "primary")}</section></div>`;
+      return `<div class="modal-scrim"><section class="modal reserve-notice" role="dialog" aria-modal="true" aria-label="${escape(reserve.title)}"><h2>${escape(reserve.title)}</h2>${reserve.messages.map((m) => `<p>${escape(m)}</p>`).join("")}<p>Confirm this committed outcome to continue. Committed moves and hidden reveals cannot be undone.</p>${button("Confirm outcome", "acknowledge", "", false, "primary")}</section></div>`;
+    if (utilityOwner !== null && game) return ongoingModal(game);
     if (activeCard) {
       const card = CARD_MAP[activeCard];
-      return `<div class="modal-scrim"><section class="modal card-modal" role="dialog" aria-modal="true" aria-label="${attrs(card.title)}">${button("Close ×", "close-overlay", "", false, "quiet close")}<img src="${ART.cards[activeCard].image}" width="240" height="388" alt="${attrs(card.title)}"/><div><span class="eyebrow">${card.type === "tech" ? `${card.cost} Credits` : "Event reference"}</span><h2>${escape(card.title)}</h2><p>${escape(card.text)}</p>${activeCard === "tech.disruptor" && game && isFinalRound(game) ? '<p class="token-used">Disruptor has no effect in the last round. It still scores 1 point.</p>' : ""}${card.type === "event" ? '<p class="scope-note">Effects are disabled in the simpler Events prototype.</p>' : ""}</div></section></div>`;
+      return `<div class="modal-scrim"><section class="modal card-modal" role="dialog" aria-modal="true" aria-label="${attrs(card.title)}">${button("Close ×", "close-overlay", "", false, "quiet close")}<img src="${ART.cards[activeCard].image}" width="240" height="388" alt="${attrs(card.title)}"/><div><span class="eyebrow">${card.type === "tech" ? `${card.cost} Credits` : "Event reference"}</span><h2>${escape(card.title)}</h2><p>${escape(card.text)}</p>${activeCard === "tech.disruptor" && game && isFinalRound(game) ? '<p class="token-used">Disruptor has no effect in the last round. It still scores 1 point.</p>' : ""}${card.type === "event" ? '<p class="scope-note">Event effects are disabled in this local prototype.</p>' : ""}</div></section></div>`;
     }
     if (!showHelp) return "";
-    return `<div class="modal-scrim"><section class="modal" role="dialog" aria-modal="true" aria-label="Rules and prototype scope">${button("Close ×", "close-overlay", "", false, "quiet close")}<span class="eyebrow">Space Force · Charlie Fish</span><h2>One galaxy. Plenty of possibilities.</h2><p>This is a local pass-and-play prototype for two to seven people sharing one device. It implements normal turns, a choice of three ten-Tech displays drawn from twenty implemented Techs, and the rulebook's simpler Events variant. Choose Family, New Techs, or Tech chain mix at setup; the optional R01 scenario starts each player with the five chain Techs and their five Reserve markers. There are no remote rooms, full Event effects/auctions, simultaneous turns, newsletter forms, or private admin service in this build.</p><p>Use Board, Techs, Event, Actions and Supply, and Player Aid. The aid shows both faces together. Select chips in PLAN; later resolve top chips into each of four action slots, or Invest. Complete Economy between rounds.</p><h3>Undo and secrets</h3><p>Reset drafts before Commit. A committed move or hidden reveal cannot be undone. This trusted-device prototype stores the full game locally; authoritative remote privacy will be added with the server.</p><h3>Keyboard</h3><p>S Status Box (scroll to top) · B Board · T Techs · E Event · A Actions and Supply · P Player aid. View shortcuts scroll to the chosen view. With the map focused: R resets the view, +/− zoom, arrows pan. Escape closes details; ? opens Help. Shortcuts ignore editable fields and browser modifiers.</p><label class="check-row"><input type="checkbox" data-check="shortcuts" ${shortcuts ? "checked" : ""}/>Enable character shortcuts while the game has focus</label><div class="commit-row">${button(guide ? "Restart contextual guide" : "Show contextual guide", "guide-on", "", false, "secondary")}${game ? button("Export local game", "export", "", false, "quiet") : ""}</div><p class="muted">Public/private rooms, the wider card set, simultaneous mode, server-owned idle votes, and private administration remain later milestones. Rocket art is provisional and replaceable.</p></section></div>`;
+    return `<div class="modal-scrim"><section class="modal" role="dialog" aria-modal="true" aria-label="Rules and prototype scope">${button("Close ×", "close-overlay", "", false, "quiet close")}<span class="eyebrow">Space Force · Charlie Fish</span><h2>One galaxy. Plenty of possibilities.</h2><p>This is a local pass-and-play prototype for two to seven people sharing one device. It implements normal turns, ten-card displays drawn from all thirty implemented Techs, and the rulebook's simpler Events variant. Choose a printed preset, either new-Tech display, a mix or Random at setup. The labelled Foresight test keeps that card for private-peek testing while Event effects/auctions remain disabled; normal simpler Events exclude it. the optional R01 scenario starts each player with the five chain Techs and their five Reserve markers. There are no remote rooms, full Event effects/auctions, simultaneous turns, newsletter forms, or private admin service in this build.</p><p>Use Board, Techs, Event, Actions and Supply, and Player Aid. The aid shows both faces together. Select chips in PLAN; later resolve top chips into each of four action slots, or Invest. Complete Economy between rounds.</p><h3>Undo and secrets</h3><p>Reset drafts before Commit. A committed move or hidden reveal cannot be undone. This trusted-device prototype stores the full game locally; authoritative remote privacy will be added with the server.</p><h3>Keyboard</h3><p>S Status Box (scroll to top) · B Board · T Techs · E Event · A Actions and Supply · P Player aid. View shortcuts scroll to the chosen view. With the map focused: R resets the view, +/− zoom, arrows pan. Escape closes details; ? opens Help. Shortcuts ignore editable fields and browser modifiers.</p><label class="check-row"><input type="checkbox" data-check="shortcuts" ${shortcuts ? "checked" : ""}/>Enable character shortcuts while the game has focus</label><div class="commit-row">${button(guide ? "Restart contextual guide" : "Show contextual guide", "guide-on", "", false, "secondary")}${game ? button("Export local game", "export", "", false, "quiet") : ""}</div><p class="muted">Public/private rooms, full Event effects, simultaneous mode, server-owned idle votes, and private administration remain later milestones. Rocket art is provisional and replaceable.</p></section></div>`;
   }
   function economyTracker(g: Game) {
     if (
@@ -1365,7 +1752,7 @@ export function mountApp(
         actions: "A",
         player_aid: "P",
       };
-      root.innerHTML = `<div class="game-shell">${sharedArt(g)}<header class="game-header"><button class="wordmark" data-action="help" aria-label="Space Force help"><span>SPACE</span><span>FORCE</span></button><div class="round-status"><span class="eyebrow">Local ${TECH_PRESETS[g.config.techPreset].label} game · simpler Events${g.config.scenario === "five-tech-chain" ? " · R01 scenario" : ""}</span><strong>Round ${g.round} / ${g.players.length <= 3 ? 6 : 5}</strong><span>${phaseLabel(g)}</span></div><div class="header-player">${badge(p.style, p.name)}<div class="resource-pills"><span><small>Reserve</small><strong>${p.reserve}</strong></span><span><small>Credits</small><strong>${p.credits}</strong></span></div></div><div class="header-tools">${button("?", "help", 'aria-label="Open Help"')}${button("New", "new-game", "", false, "quiet")}</div></header>${statusBox(g)}${g.phase === "finished" ? finalScores(g) : tutorial(g)}<nav class="view-tabs" aria-label="Game views" role="tablist">${(Object.keys(VIEW_LABELS) as View[]).map((v) => `<button id="tab-${v}" role="tab" aria-selected="${view === v}" aria-controls="game-panel" data-view="${v}" class="${view === v ? "active" : ""}"><span aria-hidden="true">${{ board: "⬡", techs: "✧", event: "◷", actions: "↗", player_aid: "▤" }[v]}</span>${VIEW_LABELS[v]}<span class="shortcut-hint"> (${shortcuts[v]})</span></button>`).join("")}</nav><main id="game-panel" class="main-panel" role="tabpanel" aria-labelledby="tab-${view}" tabindex="-1">${panel}</main><footer class="game-footer"><span>${autosave ? "Autosaved on this device" : "Session only · local storage unavailable"}</span><span>Normal turns · ${g.players.length} players · revision ${g.revision}</span>${button("Game record ↓", "export", "", false, "text-link")}<details class="history"><summary>Recent game history</summary><ol>${g.log
+      root.innerHTML = `<div class="game-shell">${sharedArt(g)}<header class="game-header"><button class="wordmark" data-action="help" aria-label="Space Force help"><span>SPACE</span><span>FORCE</span></button><div class="round-status"><span class="eyebrow">Local ${TECH_PRESETS[g.config.techPreset].label} game · ${g.config.events === "foresight-test" ? "Tech playtest Events" : "simpler Events"}${g.config.scenario === "five-tech-chain" ? " · R01 scenario" : ""}</span><strong>Round ${g.round} / ${g.players.length <= 3 ? 6 : 5}</strong><span>${phaseLabel(g)}</span></div><div class="header-player">${badge(p.style, p.name)}<div class="resource-pills"><span><small>Reserve</small><strong>${p.reserve}</strong></span><span><small>Credits</small><strong>${p.credits}</strong></span></div></div><div class="header-tools">${ongoingButton(g)}${button("?", "help", 'aria-label="Open Help"')}${button("New", "new-game", "", false, "quiet")}</div></header>${statusBox(g)}${g.phase === "finished" ? finalScores(g) : tutorial(g)}<nav class="view-tabs" aria-label="Game views" role="tablist">${(Object.keys(VIEW_LABELS) as View[]).map((v) => `<button id="tab-${v}" role="tab" aria-selected="${view === v}" aria-controls="game-panel" data-view="${v}" class="${view === v ? "active" : ""}"><span aria-hidden="true">${{ board: "⬡", techs: "✧", event: "◷", actions: "↗", player_aid: "▤" }[v]}</span>${VIEW_LABELS[v]}<span class="shortcut-hint"> (${shortcuts[v]})</span></button>`).join("")}</nav><main id="game-panel" class="main-panel" role="tabpanel" aria-labelledby="tab-${view}" tabindex="-1">${panel}</main><footer class="game-footer"><span>${autosave ? "Autosaved on this device" : "Session only · local storage unavailable"}</span><span>Normal turns · ${g.players.length} players · revision ${g.revision}</span>${button("Game record ↓", "export", "", false, "text-link")}<details class="history"><summary>Recent game history</summary><ol>${g.log
         .slice(-30)
         .reverse()
         .map(
@@ -1380,7 +1767,8 @@ export function mountApp(
           (el) =>
             el.dataset.number === focusKey &&
             (el.dataset.id ?? null) === focusId &&
-            el.dataset.planet === focused?.dataset.planet,
+            el.dataset.planet === focused?.dataset.planet &&
+            el.dataset.origin === focused?.dataset.origin,
         )
         ?.focus({ preventScroll: true });
     else if (focusData?.check)
@@ -1427,6 +1815,15 @@ export function mountApp(
     const options = root.querySelector<HTMLElement>(".feature-options");
     if (options) options.scrollLeft = 0;
     updateTypography();
+    if (game?.phase === "finished" && displayedFinishedGame !== game) {
+      displayedFinishedGame = game;
+      const results = root.querySelector<HTMLElement>("#expedition-results");
+      if (results) {
+        results.style.scrollMarginTop = `${(root.querySelector(".game-header")?.getBoundingClientRect().height ?? 80) + 8}px`;
+        results.scrollIntoView?.({ block: "start", behavior: "auto" });
+        results.focus({ preventScroll: true });
+      }
+    } else if (game?.phase !== "finished") displayedFinishedGame = null;
     const modal = root.querySelector<HTMLElement>(".modal");
     if (modal && !modal.contains(root.ownerDocument.activeElement))
       modal
@@ -1440,7 +1837,7 @@ export function mountApp(
       [
         JSON.stringify(
           {
-            application: "Space Force local prototype 0.14.0",
+            application: "Space Force local prototype 0.15.0",
             exportedAt: new Date().toISOString(),
             game,
           },
@@ -1495,6 +1892,8 @@ export function mountApp(
     const tile = target.closest<SVGElement>("[data-system]");
     if (!tile) return;
     const id = tile.dataset.system!;
+    if (game.pending?.kind === "filibuster" && selected !== id)
+      draft.tokenIndex = undefined;
     if (selected !== id && !game.pending && game.phase === "actions")
       draft = freshDraft();
     selected = id;
@@ -1512,7 +1911,7 @@ export function mountApp(
     render();
   }
   function selectPlanSystem(id: string, source: string, x: number, y: number) {
-    if (!game || game.phase !== "plan") {
+    if (!game || game.phase !== "plan" || game.pending) {
       planTap = null;
       return;
     }
@@ -1606,6 +2005,9 @@ export function mountApp(
       sources: draft.sources,
       credits: draft.credits,
       settlements: draft.action === "settle" ? draft.settlements : undefined,
+      replacements: draft.action === "settle" ? draft.replacements : undefined,
+      carried: draft.carried,
+      passengerLosses: draft.passengerLosses,
       reveal:
         draft.action === "move" &&
         !system(game, active).revealed &&
@@ -1642,7 +2044,7 @@ export function mountApp(
     const control = target.closest<HTMLElement>("[data-action]");
     if (!control && !dragged) {
       const tile = target.closest<SVGElement>("#galaxy [data-system]");
-      if (tile && game?.phase === "plan") {
+      if (tile && game?.phase === "plan" && !game.pending) {
         const pointer = event as MouseEvent;
         selectPlanSystem(
           tile.dataset.system!,
@@ -1703,6 +2105,37 @@ export function mountApp(
         render();
       }
     } else if (action === "export") exportGame();
+    else if (action === "ongoing-techs" && game) {
+      utilityOwner =
+        hasTech(game, game.turn, "flexible-economy") ||
+        hasTech(game, game.turn, "foresight")
+          ? game.turn
+          : game.players.find(
+              (p) =>
+                hasTech(game!, p.id, "flexible-economy") ||
+                hasTech(game!, p.id, "foresight"),
+            )!.id;
+      utilityAmount = Math.min(1, player(game, utilityOwner).credits);
+      privatePeek = false;
+      render();
+    } else if (action === "utility-owner" && game) {
+      utilityOwner = Number(data.owner);
+      utilityAmount = Math.min(1, player(game, utilityOwner).credits);
+      privatePeek = false;
+      render();
+    } else if (action === "show-peek") {
+      privatePeek = true;
+      render();
+    } else if (action === "hide-peek") {
+      privatePeek = false;
+      render();
+    } else if (action === "return-credits" && game && utilityOwner !== null)
+      perform(
+        { type: "returnCredits", count: utilityAmount },
+        game.revision,
+        undefined,
+        utilityOwner,
+      );
     else if (action === "to-status") scrollToStatus();
     else if (action === "zoom-in") zoomBy(1.25);
     else if (action === "zoom-out") zoomBy(0.8);
@@ -1749,6 +2182,27 @@ export function mountApp(
         render();
       } else if (action === "commit-action" || action === "commit-effect")
         commitDraft();
+      else if (action === "filibuster-option") {
+        selected = data.systemId!;
+        draft.tokenIndex = Number(data.index);
+        render();
+      } else if (action === "skip-filibuster")
+        perform({ type: "filibuster", skip: true });
+      else if (action === "commit-filibuster")
+        perform({
+          type: "filibuster",
+          system: selected!,
+          index: draft.tokenIndex,
+        });
+      else if (action === "insurance-credit") perform({ type: "insurance" });
+      else if (action === "insurance-ship")
+        perform({ type: "insurance", system: data.systemId });
+      else if (action === "use-eminent" || action === "skip-eminent")
+        perform({ type: "eminent", use: action === "use-eminent" });
+      else if (action === "order-after")
+        perform({ type: "orderAfter", tech: data.tech! });
+      else if (action === "commit-mercenaries")
+        perform({ type: "mercenaries", count: draft.techCount });
       else if (action === "plan-pass") perform({ type: "planPass" });
       else if (action === "skip-rapid") perform({ type: "rapid", skip: true });
       else if (action === "commit-rapid" && selectedPlanet)
@@ -1761,9 +2215,9 @@ export function mountApp(
         perform({
           type: "redistribute",
           ships:
-            draft.keptShips ??
-            game.pending.amount - sumOwners(Object.values(draft.settlements)),
+            draft.keptShips ?? game.pending.amount - settlementDraftTotal(),
           settlements: draft.settlements,
+          replacements: draft.replacements,
         });
       else if (action === "rotate-preview") {
         orientation = (orientation + Number(data.delta) + 6) % 6;
@@ -1771,17 +2225,36 @@ export function mountApp(
       } else if (action === "commit-orientation")
         perform({ type: "orient", rotation: orientation });
       else if (action === "finish-move")
-        perform({ type: "move", sources: draft.sources });
+        perform({
+          type: "move",
+          sources: draft.sources,
+          carried: draft.carried,
+          passengerLosses: draft.passengerLosses,
+        });
       else if (action === "commit-settlements")
-        perform({ type: "settleBatch", settlements: draft.settlements });
+        perform({
+          type: "settleBatch",
+          settlements: draft.settlements,
+          replacements: draft.replacements,
+        });
       else if (action === "recipient")
         perform({ type: "explore", recipient: Number(data.recipient) });
       else if (action === "continue-event") perform({ type: "continueEvent" });
-      else if (action === "buy") {
+      else if (action === "sabotage-target") {
+        draft.sabotageTarget = { player: Number(data.owner), tech: data.tech! };
+        draft.sabotageValue = Math.max(
+          draft.sabotageValue ?? 0,
+          Number(CARD_MAP[data.tech!].cost),
+        );
+        render();
+      } else if (action === "buy") {
         const command: Command = {
           type: "buy",
           tech: data.tech!,
           fullPrice: data.fullPrice === "true",
+          ...(data.tech === "tech.sabotage"
+            ? { value: draft.sabotageValue, target: draft.sabotageTarget }
+            : {}),
         };
         const empty = game.systems.some(
           (s) =>
@@ -1855,7 +2328,13 @@ export function mountApp(
     }
     if (el.dataset.setting === "tech-preset") {
       techPreset = el.value as GameConfig["techPreset"];
+      eventMode = techPreset === "remaining" ? "foresight-test" : "simpler";
       if (techPreset === "family") scenario = "standard";
+      render();
+      return;
+    }
+    if (el.dataset.check === "foresight-test") {
+      eventMode = el.checked ? "foresight-test" : "simpler";
       render();
       return;
     }
@@ -1879,7 +2358,36 @@ export function mountApp(
     if (!Number.isFinite(raw)) return;
     const n = Math.max(0, Math.min(Number(el.max), Math.floor(raw))),
       id = el.dataset.id!;
-    if (el.dataset.number === "source") draft.sources[id] = n;
+    if (el.dataset.number === "source") {
+      draft.sources[id] = n;
+      let room = n;
+      for (const owner of Object.keys(draft.carried[id] ?? {})) {
+        const value = Math.min(draft.carried[id][owner], room);
+        draft.carried[id][owner] = value;
+        room -= value;
+      }
+      draft.passengerLosses = undefined;
+    }
+    if (el.dataset.number === "carried") {
+      draft.carried[el.dataset.origin!] ??= {};
+      draft.carried[el.dataset.origin!][id] = n;
+      draft.passengerLosses = undefined;
+    }
+    if (el.dataset.number === "passenger-loss") {
+      if (!draft.passengerLosses)
+        draft.passengerLosses = currentPassengerLosses();
+      draft.passengerLosses[id] = n;
+      normalizePassengerLosses();
+    }
+    if (el.dataset.number === "mercenaries") draft.techCount = n;
+    if (el.dataset.number === "return-credits") utilityAmount = n;
+    if (el.dataset.number === "sabotage-value") draft.sabotageValue = n;
+    if (el.dataset.number === "replacement") {
+      draft.replacements[el.dataset.planet!] ??= {};
+      draft.replacements[el.dataset.planet!][id] = n;
+      if (game.pending?.kind === "redistribute")
+        draft.keptShips = game.pending.amount - settlementDraftTotal();
+    }
     if (el.dataset.number === "settlement")
       draft.settlements[el.dataset.planet!] = n;
     if (el.dataset.number === "produce-credits") draft.credits = n;
@@ -1917,7 +2425,7 @@ export function mountApp(
       const targets = attackTotals();
       draft.sacrifice = Math.max(
         draft.sacrifice,
-        targets.settlements + Math.ceil(targets.ships / 2),
+        attackCost(game, targets.ships, targets.settlements),
       );
     }
     if (
@@ -1925,8 +2433,7 @@ export function mountApp(
       game.pending?.kind === "redistribute"
     ) {
       draft.settlements[el.dataset.planet!] = n;
-      draft.keptShips =
-        game.pending.amount - sumOwners(Object.values(draft.settlements));
+      draft.keptShips = game.pending.amount - settlementDraftTotal();
     }
     if (
       el.dataset.number === "redistribute-ships" &&
@@ -1935,15 +2442,31 @@ export function mountApp(
       draft.keptShips = n;
       let excess = Math.max(
         0,
-        n + sumOwners(Object.values(draft.settlements)) - game.pending.amount,
+        n + settlementDraftTotal() - game.pending.amount,
       );
       for (const p of system(game, game.pending.system).planets) {
         const d = Math.min(draft.settlements[p.id] ?? 0, excess);
         draft.settlements[p.id] = (draft.settlements[p.id] ?? 0) - d;
         excess -= d;
       }
+      for (const targets of Object.values(draft.replacements))
+        for (const id of Object.keys(targets)) {
+          const d = Math.min(targets[id], excess);
+          targets[id] -= d;
+          excess -= d;
+        }
     }
-    if (JSON.stringify(draft) !== before) render();
+    if (
+      ["settlement", "redistribute-settlement", "redistribute-ships"].includes(
+        el.dataset.number,
+      )
+    )
+      trimReplacementDraft();
+    if (
+      JSON.stringify(draft) !== before ||
+      ["return-credits", "sabotage-value"].includes(el.dataset.number)
+    )
+      render();
     else el.value = String(n);
   };
 
@@ -1964,7 +2487,8 @@ export function mountApp(
     const modal = root.querySelector(".modal");
     if (event.key === "Escape" && modal) {
       event.preventDefault();
-      if (showHelp || activeCard || confirmation) closeOverlay();
+      if (showHelp || activeCard || confirmation || utilityOwner !== null)
+        closeOverlay();
       return;
     }
     if (event.key === "Tab" && modal) {
@@ -2019,7 +2543,15 @@ export function mountApp(
       selectLocation(target);
       return;
     }
-    if (!shortcuts || !game || showHelp || activeCard || confirmation) return;
+    if (
+      !shortcuts ||
+      !game ||
+      showHelp ||
+      activeCard ||
+      confirmation ||
+      utilityOwner !== null
+    )
+      return;
     const shortcut: Record<string, View> = {
       b: "board",
       t: "techs",
@@ -2095,6 +2627,7 @@ export function mountApp(
     const tile = target.closest<SVGElement>("[data-system]");
     if (
       game?.phase === "plan" &&
+      !game.pending &&
       event.pointerType === "touch" &&
       tile &&
       pointerPositions.size === 0 &&
@@ -2296,6 +2829,8 @@ export function mountApp(
       previewCache = new WeakMap();
       featureCache = new WeakMap();
       game = value;
+      utilityOwner = null;
+      privatePeek = false;
       planTap = null;
       draft = freshDraft();
       selected =
@@ -2304,8 +2839,10 @@ export function mountApp(
           : null;
       if (value.pending?.kind === "orient")
         orientation = value.pending.rotations[0];
-      if (value.pending?.kind === "move")
+      if (value.pending?.kind === "move") {
         draft.sources = { ...value.pending.sources };
+        draft.carried = { ...value.pending.carried };
+      }
       if (value.pending?.kind === "action") {
         draft.action = value.pending.action;
         draft.bank = value.context?.bank ?? false;

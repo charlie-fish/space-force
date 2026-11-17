@@ -102,11 +102,41 @@ export const NEW_TECHS = [
   "research-lab",
   "strategic-stall",
 ].map((id) => `tech.${id}`);
-export const IMPLEMENTED_TECHS = [...FAMILY, ...NEW_TECHS];
+export const REMAINING_TECHS = [
+  "soylent-green",
+  "mercenaries",
+  "gravity-drive",
+  "foresight",
+  "death-sun",
+  "filibuster",
+  "insurance",
+  "eminent-domain",
+  "sabotage",
+  "flexible-economy",
+].map((id) => `tech.${id}`);
+export const IMPLEMENTED_TECHS = [...FAMILY, ...NEW_TECHS, ...REMAINING_TECHS];
 export const CHAIN_TECHS = NEW_TECHS.slice(0, 5);
 export const TECH_PRESETS = {
   family: { label: "Family", techs: FAMILY },
   chains: { label: "New Techs", techs: NEW_TECHS },
+  remaining: { label: "Last ten Techs", techs: REMAINING_TECHS },
+  aggressive: {
+    label: "Aggressive",
+    techs: cardData.presets["preset.aggressive"].techIds,
+  },
+  cunning: {
+    label: "Cunning",
+    techs: cardData.presets["preset.cunning"].techIds,
+  },
+  economic: {
+    label: "Economic",
+    techs: cardData.presets["preset.economic"].techIds,
+  },
+  peaceful: {
+    label: "Peaceful",
+    techs: cardData.presets["preset.peaceful"].techIds,
+  },
+  random: { label: "Random", techs: IMPLEMENTED_TECHS },
   mixed: {
     label: "Tech chain mix",
     techs: [

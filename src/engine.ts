@@ -22,6 +22,9 @@ import type {
   SettlementResume,
   ActionChoices,
   GameConfig,
+  Replacements,
+  SettlementPlacement,
+  MovePayload,
 } from "./types.js";
 import {
   findOpenSpace,
@@ -93,15 +96,17 @@ export function createGame(
     "Space Force supports two to seven players.",
   );
   requireRule(
-    ["family", "chains", "mixed"].includes(config.techPreset) &&
-      ["standard", "five-tech-chain"].includes(config.scenario),
+    Object.prototype.hasOwnProperty.call(TECH_PRESETS, config.techPreset) &&
+      ["standard", "five-tech-chain"].includes(config.scenario) &&
+      (config.events === undefined ||
+        ["simpler", "foresight-test"].includes(config.events)),
     "Choose a supported test setup.",
   );
   const g: Game = {
-    schema: 5,
-    engine: "0.14.0",
-    content: "tech-chains-simple-events-2",
-    config: clone(config),
+    schema: 6,
+    engine: "0.15.0",
+    content: "all-techs-event-tracker-3",
+    config: { ...clone(config), events: config.events ?? "simpler" },
     seed: seed >>> 0,
     rng: seed >>> 0,
     revision: 0,
@@ -126,6 +131,7 @@ export function createGame(
     decisions: [{ player: 0, revision: 0 }],
     scores: [],
     winners: [],
+    endgameQueue: [],
   };
   g.players = Array.from({ length: count }, (_, id) => ({
     id,
@@ -231,9 +237,34 @@ export function createGame(
     g,
     CARDS.filter((c) => c.type === "event").map((c) => c.id),
   ).slice(0, count <= 3 ? 10 : 8);
+  if (config.techPreset === "random")
+    g.market = shuffle(
+      g,
+      IMPLEMENTED_TECHS.filter(
+        (id) => id !== "tech.foresight" || g.config.events === "foresight-test",
+      ),
+    ).slice(0, 10);
+  if (
+    g.config.events !== "foresight-test" &&
+    g.market.includes("tech.foresight")
+  ) {
+    const legal = IMPLEMENTED_TECHS.filter(
+      (id) =>
+        !g.market.includes(id) &&
+        id !== "tech.foresight" &&
+        [2, 3].includes(Number(CARD_MAP[id].cost)),
+    );
+    const replacement = shuffle(g, legal)[0];
+    g.market[g.market.indexOf("tech.foresight")] = replacement;
+    log(
+      g,
+      `Simpler Events excludes Foresight; replaced it with ${CARD_MAP[replacement].title} under R08.`,
+      null,
+    );
+  }
   log(
     g,
-    `Local ${TECH_PRESETS[config.techPreset].label} game created. Simpler Events count rounds; their effects and auction are disabled.${config.scenario === "five-tech-chain" ? " Designer test scenario: each player starts with the five R01 Techs; their ownership markers come from Reserve." : ""}`,
+    `Local ${TECH_PRESETS[config.techPreset].label} game created. ${g.config.events === "foresight-test" ? "Nonstandard Foresight Tech test: Events count rounds and permit owner peeks; effects and auctions are disabled." : "Simpler Events count rounds; their effects and auction are disabled."}${config.scenario === "five-tech-chain" ? " Designer test scenario: each player starts with the five R01 Techs; their ownership markers come from Reserve." : ""}`,
     null,
   );
   assertInvariants(g);
@@ -348,10 +379,11 @@ export function purchaseReason(
   tech: string,
   id = g.turn,
   fullPrice = false,
+  value?: number,
 ): string | null {
   const p = player(g, id);
   const card = CARD_MAP[tech];
-  if (!g.market.includes(tech) || typeof card?.cost !== "number")
+  if (!g.market.includes(tech) || !IMPLEMENTED_TECHS.includes(tech))
     return "This Tech is outside the prototype preset.";
   if (p.techs.includes(tech)) return "You already own this Tech.";
   if (
@@ -363,7 +395,20 @@ export function purchaseReason(
     )
   )
     return "Another player’s Patents prevents this purchase.";
-  const cost = purchaseCost(g, tech, id, fullPrice);
+  if (tech === "tech.foresight" && g.config.events !== "foresight-test")
+    return "Foresight is excluded with simpler Events.";
+  if (tech === "tech.sabotage") {
+    if (isFinalRound(g)) return "Sabotage cannot be bought in the last round.";
+    if (!Number.isInteger(value) || value! < 0 || value! > 81)
+      return "Choose Sabotage's undiscounted value.";
+    if (
+      !sabotageTargets(g, id).some(
+        (t) => Number(CARD_MAP[t.tech].cost) <= value!,
+      )
+    )
+      return "No opponent Tech can be removed at this value.";
+  }
+  const cost = purchaseCost(g, tech, id, fullPrice, value);
   if (p.credits < cost) return `You need ${cost} Credits.`;
   if (p.reserve + cost < 1)
     return "A Reserve rocket is needed to mark ownership.";
@@ -374,12 +419,72 @@ export function purchaseCost(
   tech: string,
   id = g.turn,
   fullPrice = false,
+  sabotageValue = 0,
 ) {
-  const value = CARD_MAP[tech]?.cost;
+  const value =
+    tech === "tech.sabotage"
+      ? integer(sabotageValue, 81)
+      : CARD_MAP[tech]?.cost;
   requireRule(typeof value === "number", "Unknown Tech value.");
   return hasTech(g, id, "research-lab") && !fullPrice
     ? Math.floor(value / 2)
     : value;
+}
+export function sabotageTargets(g: Game, id = g.turn) {
+  return g.players.flatMap((p) =>
+    p.id === id
+      ? []
+      : p.techs
+          .filter((t) => t !== "tech.sabotage")
+          .map((tech) => ({ player: p.id, tech })),
+  );
+}
+export function peekEvents(g: Game, id: number): string[] {
+  requireRule(
+    hasTech(g, id, "foresight") && g.config.events === "foresight-test",
+    "Only a Foresight owner may inspect the upcoming Events.",
+  );
+  return g.events.slice(0, 2);
+}
+export function canSoylent(
+  g: Game,
+  s: System,
+  id = g.turn,
+  additions: Record<string, number> = {},
+) {
+  const planets = s.planets.filter((p) => !p.blocked);
+  return (
+    s.revealed &&
+    hasTech(g, id, "soylent-green") &&
+    planets.length > 0 &&
+    planets.every((p) => sum(p.owners) + (additions[p.id] ?? 0) >= p.capacity)
+  );
+}
+export function attackCost(
+  g: Game,
+  ships: number,
+  settlements: number,
+  id = g.turn,
+) {
+  return hasTech(g, id, "death-sun")
+    ? Math.max(
+        Math.ceil((ships + settlements) / 3),
+        Math.ceil((ships + 2 * settlements) / 4),
+      )
+    : Math.ceil(ships / 2) + settlements;
+}
+export function afterActionHooks(
+  g: Game,
+  action: Action,
+  source?: string,
+): string[] {
+  return (
+    action === "produce"
+      ? ["population-explosion", ...(source === "tech.spice" ? [] : ["spice"])]
+      : action === "move"
+        ? ["rapid-advance", "mercenaries"]
+        : []
+  ).filter((id) => hasTech(g, g.turn, id));
 }
 export function settlementSpace(g: Game, p: Planet, id = g.turn): number {
   return p.blocked
@@ -390,11 +495,21 @@ export function settlementSpace(g: Game, p: Planet, id = g.turn): number {
       );
 }
 
+function finishPlanning(g: Game) {
+  const owners = Array.from(
+    { length: g.players.length },
+    (_, i) => (g.first + i) % g.players.length,
+  ).filter((id) => hasTech(g, id, "filibuster"));
+  if (owners.length) {
+    g.turn = owners[0];
+    g.pending = { kind: "filibuster", remaining: owners.slice(1) };
+  } else startActions(g);
+}
 function startActions(g: Game) {
   g.phase = "actions";
   advanceActions(g, (g.first + g.players.length - 1) % g.players.length);
 }
-function advanceActions(g: Game, after: number) {
+function advanceActions(g: Game, after: number, remaining = g.players.length) {
   g.pending = null;
   g.context = null;
   if (g.systems.every((s) => s.tokens.length === 0)) {
@@ -403,10 +518,19 @@ function advanceActions(g: Game, after: number) {
     skipEmptyAllocation(g);
     return;
   }
-  for (let step = 1; step <= g.players.length; step++) {
+  for (let step = 1; step <= remaining; step++) {
     const id = (after + step) % g.players.length;
     if (eligibleTokens(g, id).length) {
       g.turn = id;
+      return;
+    }
+    if (hasTech(g, id, "insurance")) {
+      g.turn = id;
+      g.pending = { kind: "insurance", after: id, remaining: remaining - step };
+      log(
+        g,
+        "Insurance: your ACTIONS turn was skipped because none of your tokens was on top. Choose a Credit or a Ship.",
+      );
       return;
     }
   }
@@ -449,7 +573,7 @@ function actionBody(g: Game) {
     source: c.source
       ? CARD_MAP[c.source].title
       : `Your ${c.kind.toUpperCase()} action`,
-    free: Boolean(c.parent),
+    free: Boolean(c.source),
   };
 }
 function startAction(
@@ -514,6 +638,14 @@ function runBeforeHooks(g: Game) {
 function runAfterHooks(g: Game) {
   g.pending = null;
   const c = g.context!;
+  if (
+    c.kind === "move" &&
+    (c.afterHooks?.length ?? 0) > 1 &&
+    !c.afterOrderChosen
+  ) {
+    g.pending = { kind: "afterOrder", system: c.system };
+    return;
+  }
   const hook = c.afterHooks?.shift();
   if (hook === "population-explosion") {
     startAction(g, "settle", c.system, "tech.population-explosion");
@@ -521,6 +653,10 @@ function runAfterHooks(g: Game) {
   }
   if (hook === "spice") {
     startAction(g, "produce", c.system, "tech.spice");
+    return;
+  }
+  if (hook === "mercenaries") {
+    g.pending = { kind: "mercenaries", system: c.system };
     return;
   }
   if (hook === "rapid-advance") {
@@ -541,27 +677,21 @@ function runAfterHooks(g: Game) {
     g.context = c.parent;
     if (g.context.stage === "before") runBeforeHooks(g);
     else runAfterHooks(g);
-  } else advanceActions(g, c.actor);
+  } else if (g.phase === "endgame") nextEndgame(g);
+  else advanceActions(g, c.actor);
 }
 function finishAction(g: Game, messages: string[] = []) {
   const c = g.context;
   requireRule(c, "No action is being resolved.");
   c.stage = "after";
   // Finish Population Explosion's entire chain before starting Spice's bonus.
-  c.afterHooks =
-    c.kind === "produce"
-      ? [
-          ...(hasTech(g, c.actor, "population-explosion")
-            ? ["population-explosion"]
-            : []),
-          ...(hasTech(g, c.actor, "spice") && c.source !== "tech.spice"
-            ? ["spice"]
-            : []),
-        ]
-      : c.kind === "move" && hasTech(g, c.actor, "rapid-advance")
-        ? ["rapid-advance"]
-        : [];
-  if (c.bank && !c.bankDone && hasTech(g, c.actor, "banking")) {
+  c.afterHooks = afterActionHooks(g, c.kind, c.source);
+  if (
+    g.phase === "actions" &&
+    c.bank &&
+    !c.bankDone &&
+    hasTech(g, c.actor, "banking")
+  ) {
     c.bankDone = true;
     if (player(g).reserve > 0) {
       player(g).reserve--;
@@ -582,7 +712,14 @@ function resolveActionBody(g: Game, choices: ActionChoices) {
   const p = player(g),
     s = system(g, c.system);
   if (c.kind === "move")
-    beginMove(g, s, choices.sources ?? {}, Boolean(choices.reveal));
+    beginMove(
+      g,
+      s,
+      choices.sources ?? {},
+      Boolean(choices.reveal),
+      choices.carried,
+      choices.passengerLosses,
+    );
   else if (c.kind === "produce") {
     const available = p.reserve,
       wanted = production(g, s),
@@ -606,11 +743,12 @@ function resolveActionBody(g: Game, choices: ActionChoices) {
       s,
       choices.attack ?? { sacrifice: 0, ships: {}, settlements: {} },
     );
-  else if (choices.settlements) beginSettlementBatch(g, s, choices.settlements);
+  else if (choices.settlements || choices.replacements)
+    beginSettlementBatch(g, s, choices.settlements ?? {}, choices.replacements);
   else if (
     s.revealed &&
     s.ships[g.turn] > 0 &&
-    s.planets.some((p) => settlementSpace(g, p) > 0)
+    (s.planets.some((p) => settlementSpace(g, p) > 0) || canSoylent(g, s))
   )
     g.pending = { kind: "settle", system: s.id };
   else {
@@ -688,7 +826,7 @@ function finishTechTurn(g: Game) {
     return;
   }
   if (g.finalEconomy) {
-    finishGame(g);
+    startEndgame(g);
     return;
   }
   g.phase = "reinforce";
@@ -710,7 +848,9 @@ function nextRound(g: Game) {
   log(g, `Round ${g.round}: plan four action tokens each.`, null);
 }
 function resumeContinuation(g: Game, after: Continuation) {
-  if (after.kind === "beforeHooks") runBeforeHooks(g);
+  if (after.kind === "insuranceNext")
+    advanceActions(g, after.after, after.remaining);
+  else if (after.kind === "beforeHooks") runBeforeHooks(g);
   else if (after.kind === "afterHooks") runAfterHooks(g);
   else if (after.kind === "actionDone") advanceActions(g, after.actor);
   else if (after.kind === "techDone") finishTechTurn(g);
@@ -748,6 +888,29 @@ export function scoreGame(g: Game): Score[] {
     };
   });
 }
+function startEndgame(g: Game) {
+  g.endgameQueue = Array.from(
+    { length: g.players.length },
+    (_, i) => (g.first + i) % g.players.length,
+  ).filter((id) => hasTech(g, id, "eminent-domain"));
+  nextEndgame(g);
+}
+function nextEndgame(g: Game) {
+  g.pending = null;
+  g.context = null;
+  const id = g.endgameQueue.shift();
+  if (id === undefined) {
+    finishGame(g);
+    return;
+  }
+  g.phase = "endgame";
+  g.turn = id;
+  g.pending = { kind: "eminent" };
+  log(
+    g,
+    "Eminent Domain: choose whether to perform a free SETTLE at home before scoring.",
+  );
+}
 function finishGame(g: Game) {
   g.phase = "finished";
   g.pending = null;
@@ -764,16 +927,88 @@ function finishGame(g: Game) {
   );
 }
 
+function checkCarried(
+  g: Game,
+  sources: Record<string, number>,
+  carried: MovePayload["carried"] = {},
+) {
+  for (const [origin, owners] of Object.entries(carried)) {
+    const from = system(g, origin);
+    let passengers = 0;
+    for (const [raw, amount] of Object.entries(owners)) {
+      const id = integer(Number(raw), g.players.length - 1);
+      integer(amount, 40);
+      requireRule(
+        !amount || id !== g.turn,
+        "Gravity Drive carries opponents, not your own Ships.",
+      );
+      requireRule(
+        amount <= from.ships[id],
+        "Not enough passenger Ships at their origin.",
+      );
+      passengers += amount;
+    }
+    requireRule(
+      passengers <= (sources[origin] ?? 0),
+      "Each incoming carrier can carry only one opponent Ship from the same origin.",
+    );
+    requireRule(
+      !passengers || hasTech(g, g.turn, "gravity-drive"),
+      "Gravity Drive is required to carry opponent Ships.",
+    );
+  }
+}
+export function movementLosses(
+  g: Game,
+  target: System,
+  sources: Record<string, number>,
+  carried: MovePayload["carried"] = {},
+  requested?: MovePayload["passengerLosses"],
+) {
+  const incoming = sum(Object.values(sources)),
+    passengers = Array(g.players.length).fill(0) as number[];
+  for (const owners of Object.values(carried))
+    for (const [raw, amount] of Object.entries(owners)) {
+      const id = integer(Number(raw), g.players.length - 1);
+      passengers[id] += integer(amount, 40);
+    }
+  const total = Math.min(incoming + sum(passengers), blackHoles(target));
+  const lost = Array(g.players.length).fill(0) as number[];
+  if (requested) {
+    for (const [raw, amount] of Object.entries(requested)) {
+      const id = integer(Number(raw), g.players.length - 1);
+      lost[id] = integer(amount, 40);
+      requireRule(
+        lost[id] <= passengers[id],
+        "You cannot lose more passenger Ships than are being carried.",
+      );
+    }
+  } else {
+    let left = total;
+    for (let id = 0; id < passengers.length; id++) {
+      lost[id] = Math.min(left, passengers[id]);
+      left -= lost[id];
+    }
+  }
+  const own = total - sum(lost);
+  requireRule(
+    own >= 0 && own <= incoming,
+    "Choose black-hole casualties from the incoming carrier and passenger Ships.",
+  );
+  return { total, own, passengers: lost, carried: passengers, incoming };
+}
 function moveShips(
   g: Game,
   target: System,
   sources: Record<string, number>,
   requireEntry?: string[],
+  carried: MovePayload["carried"] = {},
+  passengerLosses?: MovePayload["passengerLosses"],
 ) {
   let incoming = 0;
   for (const [id, raw] of Object.entries(sources)) {
-    const n = integer(raw, 40);
-    const from = system(g, id);
+    const n = integer(raw, 40),
+      from = system(g, id);
     requireRule(
       n <= from.ships[g.turn],
       "Not enough Ships in an origin system.",
@@ -790,15 +1025,28 @@ function moveShips(
       requireEntry.some((id) => (sources[id] ?? 0) > 0),
       "At least one Ship must finish entering through the exploration route.",
     );
+  checkCarried(g, sources, carried);
+  const losses = movementLosses(g, target, sources, carried, passengerLosses);
   for (const [id, n] of Object.entries(sources))
     system(g, id).ships[g.turn] -= n;
-  const losses = Math.min(incoming, blackHoles(target));
-  target.ships[g.turn] += incoming - losses;
-  player(g).credits += losses;
+  for (const [id, owners] of Object.entries(carried))
+    for (const [owner, n] of Object.entries(owners))
+      system(g, id).ships[Number(owner)] -= n;
+  target.ships[g.turn] += incoming - losses.own;
+  player(g).credits += losses.own;
+  for (let id = 0; id < g.players.length; id++) {
+    target.ships[id] += losses.carried[id] - losses.passengers[id];
+    player(g, id).credits += losses.passengers[id];
+  }
   log(
     g,
-    `Moved ${incoming} Ship${incoming === 1 ? "" : "s"} into ${nameOf(target)}${losses ? `; ${losses} lost to black holes and returned as Credits` : ""}.`,
+    `Moved ${incoming} Ship${incoming === 1 ? "" : "s"} into ${nameOf(target)}${losses.total ? `; ${losses.total} lost to black holes and returned as Credits` : ""}.`,
   );
+  if (sum(losses.carried))
+    log(
+      g,
+      `Gravity Drive: carried ${sum(losses.carried)} opponent Ships; ${losses.own} own and ${sum(losses.passengers)} passenger Ships lost on entry.`,
+    );
   finishAction(g);
 }
 function beginMove(
@@ -806,6 +1054,8 @@ function beginMove(
   target: System,
   sources: Record<string, number>,
   reveal = false,
+  carried: MovePayload["carried"] = {},
+  passengerLosses?: MovePayload["passengerLosses"],
 ) {
   let incoming = 0;
   for (const [id, raw] of Object.entries(sources)) {
@@ -817,8 +1067,9 @@ function beginMove(
     );
     incoming += n;
   }
+  checkCarried(g, sources, carried);
   if (target.revealed || (!incoming && !reveal)) {
-    moveShips(g, target, sources);
+    moveShips(g, target, sources, undefined, carried, passengerLosses);
     return;
   }
   const candidates = g.systems.filter(
@@ -845,6 +1096,7 @@ function beginMove(
     system: target.id,
     sources,
     rotations,
+    ...(Object.keys(carried).length ? { carried } : {}),
     entrySources: reveal
       ? candidates.map((s) => s.id)
       : Object.keys(sources).filter((id) => sources[id] > 0),
@@ -871,10 +1123,72 @@ function continueSettlement(g: Game, s: System, resume: SettlementResume) {
   if (
     s.revealed &&
     s.ships[g.turn] > 0 &&
-    s.planets.some((p) => settlementSpace(g, p) > 0)
+    (s.planets.some((p) => settlementSpace(g, p) > 0) || canSoylent(g, s))
   )
     g.pending = { kind: "settle", system: s.id };
   else finishAction(g);
+}
+function replacementPlacements(
+  g: Game,
+  s: System,
+  replacements: Replacements = {},
+  reserved: SettlementPlacement[] = [],
+  additions: Record<string, number> = {},
+): SettlementPlacement[] {
+  return Object.entries(replacements)
+    .map(([id, targets]) => {
+      const planet = s.planets.find((p) => p.id === id);
+      requireRule(planet, "Choose a planet in the active system.");
+      let count = 0;
+      for (const [raw, amount] of Object.entries(targets)) {
+        const owner = integer(Number(raw), g.players.length - 1);
+        integer(amount, 40);
+        const fixed = sum(
+          reserved
+            .filter((p) => p.planet === id)
+            .map((p) => p.replace?.[raw] ?? 0),
+        );
+        requireRule(
+          !amount || owner !== g.turn,
+          "Soylent Green replaces opponents' Settlements, not yours.",
+        );
+        requireRule(
+          amount <= planet.owners[owner] - fixed,
+          "Other committed replacements must remain allocated.",
+        );
+        count += amount;
+      }
+      requireRule(
+        !count || canSoylent(g, s, g.turn, additions),
+        "Soylent Green requires every unblocked planet in this system to be full.",
+      );
+      return { planet: id, count, replace: targets };
+    })
+    .filter((p) => p.count > 0);
+}
+function replaceSettlements(
+  g: Game,
+  s: System,
+  planet: Planet,
+  targets: Record<string, number>,
+) {
+  const count = sum(Object.values(targets));
+  replacementPlacements(g, s, { [planet.id]: targets });
+  requireRule(
+    count <= s.ships[g.turn],
+    "Not enough Ships for these replacements.",
+  );
+  for (const [raw, n] of Object.entries(targets)) {
+    const owner = Number(raw);
+    planet.owners[owner] -= n;
+    player(g, owner).credits += n;
+  }
+  s.ships[g.turn] -= count;
+  planet.owners[g.turn] += count;
+  log(
+    g,
+    `Soylent Green: replaced ${count} opposing Settlements in ${nameOf(s)}; removed rockets returned as their owners' Credits.`,
+  );
 }
 function resolveSettlementQueue(g: Game, s: System) {
   const next = g.context?.settlementQueue?.shift();
@@ -883,7 +1197,10 @@ function resolveSettlementQueue(g: Game, s: System) {
     return;
   }
   const planet = s.planets.find((p) => p.id === next.planet)!;
-  if (next.count > settlementSpace(g, planet))
+  if (next.replace) {
+    g.context!.replacement = next.replace;
+    settlePlanet(g, s, planet, next.count, "ships", "settle");
+  } else if (next.count > settlementSpace(g, planet))
     place(g, s, planet, next.count, "ships", "settle");
   else settlePlanet(g, s, planet, next.count, "ships", "settle");
 }
@@ -891,6 +1208,7 @@ function beginSettlementBatch(
   g: Game,
   s: System,
   placements: Record<string, number>,
+  replacements: Replacements = {},
 ) {
   let total = 0;
   const queue = Object.entries(placements)
@@ -905,6 +1223,14 @@ function beginSettlementBatch(
       return { planet: id, count };
     })
     .filter((p) => p.count > 0);
+  const replace = replacementPlacements(
+    g,
+    s,
+    replacements,
+    [],
+    Object.fromEntries(queue.map((p) => [p.planet, p.count])),
+  );
+  total += sum(replace.map((p) => p.count));
   requireRule(
     total <= s.ships[g.turn],
     "Not enough Ships for these Settlements.",
@@ -914,7 +1240,7 @@ function beginSettlementBatch(
     "Explore this system before settling hidden planets.",
   );
   requireRule(g.context?.kind === "settle", "No SETTLE is active.");
-  g.context.settlementQueue = queue;
+  g.context.settlementQueue = [...queue, ...replace];
   resolveSettlementQueue(g, s);
 }
 function place(
@@ -925,6 +1251,12 @@ function place(
   from: "ships" | "reserve",
   resume: SettlementResume,
 ) {
+  if (from === "ships" && resume === "settle" && g.context?.replacement) {
+    replaceSettlements(g, s, planet, g.context.replacement);
+    delete g.context.replacement;
+    continueSettlement(g, s, resume);
+    return;
+  }
   const available = from === "ships" ? s.ships[g.turn] : player(g).reserve,
     room = settlementSpace(g, planet),
     actual = Math.min(count, room, available);
@@ -969,7 +1301,9 @@ function settlePlanet(
 ) {
   integer(count, 40);
   requireRule(
-    count > 0 && count <= settlementSpace(g, planet),
+    count > 0 &&
+      (count <= settlementSpace(g, planet) ||
+        (resume === "settle" && Boolean(g.context?.replacement))),
     "Choose a number that fits this planet.",
   );
   requireRule(
@@ -1065,8 +1399,10 @@ function attack(g: Game, s: System, payload: AttackPayload) {
     }
   }
   requireRule(
-    settlements + Math.ceil(ships / 2) <= n,
-    "Each sacrificed Ship destroys two Ships OR one Settlement.",
+    attackCost(g, ships, settlements) <= n,
+    hasTech(g, g.turn, "death-sun")
+      ? "These targets exceed the destruction allowed by Death Sun and the sacrificed Ships."
+      : "Each sacrificed Ship destroys two Ships OR one Settlement.",
   );
   s.ships[g.turn] -= n;
   player(g).credits += n;
@@ -1144,22 +1480,48 @@ export function featureOptions(
   }
   return options;
 }
-function buy(g: Game, tech: string | null, fullPrice = false) {
+function buy(
+  g: Game,
+  tech: string | null,
+  fullPrice = false,
+  value?: number,
+  sabotageTarget?: { player: number; tech: string },
+) {
   if (!tech) {
     log(g, "Passed the Tech purchase.");
     finishTechTurn(g);
     return;
   }
   requireRule(
-    !purchaseReason(g, tech, g.turn, fullPrice),
-    purchaseReason(g, tech, g.turn, fullPrice) ?? "Cannot buy Tech.",
+    !purchaseReason(g, tech, g.turn, fullPrice, value),
+    purchaseReason(g, tech, g.turn, fullPrice, value) ?? "Cannot buy Tech.",
   );
   const p = player(g);
-  const cost = purchaseCost(g, tech, g.turn, fullPrice);
+  if (tech === "tech.sabotage")
+    requireRule(
+      sabotageTarget &&
+        sabotageTargets(g).some(
+          (t) =>
+            t.player === sabotageTarget.player &&
+            t.tech === sabotageTarget.tech &&
+            Number(CARD_MAP[t.tech].cost) <= value!,
+        ),
+      "Choose a legal opposing Tech within the undiscounted Sabotage value.",
+    );
+  const cost = purchaseCost(g, tech, g.turn, fullPrice, value);
   p.credits -= cost;
   p.reserve += cost - 1;
   p.techs.push(tech);
   log(g, `Bought ${CARD_MAP[tech].title} for ${cost} Credits.`);
+  if (tech === "tech.sabotage") {
+    const target = player(g, sabotageTarget!.player);
+    target.techs.splice(target.techs.indexOf(sabotageTarget!.tech), 1);
+    target.reserve++;
+    log(
+      g,
+      `Sabotage: undiscounted value ${value}; removed ${CARD_MAP[sabotageTarget!.tech].title} from ${target.name}. Its ownership rocket returned to their Reserve.`,
+    );
+  }
   if (tech === "tech.disruptor" && isFinalRound(g))
     log(
       g,
@@ -1286,13 +1648,27 @@ export function applyCommand(
     "The game changed. Refresh your choices.",
   );
   requireRule(
-    actor === state.turn && state.phase !== "finished",
+    (actor === state.turn || command.type === "returnCredits") &&
+      state.phase !== "finished",
     "It is not this player’s turn.",
   );
   command = clone(command);
   const g = clone(state);
-  const p = player(g);
-  if (command.type === "home") {
+  const p = player(g, actor);
+  if (command.type === "returnCredits") {
+    requireRule(
+      hasTech(g, actor, "flexible-economy"),
+      "Flexible Economy is required to return Credits.",
+    );
+    const n = integer(command.count, 40);
+    requireRule(
+      n > 0 && n <= p.credits,
+      "Choose available Credits to return to Reserve.",
+    );
+    p.credits -= n;
+    p.reserve += n;
+    log(g, `Flexible Economy: returned ${n} Credits to Reserve.`, actor);
+  } else if (command.type === "home") {
     requireRule(
       g.phase === "homes" && !g.pending,
       "Choose homes during setup.",
@@ -1325,7 +1701,7 @@ export function applyCommand(
     s.tokens.push(p.id);
     p.unplaced--;
     log(g, `Placed an action chip in ${nameOf(s)}.`);
-    if (g.players.every((p) => p.unplaced === 0)) startActions(g);
+    if (g.players.every((p) => p.unplaced === 0)) finishPlanning(g);
     else {
       do {
         g.turn = (g.turn + 1) % g.players.length;
@@ -1345,6 +1721,88 @@ export function applyCommand(
     do {
       g.turn = (g.turn + 1) % g.players.length;
     } while (player(g).unplaced === 0);
+  } else if (command.type === "filibuster") {
+    requireRule(
+      g.pending?.kind === "filibuster",
+      "No Filibuster decision is pending.",
+    );
+    const remaining = g.pending.remaining;
+    if (!command.skip) {
+      const s = system(g, command.system!);
+      const index = integer(command.index ?? -1, s.tokens.length - 1);
+      requireRule(
+        s.tokens[index] === actor,
+        "Choose one of your own action tokens.",
+      );
+      s.tokens.splice(index, 1);
+      s.tokens.push(actor);
+      log(g, `Filibuster: moved your token to the top of ${nameOf(s)}.`);
+    } else log(g, "Filibuster: declined to move a token.");
+    if (remaining.length) {
+      g.turn = remaining[0];
+      g.pending = { kind: "filibuster", remaining: remaining.slice(1) };
+    } else startActions(g);
+  } else if (command.type === "insurance") {
+    requireRule(
+      g.pending?.kind === "insurance",
+      "No Insurance reward is pending.",
+    );
+    const after = g.pending.after,
+      remaining = g.pending.remaining;
+    if (command.system)
+      requireRule(
+        system(g, command.system).planets.some((p) => p.owners[actor] > 0),
+        "Insurance Ships need a system with one of your Settlements.",
+      );
+    if (p.reserve > 0) {
+      p.reserve--;
+      if (command.system) system(g, command.system).ships[actor]++;
+      else p.credits++;
+      log(
+        g,
+        `Insurance: gained 1 ${command.system ? `Ship in ${nameOf(system(g, command.system))}` : "Credit"} from Reserve.`,
+      );
+      advanceActions(g, after, remaining);
+    } else
+      notice(g, "Reserve empty", [reserveWarning("Insurance", 1, 0)], {
+        kind: "insuranceNext",
+        after,
+        remaining,
+      });
+  } else if (command.type === "eminent") {
+    requireRule(
+      g.phase === "endgame" && g.pending?.kind === "eminent",
+      "No Eminent Domain decision is pending.",
+    );
+    g.pending = null;
+    if (command.use) startAction(g, "settle", p.home!, "tech.eminent-domain");
+    else {
+      log(g, "Eminent Domain: declined the free home SETTLE.");
+      nextEndgame(g);
+    }
+  } else if (command.type === "orderAfter") {
+    requireRule(
+      g.pending?.kind === "afterOrder" && g.context?.kind === "move",
+      "No after-MOVE ordering choice is pending.",
+    );
+    const index = g.context.afterHooks!.indexOf(command.tech);
+    requireRule(index >= 0, "Choose a pending after-MOVE effect.");
+    g.context.afterHooks!.splice(index, 1);
+    g.context.afterHooks!.unshift(command.tech);
+    g.context.afterOrderChosen = true;
+    runAfterHooks(g);
+  } else if (command.type === "mercenaries") {
+    requireRule(
+      g.pending?.kind === "mercenaries",
+      "No Mercenaries effect is pending.",
+    );
+    const n = integer(command.count, 3),
+      s = system(g, g.pending.system);
+    requireRule(n <= p.credits, "Mercenaries converts existing Credits only.");
+    p.credits -= n;
+    s.ships[actor] += n;
+    log(g, `Mercenaries: converted ${n} Credits into Ships in ${nameOf(s)}.`);
+    runAfterHooks(g);
   } else if (command.type === "resolve") {
     requireRule(
       g.phase === "actions" && !g.pending,
@@ -1425,6 +1883,7 @@ export function applyCommand(
       kind: "move",
       system: s.id,
       sources: pending.sources,
+      ...(pending.carried ? { carried: pending.carried } : {}),
       entrySources: (
         pending.entrySources ??
         Object.keys(pending.sources).filter((id) => pending.sources[id] > 0)
@@ -1438,6 +1897,8 @@ export function applyCommand(
       system(g, g.pending.system),
       command.sources,
       g.pending.entrySources,
+      command.carried,
+      command.passengerLosses,
     );
   } else if (command.type === "settle") {
     requireRule(g.pending?.kind === "settle", "No SETTLE is pending.");
@@ -1450,7 +1911,12 @@ export function applyCommand(
     finishAction(g);
   } else if (command.type === "settleBatch") {
     requireRule(g.pending?.kind === "settle", "No SETTLE is pending.");
-    beginSettlementBatch(g, system(g, g.pending.system), command.settlements);
+    beginSettlementBatch(
+      g,
+      system(g, g.pending.system),
+      command.settlements,
+      command.replacements,
+    );
   } else if (command.type === "continueEvent") {
     requireRule(
       g.phase === "event" && !g.pending,
@@ -1481,7 +1947,9 @@ export function applyCommand(
         const count = integer(raw, 40),
           p = s.planets.find((p) => p.id === id),
           reserved = sum(
-            queue.filter((p) => p.planet === id).map((p) => p.count),
+            queue
+              .filter((p) => p.planet === id && !p.replace)
+              .map((p) => p.count),
           );
         requireRule(
           p && count <= Math.max(0, settlementSpace(g, p) - reserved),
@@ -1491,6 +1959,17 @@ export function applyCommand(
         return { planet: id, count };
       })
       .filter((p) => p.count > 0);
+    const additions: Record<string, number> = {};
+    for (const p of [...queue, ...extra].filter((p) => !("replace" in p)))
+      additions[p.planet] = (additions[p.planet] ?? 0) + p.count;
+    const replacements = replacementPlacements(
+      g,
+      s,
+      command.replacements,
+      queue,
+      additions,
+    );
+    allocated += sum(replacements.map((p) => p.count));
     requireRule(
       kept + allocated === pending.amount,
       "Allocate every displaced rocket as a Settlement or keep it as a Ship.",
@@ -1500,7 +1979,12 @@ export function applyCommand(
       "Other committed Settlements must remain allocated.",
     );
     requireRule(g.context, "No settlement action is active.");
-    g.context.settlementQueue = [...queue, ...extra];
+    g.context.settlementQueue = [
+      ...queue.filter((p) => !p.replace),
+      ...extra,
+      ...queue.filter((p) => p.replace),
+      ...replacements,
+    ];
     log(
       g,
       `Reallocated ${allocated} displaced Settlement${allocated === 1 ? "" : "s"}; kept ${kept} as Ships. Other committed placements remain fixed.`,
@@ -1618,13 +2102,22 @@ export function applyCommand(
     else advanceAllocation(g);
   } else if (command.type === "buy") {
     requireRule(g.phase === "tech" && !g.pending, "Buy during the Tech step.");
-    buy(g, command.tech, Boolean(command.fullPrice));
+    buy(
+      g,
+      command.tech,
+      Boolean(command.fullPrice),
+      command.value,
+      command.target,
+    );
   } else if (command.type === "feature") chooseFeature(g, command);
   else throw new Error("Unknown game command.");
   g.commands.push({ actor, command: clone(command) });
   g.revision++;
   if (g.phase !== "finished")
-    g.decisions.push({ player: g.turn, revision: g.revision });
+    g.decisions.push({
+      player: command.type === "returnCredits" ? actor : g.turn,
+      revision: g.revision,
+    });
   assertInvariants(g);
   return g;
 }
@@ -1637,9 +2130,9 @@ export function sinceLastDecision(g: Game) {
 
 export function assertInvariants(g: Game) {
   requireRule(
-    g.schema === 5 &&
-      g.engine === "0.14.0" &&
-      g.content === "tech-chains-simple-events-2",
+    g.schema === 6 &&
+      g.engine === "0.15.0" &&
+      g.content === "all-techs-event-tracker-3",
     "Unsupported saved-game version.",
   );
   requireRule(
@@ -1661,13 +2154,15 @@ export function assertInvariants(g: Game) {
       "reinforce",
       "pass",
       "finished",
+      "endgame",
     ].includes(g.phase),
     "Invalid game phase.",
   );
   requireRule(
     g.config &&
-      ["family", "chains", "mixed"].includes(g.config.techPreset) &&
-      ["standard", "five-tech-chain"].includes(g.config.scenario),
+      Object.prototype.hasOwnProperty.call(TECH_PRESETS, g.config.techPreset) &&
+      ["standard", "five-tech-chain"].includes(g.config.scenario) &&
+      ["simpler", "foresight-test"].includes(g.config.events ?? ""),
     "Invalid game setup variables.",
   );
   requireRule(
@@ -1676,6 +2171,53 @@ export function assertInvariants(g: Game) {
       g.market.every((id) => IMPLEMENTED_TECHS.includes(id)),
     "Invalid Tech display.",
   );
+  requireRule(
+    g.config.events === "foresight-test" ||
+      !g.market.includes("tech.foresight"),
+    "Foresight is excluded with simpler Events.",
+  );
+  requireRule(
+    Array.isArray(g.endgameQueue) &&
+      new Set(g.endgameQueue).size === g.endgameQueue.length &&
+      g.endgameQueue.every(
+        (id) => Number.isInteger(id) && id >= 0 && id < g.players.length,
+      ),
+    "Invalid endgame queue.",
+  );
+  if (g.pending?.kind === "filibuster")
+    requireRule(
+      g.phase === "plan" &&
+        g.pending.remaining.every(
+          (id) => Number.isInteger(id) && id >= 0 && id < g.players.length,
+        ),
+      "Invalid Filibuster checkpoint.",
+    );
+  if (g.pending?.kind === "insurance")
+    requireRule(
+      g.phase === "actions" &&
+        !g.context &&
+        g.pending.after === g.turn &&
+        Number.isInteger(g.pending.remaining) &&
+        g.pending.remaining >= 0 &&
+        g.pending.remaining < g.players.length,
+      "Invalid Insurance checkpoint.",
+    );
+  if (g.pending?.kind === "eminent")
+    requireRule(
+      g.phase === "endgame" && !g.context,
+      "Invalid Eminent Domain checkpoint.",
+    );
+  if (g.pending?.kind === "mercenaries" || g.pending?.kind === "afterOrder")
+    requireRule(
+      g.context?.kind === "move" && g.context.system === g.pending.system,
+      "Invalid after-MOVE checkpoint.",
+    );
+  if (g.pending?.kind === "action")
+    requireRule(
+      g.context?.kind === g.pending.action &&
+        g.context.system === g.pending.system,
+      "Invalid action checkpoint.",
+    );
   let context = g.context,
     depth = 0;
   while (context) {
@@ -1683,6 +2225,8 @@ export function assertInvariants(g: Game) {
       ++depth <= 8 &&
         context.actor === g.turn &&
         ["move", "settle", "produce", "attack"].includes(context.kind) &&
+        (context.source === undefined ||
+          IMPLEMENTED_TECHS.includes(context.source)) &&
         g.systems.some((s) => s.id === context!.system),
       "Invalid action chain.",
     );
@@ -1743,6 +2287,11 @@ export function assertInvariants(g: Game) {
       new Set(p.techs).size === p.techs.length &&
         p.techs.every((t) => IMPLEMENTED_TECHS.includes(t)),
       "Invalid prototype Tech ownership.",
+    );
+    requireRule(
+      g.config.events === "foresight-test" ||
+        !p.techs.includes("tech.foresight"),
+      "Foresight ownership is excluded with simpler Events.",
     );
     integer(p.unplaced, 4);
     integer(p.stalledRound, 6);
