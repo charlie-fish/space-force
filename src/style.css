@@ -280,6 +280,29 @@ small {
   padding: 0;
   margin: 0 0 1rem;
 }
+
+.setup-options {
+  display: grid;
+  gap: 12px;
+}
+.setup-options > label:first-of-type {
+  display: grid;
+  gap: 6px;
+}
+.setup-options select {
+  min-height: 44px;
+  width: 100%;
+  padding: 8px 12px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #fff9e9;
+  color: var(--ink);
+  font: inherit;
+}
+.setup-options .check-row {
+  align-items: flex-start;
+  line-height: 1.5;
+}
 .landing legend {
   font-weight: 700;
   font-size: max(10pt, 0.85rem);

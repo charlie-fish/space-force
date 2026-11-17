@@ -2,7 +2,7 @@
 
 A browser implementation of Charlie Fish's board game, for desktop and mobile.
 
-**Current implementation: prototype 0.13.0, 16 November 2026.** A complete local pass-and-play game for **2–7 players sharing one device**, using normal turns, the official ten-Tech **Family** preset, and the rulebook's **simpler Events** variant. Event cards count rounds; their effects and auctions are disabled. This is the first implementation milestone; remote multiplayer is next.
+**Current implementation: prototype 0.14.0, 17 November 2026.** A complete local pass-and-play game for **2–7 players sharing one device**, using normal turns, three selectable ten-Tech displays drawn from **20 implemented Techs**, and the rulebook's **simpler Events** variant. Event cards count rounds; their effects and auctions are disabled. This is the first implementation milestone; remote multiplayer is next.
 
 ## Run the prototype
 
@@ -19,14 +19,15 @@ npm ci
 npm run dev
 ```
 
-Open **http://localhost:5173**. Choose the player count and names, start a game, and select homes in player order. The guide explains each phase. On a phone sharing the computer's network, use the Network URL printed by Vite.
+Open **http://localhost:5173**. Choose the player count, names and Tech display, start a game, and select homes in player order. **New Techs** is the default display; **Family** retains the original ten cards. For the five-Tech PRODUCE example, enable **R01 chain test** before starting: everyone begins with those Techs, using five Reserve markers each. See the [0.14 playtest guide](docs/PLAYTEST_CHANGES_0.14.md). The guide explains each phase. On a phone sharing the computer's network, use the Network URL printed by Vite.
 
 For a production static build, run `npm run build`; serve the generated `dist/` directory over HTTP(S). `npm run preview` serves that build locally on port 4173. `npm run package` also creates the portable playtest copy in `work/portable/`. The build supports hosting under a subpath. GitHub Actions runs the tests/build and provides a downloadable `space-force-static-prototype` artifact; it does not publish a live site.
 
 ## Included now
 
 - Correct layouts, home/hidden pools, and 40 rockets/four chips per player. Six-player games use Asimov; seven-player games use Adams as the central seventh home.
-- Ordered chip stacks, all four actions, Investments, limited supplies, Economy, all ten Family Tech effects, final scoring and tie-breaks.
+- Ordered chip stacks, all four actions, Investments, limited supplies, Economy, all ten Family Tech effects plus ten new Techs, nested free-action chains, final scoring and tie-breaks.
+- New Techs: Population Explosion, Government Incentives, Frontier Pioneer, Rapid Advance, Spice, Arcologies, Cloaking, Patrol, Research Lab and Strategic Stall. Choose Family, New Techs or Tech chain mix; the optional R01 starting-Tech scenario makes the full chain testable immediately.
 - Board, Techs, Event, Actions and Supply, and Player aid views, including after scoring. Both shared-aid faces appear together. Reserve and Credits stay visible; the player summary shows everyone's public supplies and current scores in order from the current first player.
 - Seven provisional rocket silhouettes and matching poker-chip rim motifs, with chips anchored to the printed suns.
 - A top Status Box with highlighted turn details, a clear prompt, selected system/stack order and a “Since your last turn” history toggle.
@@ -39,7 +40,7 @@ For a production static build, run `npm run build`; serve the generated `dist/` 
 - Exportable local game records with version, setup seed, command history, final state and scores. Deterministic replay tests cover complete games.
 - Optimised, self-hosted artwork from the supplied PDFs, replaceable through stable IDs and an art manifest. No runtime framework, external fonts, Steam links, or 3D engine.
 
-See [the 0.13 playtest changes](docs/PLAYTEST_CHANGES_0.13.md) and [prototype scope, controls, validation and limitations](docs/PROTOTYPE.md). The [0.12](docs/PLAYTEST_CHANGES_0.12.md), [0.11](docs/PLAYTEST_CHANGES_0.11.md), [0.10](docs/PLAYTEST_CHANGES_0.10.md) and [0.9](docs/PLAYTEST_CHANGES_0.9.md) checklists record previous iterations.
+See [the 0.14 playtest changes and chain-testing instructions](docs/PLAYTEST_CHANGES_0.14.md) and [prototype scope, controls, validation and limitations](docs/PROTOTYPE.md). The [0.13](docs/PLAYTEST_CHANGES_0.13.md), [0.12](docs/PLAYTEST_CHANGES_0.12.md), [0.11](docs/PLAYTEST_CHANGES_0.11.md), [0.10](docs/PLAYTEST_CHANGES_0.10.md) and [0.9](docs/PLAYTEST_CHANGES_0.9.md) checklists record previous iterations.
 
 ## Next milestones
 
@@ -59,9 +60,9 @@ npm run check  # strict TypeScript
 npm run build  # production bundle, artwork references and compressed-JavaScript budget
 ```
 
-The 112 tests include 72 complete seeded games across all supported player counts. DOM tests run in JSDOM; they do not replace visual browser/device testing. See [the validation record](docs/PROTOTYPE.md#validation).
+The 137 tests include 90 complete seeded games across all supported player counts. DOM tests run in JSDOM; they do not replace visual browser/device testing. See [the validation record](docs/PROTOTYPE.md#validation).
 
-Code: [engine](src/engine.ts), [UI](src/ui.ts), [state and commands](src/types.ts). Data: [layouts](src/layouts-data.json), [art/anchors](src/art-data.json), [card reference text](src/cards-data.json). Only the Family preset is playable; other card entries are reference data.
+Code: [engine](src/engine.ts), [UI](src/ui.ts), [state and commands](src/types.ts). Data: [layouts](src/layouts-data.json), [art/anchors](src/art-data.json), [card reference text](src/cards-data.json). Twenty Tech effects are playable through the three ten-card displays; the other ten Techs and all Event effects remain reference data.
 
 ## Project documents
 

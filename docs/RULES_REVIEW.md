@@ -119,7 +119,7 @@ Source: the designer's follow-up message on 13 November 2026, with subsequent co
 
 ### Confirmed R01 example
 
-Assume the player owns Population Explosion, Government Incentives, Frontier Pioneer, Rapid Advance, and Spice, and chooses to use the applicable effects:
+Assume the player owns Population Explosion, Government Incentives, Frontier Pioneer, Rapid Advance, and Spice, and resolves the applicable effects:
 
 1. Resolve the standard PRODUCE.
 2. Population Explosion grants a free SETTLE. Its before-effects include Frontier Pioneer adding one Ship and Government Incentives granting a free MOVE INTO.

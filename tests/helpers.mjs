@@ -13,18 +13,28 @@ import {
   production,
   purchaseReason,
   reinforceCount,
+  settlementSpace,
   system,
 } from "../work/compiled/engine.js";
 export * from "../work/compiled/engine.js";
-export { ART, CARD_MAP, FAMILY, LAYOUTS } from "../work/compiled/content.js";
+export {
+  ART,
+  CARD_MAP,
+  FAMILY,
+  LAYOUTS,
+  CHAIN_TECHS,
+  NEW_TECHS,
+  TECH_PRESETS,
+  IMPLEMENTED_TECHS,
+} from "../work/compiled/content.js";
 
 export function step(g, command) {
   const next = applyCommand(g, g.turn, command);
   assertInvariants(next);
   return next;
 }
-export function setup(count = 2, seed = 7) {
-  let g = createGame(count, seed);
+export function setup(count = 2, seed = 7, config) {
+  let g = createGame(count, seed, [], config);
   while (g.phase === "homes")
     g = step(g, {
       type: "home",
@@ -75,9 +85,32 @@ export function botCommand(g) {
     return { type: "orient", rotation: pending.rotations[0] };
   if (pending?.kind === "move")
     return { type: "move", sources: pending.sources };
+  if (pending?.kind === "action") {
+    const active = system(g, pending.system);
+    const command = { type: "act", bank: true };
+    if (pending.action === "settle") {
+      let remaining = active.ships[g.turn];
+      command.settlements = Object.fromEntries(
+        active.revealed
+          ? active.planets.map((planet) => {
+              const n = Math.min(remaining, settlementSpace(g, planet));
+              remaining -= n;
+              return [planet.id, n];
+            })
+          : [],
+      );
+    }
+    return command;
+  }
+  if (pending?.kind === "rapid") {
+    const option = featureOptions(g, "tech.rapid-advance")[0];
+    return option
+      ? { type: "rapid", planet: option.planet }
+      : { type: "rapid", skip: true };
+  }
   if (pending?.kind === "settle") {
     const s = system(g, pending.system);
-    const planet = s.planets.find((p) => freeSpace(p));
+    const planet = s.planets.find((p) => settlementSpace(g, p));
     return planet && s.ships[g.turn]
       ? { type: "settle", planet: planet.id, count: 1 }
       : { type: "finishSettle" };
@@ -101,6 +134,8 @@ export function botCommand(g) {
       ).id,
     };
   if (g.phase === "plan") {
+    if (p.techs.includes("tech.strategic-stall") && p.stalledRound !== g.round)
+      return { type: "planPass" };
     // Stack half at home and half at the nearest expansion route.
     const home = system(g, p.home);
     const next =
@@ -138,7 +173,10 @@ export function botCommand(g) {
       }
     if (!p.used.includes("settle")) {
       const s = options.find(
-        (s) => s.ships[p.id] && s.planets.some((p) => freeSpace(p)),
+        (s) =>
+          s.revealed &&
+          s.ships[p.id] &&
+          s.planets.some((p) => settlementSpace(g, p)),
       );
       if (s)
         return {
@@ -148,7 +186,7 @@ export function botCommand(g) {
           bank: true,
           settlements: Object.fromEntries(
             s.planets
-              .filter((p) => freeSpace(p))
+              .filter((p) => settlementSpace(g, p))
               .slice(0, s.ships[g.turn])
               .map((p) => [p.id, 1]),
           ),

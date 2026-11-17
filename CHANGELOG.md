@@ -1,5 +1,15 @@
 # Change log
 
+## 0.14.0 — 2026-11-17
+
+- Default PRODUCE to maximum Ships, retain blocked PLAN systems for inspection with disabled placement, and apply the four requested wording changes.
+- Implement ten additional Techs: Population Explosion, Government Incentives, Frontier Pioneer, Rapid Advance, Spice, Arcologies, Cloaking, Patrol, Research Lab and Strategic Stall. Family remains available; new ten-card displays expose the additions and a mixed interaction set.
+- Resolve nested before/after free actions without consuming extra tokens/slots, preserve Explore/Reserve interruptions and saves, and implement the confirmed R01 sequence. Rapid Advance is direct conversion; Spice repeats the complete chain once with recalculated production. Banking optionally applies to each performed free action.
+- Add the labelled R01 scenario, accounting for five starting Tech markers from each Reserve and recording the setup in exports. It makes the full example testable before the final Actions phase at every player count.
+- Add shared Arcologies capacity/snaps, Cloaking before-effect quantities, owner-specific Patrol protection, Research Lab discount/full-price choices and once-per-round Strategic Stall passes.
+- Upgrade engine/saves to 0.14.0/schema 5, with compatible replay of genuine 0.8–0.11 engine saves, preserving old production defaults and final scores.
+- All 137 automated rules/DOM/replay checks pass, including 90 complete seeded games. Production and portable packaging pass at approximately 53 KB compressed JavaScript with all 85 self-hosted assets. Real-browser/phone visual verification remains pending. See the [complete 0.14 playtest guide](docs/PLAYTEST_CHANGES_0.14.md).
+
 ## 0.13.0 — 2026-11-16
 
 - Updated the Actions and Supply explanation, stack-selection prompt and empty-ATTACK confirmation wording.

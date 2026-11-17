@@ -1,4 +1,10 @@
-import { blackHoles, nameOf, reinforceCount, system } from "./engine.js";
+import {
+  blackHoles,
+  nameOf,
+  reinforceCount,
+  system,
+  beforeActionHooks,
+} from "./engine.js";
 import type { Command, Game } from "./types.js";
 
 const total = (values: Record<string, number> = {}) =>
@@ -7,7 +13,25 @@ const total = (values: Record<string, number> = {}) =>
 /** Confirm draft consequences without changing the rules or exposing a hidden result. */
 export function intentWarnings(game: Game, command: Command): string[] {
   const messages: string[] = [];
-  if (command.type === "resolve" && !command.invest) {
+  const effect =
+    command.type === "act" && game.context
+      ? {
+          ...command,
+          type: "resolve" as const,
+          action: game.context.kind,
+          system: game.context.system,
+          invest: false,
+        }
+      : command;
+  command = effect;
+  if (
+    command.type === "resolve" &&
+    !command.invest &&
+    !(
+      game.pending?.kind !== "action" &&
+      beforeActionHooks(game, command.action).length
+    )
+  ) {
     if (command.action === "move" && !command.reveal && !total(command.sources))
       messages.push(
         "No Ships are selected to move. Use your MOVE INTO action without moving any Ships?",
@@ -53,7 +77,7 @@ export function intentWarnings(game: Game, command: Command): string[] {
       const holes = blackHoles(target),
         lost = Math.min(incoming, holes);
       messages.push(
-        `You are sending ${incoming} Ship${incoming === 1 ? "" : "s"} into ${nameOf(target)}, which has ${holes} black hole${holes === 1 ? "" : "s"}. ${lost} incoming Ship${lost === 1 ? "" : "s"} will be destroyed and returned as Credits. Is that what you intended?`,
+        `You are sending ${incoming} Ship${incoming === 1 ? "" : "s"} into ${nameOf(target)}, which has ${holes} black hole${holes === 1 ? "" : "s"}. ${lost} incoming Ship${lost === 1 ? "" : "s"} will be destroyed and returned as Credits.`,
       );
     }
   }

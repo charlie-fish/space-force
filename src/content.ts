@@ -90,6 +90,35 @@ export const FAMILY = [
   "planet-killer",
   "planet-nine",
 ].map((id) => `tech.${id}`);
+export const NEW_TECHS = [
+  "population-explosion",
+  "government-incentives",
+  "frontier-pioneer",
+  "rapid-advance",
+  "spice",
+  "arcologies",
+  "cloaking",
+  "patrol",
+  "research-lab",
+  "strategic-stall",
+].map((id) => `tech.${id}`);
+export const IMPLEMENTED_TECHS = [...FAMILY, ...NEW_TECHS];
+export const CHAIN_TECHS = NEW_TECHS.slice(0, 5);
+export const TECH_PRESETS = {
+  family: { label: "Family", techs: FAMILY },
+  chains: { label: "New Techs", techs: NEW_TECHS },
+  mixed: {
+    label: "Tech chain mix",
+    techs: [
+      ...CHAIN_TECHS,
+      "tech.banking",
+      "tech.agility",
+      "tech.genesis",
+      "tech.arcologies",
+      "tech.research-lab",
+    ],
+  },
+};
 export const STYLES = [
   { name: "Moss", color: "#8eae5c", rim: "dots" },
   { name: "Ink", color: "#303746", rim: "stripes" },

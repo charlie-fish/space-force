@@ -76,6 +76,16 @@ export function findOpenSpace(
   return best;
 }
 export function fleetPositions(s: System): Point[] {
+  // Public pieces in an unexplored system must not use its hidden planet geometry.
+  if (!s.revealed && s.ships.some((n) => n > 0))
+    return fleetPositions({
+      ...s,
+      revealed: true,
+      template: "system.asimov",
+      planets: [],
+      extraWarp: false,
+      extraHoles: 0,
+    });
   const layout = featureLayout(s);
   const fleetKey = s.ships.map((n) => Number(n > 0)).join("");
   if (layout.fleetKey === fleetKey) return layout.fleets;

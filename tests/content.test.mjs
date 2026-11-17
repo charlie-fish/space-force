@@ -80,7 +80,7 @@ test("Planet Nine uses available empty space across source systems instead of co
   }
 });
 
-test("Family market matches the supplied preset; other cards remain reference data only", () => {
+test("Family market matches the supplied preset and all cards retain reference text", () => {
   assert.equal(cards.techs.length, 30);
   assert.equal(cards.events.length, 30);
   assert.equal(

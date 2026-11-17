@@ -105,9 +105,13 @@ test("production Ships and Credits stay linked in both directions and commit the
   h.click(`[data-system="${id}"][role="button"]`);
   h.click('[data-kind="produce"]');
   const total = Number(
-    h.root.querySelector('[data-number="produce-credits"]').value,
+    h.root.querySelector('[data-number="produce-ships"]').value,
   );
   assert.ok(total > 0);
+  assert.equal(
+    h.root.querySelector('[data-number="produce-credits"]').value,
+    "0",
+  );
   h.input('[data-number="produce-ships"]', String(total));
   assert.equal(
     h.root.querySelector('[data-number="produce-credits"]').value,
@@ -696,8 +700,8 @@ test("game export downloads a versioned JSON record with setup, commands, and cu
     h.click('[data-action="export"]');
     const record = JSON.parse(await blob.text());
     assert.match(download, /^space-force-/);
-    assert.equal(record.game.engine, "0.11.0");
-    assert.equal(record.game.content, "family-simple-events-1");
+    assert.equal(record.game.engine, "0.14.0");
+    assert.equal(record.game.content, "tech-chains-simple-events-2");
     assert.equal(record.game.commands.length, record.game.revision);
     assert.equal(record.game.seed, h.app.getGame().seed);
     assert.equal(record.game.phase, "plan");

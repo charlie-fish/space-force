@@ -53,6 +53,8 @@ export interface Player {
   investedActions: Action[];
   home: string | null;
   unplaced: number;
+  stalledRound: number;
+  freeInvestments: Action[];
 }
 export interface MovePayload {
   sources: Record<string, number>;
@@ -68,12 +70,20 @@ export interface ActionContext {
   kind: Action;
   bank: boolean;
   settlementQueue?: { planet: string; count: number }[];
+  parent?: ActionContext;
+  source?: string;
+  stage?: "before" | "body" | "after";
+  beforeHooks?: string[];
+  afterHooks?: string[];
+  bankDone?: boolean;
 }
-export type SettlementResume = "settle" | "genesis";
+export type SettlementResume = "settle" | "genesis" | "rapid";
 export type Continuation =
   | { kind: "actionDone"; actor: number }
   | { kind: "techDone" }
   | { kind: "allocationDone" }
+  | { kind: "beforeHooks" }
+  | { kind: "afterHooks" }
   | {
       kind: "place";
       system: string;
@@ -84,6 +94,14 @@ export type Continuation =
     }
   | { kind: "settlementNext"; system: string; resume: SettlementResume };
 export type Pending =
+  | {
+      kind: "action";
+      system: string;
+      action: Action;
+      source: string;
+      free: boolean;
+    }
+  | { kind: "rapid"; system: string }
   | { kind: "ack"; title: string; messages: string[]; after: Continuation }
   | {
       kind: "redistribute";
@@ -110,7 +128,7 @@ export type Pending =
       system: string;
       planet: string;
       effect: "otherShips" | "otherSettlement";
-      resume: "settle" | "genesis";
+      resume: SettlementResume;
       count: number;
       from: "ships" | "reserve";
     }
@@ -125,9 +143,10 @@ export interface Score {
   total: number;
 }
 export interface Game {
-  schema: 4;
-  engine: "0.11.0";
-  content: "family-simple-events-1";
+  schema: 5;
+  engine: "0.14.0";
+  content: "tech-chains-simple-events-2";
+  config: GameConfig;
   seed: number;
   rng: number;
   revision: number;
@@ -163,21 +182,30 @@ export interface Game {
   scores: Score[];
   winners: number[];
 }
+export interface GameConfig {
+  techPreset: "family" | "chains" | "mixed";
+  scenario: "standard" | "five-tech-chain";
+}
+export interface ActionChoices {
+  bank?: boolean;
+  sources?: Record<string, number>;
+  credits?: number;
+  attack?: AttackPayload;
+  settlements?: Record<string, number>;
+  reveal?: boolean;
+}
 export type Command =
   | { type: "home"; system: string }
   | { type: "plan"; system: string }
-  | {
+  | { type: "planPass" }
+  | ({ type: "act" } & ActionChoices)
+  | { type: "rapid"; planet?: string; skip?: boolean }
+  | ({
       type: "resolve";
       system: string;
       action: Action;
       invest?: boolean;
-      bank?: boolean;
-      sources?: Record<string, number>;
-      credits?: number;
-      attack?: AttackPayload;
-      settlements?: Record<string, number>;
-      reveal?: boolean;
-    }
+    } & ActionChoices)
   | { type: "orient"; rotation: number }
   | { type: "move"; sources: Record<string, number> }
   | { type: "settle"; planet: string; count: number }
@@ -189,7 +217,7 @@ export type Command =
   | { type: "nextRound" }
   | { type: "explore"; recipient: number }
   | { type: "allocate"; credits: number; ships: Record<string, number> }
-  | { type: "buy"; tech: string | null }
+  | { type: "buy"; tech: string | null; fullPrice?: boolean }
   | {
       type: "feature";
       system?: string;
