@@ -201,6 +201,7 @@ export function mountApp(
     preview?: Game;
   } | null = null;
   let rosterOpen = false;
+  let resetRoster = true;
   let reserveWarningOpen = true;
   let placementTap: {
     system: string;
@@ -213,7 +214,8 @@ export function mountApp(
     source: string;
   } | null = null;
   let snapSystem: string | null = null;
-  let homeTouch: {
+  let boardTap: {
+    kind: "home" | "orient";
     id: number;
     system: string;
     x: number;
@@ -404,6 +406,7 @@ export function mountApp(
             next.pending?.kind === "reserve" ? "finishReserve" : "acknowledge",
         });
       game = next;
+      resetRoster = true;
       reserveWarningOpen = true;
       if (
         game.turn !== old.turn ||
@@ -474,6 +477,7 @@ export function mountApp(
   }
   function start() {
     privatePeek = false;
+    resetRoster = true;
     reserveWarningOpen = true;
     game = createGame(count, seedFrom(mapCode || String(Date.now())), names, {
       techPreset,
@@ -495,6 +499,7 @@ export function mountApp(
       if (!raw) throw Error("No saved game is available.");
       const loaded = restoreGame(JSON.parse(raw));
       game = loaded;
+      resetRoster = true;
       reserveWarningOpen = true;
       view = loaded.pending
         ? "board"
@@ -632,7 +637,7 @@ export function mountApp(
     return `<aside class="guide" aria-label="Learn as you play"><div><span class="eyebrow">Learn as you play</span><p>${escape(g.pending ? instruction(g) : tips[g.phase])}</p></div>${button("Hide guide", "guide-off", "", false, "quiet")}</aside>`;
   }
   function landing() {
-    return `<main class="landing"><div class="landing-art"><img src="${ART.cover.image}" width="562" height="768" alt="Space Force cover: rocket fleets above a ringed planet"/><span class="cover-credit">A game by Charlie Fish</span></div><section class="landing-copy"><div class="eyebrow">Local pass-and-play · Prototype 0.18</div><h1>Claim your<br/><span>corner of space.</span></h1><p class="lead">Plan your moves. Explore new systems. Settle the galaxy.</p><div class="scope-note"><strong>This build: ${TECH_PRESETS[techPreset].label} · ${eventMode === "foresight-test" ? "Tech playtest Events" : "simpler Events"}.</strong><span>A complete local game for 2–7 players on one device. Event cards count rounds; their effects and auctions are disabled. Remote rooms and full Event effects follow later.</span></div><form id="setup-form"><fieldset><legend>How many players?</legend><div class="player-counts">${Array.from({ length: 6 }, (_, i) => button(String(i + 2), "count", `data-count="${i + 2}" aria-pressed="${count === i + 2}"`, false, count === i + 2 ? "selected" : "")).join("")}</div></fieldset><fieldset class="setup-options"><legend>Tech display</legend><label>Preset <select data-setting="tech-preset">${Object.entries(
+    return `<main class="landing"><div class="landing-art"><img src="${ART.cover.image}" width="562" height="768" alt="Space Force cover: rocket fleets above a ringed planet"/><span class="cover-credit">A game by Charlie Fish</span></div><section class="landing-copy"><div class="eyebrow">Local pass-and-play · Prototype 0.19</div><h1>Claim your<br/><span>corner of space.</span></h1><p class="lead">Plan your moves. Explore new systems. Settle the galaxy.</p><div class="scope-note"><strong>This build: ${TECH_PRESETS[techPreset].label} · ${eventMode === "foresight-test" ? "Tech playtest Events" : "simpler Events"}.</strong><span>A complete local game for 2–7 players on one device. Event cards count rounds; their effects and auctions are disabled. Remote rooms and full Event effects follow later.</span></div><form id="setup-form"><fieldset><legend>How many players?</legend><div class="player-counts">${Array.from({ length: 6 }, (_, i) => button(String(i + 2), "count", `data-count="${i + 2}" aria-pressed="${count === i + 2}"`, false, count === i + 2 ? "selected" : "")).join("")}</div></fieldset><fieldset class="setup-options"><legend>Tech display</legend><label>Preset <select data-setting="tech-preset">${Object.entries(
       TECH_PRESETS,
     )
       .map(
@@ -710,7 +715,7 @@ export function mountApp(
         .join(", ")}`,
     )}" viewBox="${(p.x - rx) * 400} ${(p.y - ry) * 462} ${rx * 800} ${ry * 924}">${image}${owners.map((id, j) => glyph(id, slots[j].x * 400, slots[j].y * 462, 27)).join("")}</svg>`;
   }
-  function systemTile(
+  function systemLayers(
     g: Game,
     s: System,
     miniature = false,
@@ -817,7 +822,8 @@ export function mountApp(
           `<line data-system="${s.id}" data-edge="${o.edge}" role="button" tabindex="0" aria-label="Edge ${o.edge! + 1} of ${attrs(nameOf(s))}" class="edge-target ${!miniature && selected === s.id && selectedEdge === o.edge ? "selected-edge" : ""}" x1="${W / 2}" y1="-50" x2="${W / 2}" y2="50" transform="rotate(${o.edge! * 60})"/>`,
       )
       .join("");
-    return `<g transform="translate(${x} ${y})" class="${miniature ? "system-snapshot" : "system"} ${!miniature && selected === s.id ? "chosen" : ""} ${eligible ? "eligible" : ""} ${legal ? "legal-placement" : ""}" ${miniature ? `data-snapshot-system="${s.id}"` : `data-system="${s.id}" role="button" tabindex="0"`} aria-label="${attrs(nameOf(s))}${
+    const background = `<g class="system-background" data-background-system="${s.id}" transform="translate(${x} ${y})"><g transform="rotate(${s.revealed ? rotation * 60 : 0})"><image href="${s.revealed ? art.image : ART.backs.system.image}" x="${-W / 2}" y="-100" width="${W}" height="200" clip-path="url(#hex-clip)"/></g>${!s.revealed ? '<circle class="blank-sun" cx="0" cy="0" r="25"/>' : ""}</g>`;
+    const pieces = `<g transform="translate(${x} ${y})" class="${miniature ? "system-snapshot" : "system"} ${!miniature && selected === s.id ? "chosen" : ""} ${eligible ? "eligible" : ""} ${legal ? "legal-placement" : ""}" ${miniature ? `data-snapshot-system="${s.id}"` : `data-system="${s.id}" role="button" tabindex="0"`} aria-label="${attrs(nameOf(s))}${
       s.tokens.length
         ? `, stack top to bottom: ${s.tokens
             .slice()
@@ -825,7 +831,8 @@ export function mountApp(
             .map((id) => attrs(player(g, id).name))
             .join(", ")}`
         : ""
-    }"><g transform="rotate(${s.revealed ? rotation * 60 : 0})"><image href="${s.revealed ? art.image : ART.backs.system.image}" x="${-W / 2}" y="-100" width="${W}" height="200" clip-path="url(#hex-clip)"/></g>${!s.revealed ? '<circle class="blank-sun" cx="0" cy="0" r="25"/>' : ""}<polygon points="0,-100 ${W / 2},-50 ${W / 2},50 0,100 ${-W / 2},50 ${-W / 2},-50" class="hex-outline"/>${extraEdges}${planets}${holes}${fleets}${chips}${ghost}${warpToken}${edgeTargets}</g>`;
+    }"><polygon points="0,-100 ${W / 2},-50 ${W / 2},50 0,100 ${-W / 2},50 ${-W / 2},-50" class="hex-outline"/>${extraEdges}${planets}${holes}${fleets}${chips}${ghost}${warpToken}${edgeTargets}</g>`;
+    return { background, pieces };
   }
   function sharedArt(g: Game) {
     return `<svg class="shared-art-defs" width="0" height="0" aria-hidden="true" focusable="false"><defs><clipPath id="hex-clip"><polygon points="0,-100 ${HEX_WIDTH / 2},-50 ${HEX_WIDTH / 2},50 0,100 ${-HEX_WIDTH / 2},50 ${-HEX_WIDTH / 2},-50"/></clipPath>${g.players.map((p) => `<g id="chip-rim-${p.style}">${CHIP_RIMS[p.style]}</g>`).join("")}</defs></svg>`;
@@ -841,7 +848,8 @@ export function mountApp(
       ),
       `${s.tokens.length} action chips`,
     ].join(", ");
-    const markup = `<svg class="system-preview" data-preview-system="${s.id}" width="96" height="110" viewBox="${-HEX_WIDTH / 2 - 12} -112 ${HEX_WIDTH + 24} 224" role="img" aria-label="${attrs(details)}" focusable="false">${systemTile(g, s, true)}</svg>`;
+    const layers = systemLayers(g, s, true);
+    const markup = `<svg class="system-preview" data-preview-system="${s.id}" width="96" height="110" viewBox="${-HEX_WIDTH / 2 - 12} -112 ${HEX_WIDTH + 24} 224" role="img" aria-label="${attrs(details)}" focusable="false">${layers.background}${layers.pieces}</svg>`;
     previewCache.set(s, markup);
     return markup;
   }
@@ -858,9 +866,9 @@ export function mountApp(
       g.pending.tech === "tech.kessler-syndrome"
         ? featureOptions(g, g.pending.tech)
         : [];
-    const tiles = centers
-      .map(({ s }) => systemTile(g, s, false, feature))
-      .join("");
+    const layers = centers.map(({ s }) => systemLayers(g, s, false, feature));
+    const backgrounds = layers.map((layer) => layer.background).join("");
+    const pieces = layers.map((layer) => layer.pieces).join("");
     const labels = centers
       .map(
         ({ s, x, y }) =>
@@ -869,7 +877,7 @@ export function mountApp(
       .join("");
     snapSystem = null;
     const cursorSvg = `<svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="-29 -29 58 60"><g opacity=".65">${chipFace(g.turn, 0, 0, 24)}</g></svg>`;
-    return `<section class="map-wrap ${g.phase === "plan" ? "plan-mode" : ""}" aria-label="Galaxy board"><div class="map-toolbar"><span>${g.phase === "plan" && !g.pending ? "Select a system, then confirm; double-click or double-tap to place" : "Select a system to inspect"}</span><div class="camera-controls">${button("←", "pan-left", 'aria-label="Pan left"')}${button("↑", "pan-up", 'aria-label="Pan up"')}${button("↓", "pan-down", 'aria-label="Pan down"')}${button("→", "pan-right", 'aria-label="Pan right"')}${button("−", "zoom-out", 'aria-label="Zoom out"')}${button("+", "zoom-in", 'aria-label="Zoom in"')}${button("Reset View", "fit", 'aria-label="Reset View"')}</div></div><div class="map-viewport" tabindex="0" aria-label="Galaxy map; arrow keys pan, plus and minus zoom" ${g.phase === "plan" && !g.pending && selected && canPlan(g, system(g, selected)) ? `style="cursor:url(&quot;data:image/svg+xml,${encodeURIComponent(cursorSvg)}&quot;) 24 24,pointer"` : ""}><svg id="galaxy" role="group" aria-label="Space Force galaxy" viewBox="${vx} ${vy} ${vw} ${vh}">${tiles}<g class="system-labels" aria-hidden="true" pointer-events="none">${labels}</g></svg></div></section>`;
+    return `<section class="map-wrap ${g.phase === "plan" ? "plan-mode" : ""}" aria-label="Galaxy board"><div class="map-toolbar"><span>${g.pending?.kind === "orient" ? "Click or tap the revealed system to rotate clockwise" : g.phase === "plan" && !g.pending ? "Select a system, then confirm; double-click or double-tap to place" : "Select a system to inspect"}</span><div class="camera-controls">${button("←", "pan-left", 'aria-label="Pan left"')}${button("↑", "pan-up", 'aria-label="Pan up"')}${button("↓", "pan-down", 'aria-label="Pan down"')}${button("→", "pan-right", 'aria-label="Pan right"')}${button("−", "zoom-out", 'aria-label="Zoom out"')}${button("+", "zoom-in", 'aria-label="Zoom in"')}${button("Reset View", "fit", 'aria-label="Reset View"')}</div></div><div class="map-viewport" tabindex="0" aria-label="Galaxy map; arrow keys pan, plus and minus zoom" ${g.phase === "plan" && !g.pending && selected && canPlan(g, system(g, selected)) ? `style="cursor:url(&quot;data:image/svg+xml,${encodeURIComponent(cursorSvg)}&quot;) 24 24,pointer"` : ""}><svg id="galaxy" role="group" aria-label="Space Force galaxy" viewBox="${vx} ${vy} ${vw} ${vh}"><g class="system-backgrounds" aria-hidden="true" pointer-events="none">${backgrounds}</g><g class="system-pieces">${pieces}</g><g class="system-labels" aria-hidden="true" pointer-events="none">${labels}</g></svg></div></section>`;
   }
 
   function cameraBox() {
@@ -1512,7 +1520,7 @@ export function mountApp(
     const s = selected ? g.systems.find((s) => s.id === selected) : null,
       pending = g.pending;
     if (pending?.kind === "orient")
-      return `<section class="console"><div class="eyebrow">Exploration revealed · orientation preview</div><h2>Orient ${escape(nameOf(system(g, pending.system)))}</h2><p>Rotate freely, then commit a legal orientation. The preview updates the board.</p><div class="rotation-options">${button("↶ Anti-clockwise", "rotate-preview", 'data-delta="-1"', false, "secondary")}<strong>${orientation * 60}°</strong>${button("↷ Clockwise", "rotate-preview", 'data-delta="1"', false, "secondary")}</div>${!pending.rotations.includes(orientation) ? '<p class="error">This orientation blocks the entry route or disconnects the board. Keep rotating.</p>' : ""}${button("Commit orientation", "commit-orientation", "", !pending.rotations.includes(orientation), "primary")}</section>`;
+      return `<section class="console"><div class="eyebrow">Exploration revealed · orientation preview</div><h2>Orient ${escape(nameOf(system(g, pending.system)))}</h2><p>Click or tap this system to rotate clockwise, or use the buttons. Rotate freely, then commit a legal orientation.</p><div class="rotation-options">${button("↶ Anti-clockwise", "rotate-preview", 'data-delta="-1"', false, "secondary")}<strong>${orientation * 60}°</strong>${button("↷ Clockwise", "rotate-preview", 'data-delta="1"', false, "secondary")}</div>${!pending.rotations.includes(orientation) ? '<p class="error">This orientation blocks the entry route or disconnects the board. Keep rotating.</p>' : ""}${button("Commit orientation", "commit-orientation", "", !pending.rotations.includes(orientation), "primary")}</section>`;
     if (pending?.kind === "move") {
       const target = system(g, pending.system);
       return `<section class="console"><div class="eyebrow">Committed movement</div><h2>Enter ${escape(nameOf(target))}</h2>${movementControls(g, target, draft.sources)}<p>At least one Ship must enter from ${pending.entrySources.map((id) => escape(nameOf(system(g, id)))).join(" or ")}.</p>${blackHoles(target) ? `<p>Up to ${blackHoles(target)} incoming Ships will be lost to destination black holes.</p>` : ""}${button("Finish movement", "finish-move", "", !pending.entrySources.some((id) => (draft.sources[id] ?? 0) > 0), "primary")}</section>`;
@@ -1834,7 +1842,7 @@ export function mountApp(
         ...g.players.slice(g.first),
         ...g.players.slice(0, g.first),
       ];
-    return `<section id="status-box" class="status-box" tabindex="-1" aria-label="Status Box"><div class="status-overview"><h2 class="status-title"><button data-action="to-status">Status Box<span class="shortcut-hint"> (S)</span></button></h2><div class="eyebrow status-phase">${phaseLabel(g)}</div><div class="turn-bar" tabindex="-1" aria-live="polite">${badge(p.style, p.name)}<span class="turn-instruction">${escape(instruction(g))}</span></div>${foresightControl(g)}<div class="status-supply resource-pills"><span><small>Reserve</small><strong>${p.reserve}</strong></span><span><small>Credits</small><strong>${p.credits}</strong></span></div>${flexibleControl(g)}<details class="player-roster" ${rosterOpen ? "open" : ""}><summary>Players & supply</summary><ul>${orderedPlayers.map((other) => `<li data-player="${other.id}">${badge(other.style, other.name)}<span>${other.reserve} Reserve</span><span>${other.credits} Credits</span><span>${other.techs.length} Techs</span><strong>${scores.find((s) => s.player === other.id)!.total} points${g.phase === "finished" ? "" : " currently"}</strong><span>${other.used.length}/4 slots used</span></li>`).join("")}</ul></details>${economyTracker(g)}</div><div class="status-decision">${error ? `<div class="error" role="alert">${escape(error)}</div>` : ""}<details class="since-last-turn"><summary>Since your last turn</summary>${history.length ? `<ol>${history.map((l) => `<li data-log-revision="${l.revision}"><span>Round ${l.round}</span> ${l.player === null ? "" : `<strong>${escape(player(g, l.player).name)}:</strong> `}${escape(l.text)}</li>`).join("")}</ol>` : "<p>No actions have happened since your previous decision.</p>"}</details>${inspector(g)}${g.phase === "plan" && hasTech(g, g.turn, "strategic-stall") ? `<div class="stall-choice">${button("Pass once · Strategic Stall", "plan-pass", "", player(g).stalledRound === g.round, "secondary")}</div>` : ""}</div></section>`;
+    return `<section id="status-box" class="status-box" tabindex="-1" aria-label="Status Box"><div class="status-overview"><h2 class="status-title"><button data-action="to-status">Status Box<span class="shortcut-hint"> (S)</span></button></h2><div class="eyebrow status-phase">${phaseLabel(g)}</div><div class="turn-bar" tabindex="-1" aria-live="polite">${badge(p.style, p.name)}<span class="turn-instruction">${escape(instruction(g))}</span></div>${foresightControl(g)}<div class="status-supply resource-pills"><span><small>Reserve</small><strong>${p.reserve}</strong></span><span><small>Credits</small><strong>${p.credits}</strong></span></div>${flexibleControl(g)}<details class="player-roster" ${rosterOpen ? "open" : ""}><summary>Players & supply</summary><ul>${orderedPlayers.map((other) => `<li data-player="${other.id}">${badge(other.style, other.name)}<span>${other.reserve} Reserve</span><span>${other.credits} Credits</span><span>${other.techs.length} Techs</span><strong>${scores.find((s) => s.player === other.id)!.total} points${g.phase === "finished" ? "" : " currently"}</strong><span>${other.used.length}/4 slots used · ${other.investedActions.length} Invested${other.freeInvestments.length ? ` (+${other.freeInvestments.length} from free actions)` : ""}</span></li>`).join("")}</ul></details>${economyTracker(g)}</div><div class="status-decision">${error ? `<div class="error" role="alert">${escape(error)}</div>` : ""}<details class="since-last-turn"><summary>Since your last turn</summary>${history.length ? `<ol>${history.map((l) => `<li data-log-revision="${l.revision}"><span>Round ${l.round}</span> ${l.player === null ? "" : `<strong>${escape(player(g, l.player).name)}:</strong> `}${escape(l.text)}</li>`).join("")}</ol>` : "<p>No actions have happened since your previous decision.</p>"}</details>${inspector(g)}${g.phase === "plan" && hasTech(g, g.turn, "strategic-stall") ? `<div class="stall-choice">${button("Pass once · Strategic Stall", "plan-pass", "", player(g).stalledRound === g.round, "secondary")}</div>` : ""}</div></section>`;
   }
 
   function render() {
@@ -1850,7 +1858,10 @@ export function mountApp(
       left: el.scrollLeft,
     }));
     const roster = root.querySelector<HTMLDetailsElement>(".player-roster");
-    if (roster) rosterOpen = roster.open;
+    if (resetRoster) {
+      rosterOpen = false;
+      resetRoster = false;
+    } else if (roster) rosterOpen = roster.open;
     if (!game) root.innerHTML = landing() + overlay();
     else {
       const g = game,
@@ -1957,7 +1968,7 @@ export function mountApp(
       [
         JSON.stringify(
           {
-            application: "Space Force local prototype 0.18.0",
+            application: "Space Force local prototype 0.19.0",
             exportedAt: new Date().toISOString(),
             game,
           },
@@ -2006,12 +2017,25 @@ export function mountApp(
             : "board",
     );
   }
+  function rotateOrientation(delta: number) {
+    if (game?.pending?.kind !== "orient") return;
+    orientation = (orientation + delta + 6) % 6;
+    selected = game.pending.system;
+    selectedPlanet = null;
+    selectedEdge = null;
+    error = "";
+    render();
+  }
   function selectLocation(target: Element) {
     if (!game) return;
     placementTap = null;
     const tile = target.closest<SVGElement>("[data-system]");
     if (!tile) return;
     const id = tile.dataset.system!;
+    if (game.pending?.kind === "orient" && game.pending.system === id) {
+      rotateOrientation(1);
+      return;
+    }
     if (game.pending?.kind === "filibuster" && selected !== id)
       draft.tokenIndex = undefined;
     if (selected !== id && !game.pending && game.phase === "actions")
@@ -2348,10 +2372,9 @@ export function mountApp(
           settlements: draft.settlements,
           replacements: draft.replacements,
         });
-      else if (action === "rotate-preview") {
-        orientation = (orientation + Number(data.delta) + 6) % 6;
-        render();
-      } else if (action === "commit-orientation")
+      else if (action === "rotate-preview")
+        rotateOrientation(Number(data.delta));
+      else if (action === "commit-orientation")
         perform({ type: "orient", rotation: orientation });
       else if (action === "finish-move")
         perform({
@@ -2726,7 +2749,7 @@ export function mountApp(
     }
   };
   function cancelPlacement() {
-    homeTouch = null;
+    boardTap = null;
     placementDrag = null;
     root.querySelector("#placement-chip")?.remove();
     root
@@ -2743,8 +2766,8 @@ export function mountApp(
     const target = event.target as Element;
     const modal = root.querySelector(".modal");
     if (modal && !modal.contains(target)) return;
-    if (homeTouch && homeTouch.id !== event.pointerId) {
-      homeTouch = null;
+    if (boardTap && boardTap.id !== event.pointerId) {
+      boardTap = null;
       placementTap = null;
     }
     if (target.closest(".view-tabs") && event.pointerType === "touch") {
@@ -2762,12 +2785,16 @@ export function mountApp(
     }
     const tile = target.closest<SVGElement>("[data-system]");
     if (
-      game?.phase === "homes" &&
+      game &&
       event.pointerType === "touch" &&
       tile &&
-      pointerPositions.size === 0
+      pointerPositions.size === 0 &&
+      (game.phase === "homes" ||
+        (game.pending?.kind === "orient" &&
+          game.pending.system === tile.dataset.system))
     )
-      homeTouch = {
+      boardTap = {
+        kind: game.phase === "homes" ? "home" : "orient",
         id: event.pointerId,
         system: tile.dataset.system!,
         x: event.clientX,
@@ -2841,6 +2868,12 @@ export function mountApp(
       return;
     }
     if (!pointerPositions.has(event.pointerId) || !lastDrag) return;
+    if (
+      boardTap?.id === event.pointerId &&
+      pointerPositions.size === 1 &&
+      Math.hypot(event.clientX - boardTap.x, event.clientY - boardTap.y) <= 7
+    )
+      return;
     const previous = [...pointerPositions.values()];
     const prev = pointerPositions.get(event.pointerId)!;
     pointerPositions.set(event.pointerId, {
@@ -2893,24 +2926,31 @@ export function mountApp(
   };
   const up = (event: PointerEvent) => {
     if (event.type === "pointercancel") placementTap = null;
-    if (homeTouch?.id === event.pointerId) {
-      const tapped = homeTouch;
-      homeTouch = null;
+    if (boardTap?.id === event.pointerId) {
+      const tapped = boardTap;
+      boardTap = null;
       if (
         event.type !== "pointercancel" &&
         !dragged &&
         pointerPositions.size === 1 &&
         Math.hypot(event.clientX - tapped.x, event.clientY - tapped.y) <= 7 &&
-        game?.phase === "homes" &&
+        game &&
         game.turn === tapped.actor &&
         game.revision === tapped.revision
       ) {
-        selectPlacementSystem(
-          tapped.system,
-          "touch",
-          event.clientX,
-          event.clientY,
-        );
+        if (tapped.kind === "home" && game.phase === "homes")
+          selectPlacementSystem(
+            tapped.system,
+            "touch",
+            event.clientX,
+            event.clientY,
+          );
+        else if (
+          tapped.kind === "orient" &&
+          game.pending?.kind === "orient" &&
+          game.pending.system === tapped.system
+        )
+          rotateOrientation(1);
         suppressClickUntil = Date.now() + 350;
       }
     }
@@ -3001,6 +3041,7 @@ export function mountApp(
       previewCache = new WeakMap();
       featureCache = new WeakMap();
       game = value;
+      resetRoster = true;
       reserveWarningOpen = true;
       privatePeek = false;
       placementTap = null;

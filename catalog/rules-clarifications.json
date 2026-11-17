@@ -1,6 +1,6 @@
 {
   "schema_version": 6,
-  "clarification_id": "designer-clarifications-008",
+  "clarification_id": "designer-clarifications-009",
   "date": "2026-11-17",
   "authority": "Designer follow-up messages in the project conversation, including seven-player extension and playtest corrections",
   "printed_rules_version": "1.80",
@@ -247,7 +247,7 @@
       "shortfall": "also_allows_flexible_economy_owner_to_return_to_status_box_and_resume_unfinished_effect"
     }
   },
-  "supersedes": "designer-clarifications-007",
+  "supersedes": "designer-clarifications-008",
   "configuration_reference": "game-configuration.json",
   "confirmed_implementation_interpretations": {
     "C01": {
@@ -287,5 +287,15 @@
       "remove_ongoing_ownership_effects": true,
       "undo_earlier_placements_conversions_or_arcologies_overflow": false
     }
+  },
+  "presentation": {
+    "source": "Designer playtest feedback, 2026-11-17",
+    "system_hex_artwork_layer": "below_all_placed_components",
+    "system_name_layer": "above_other_board_graphics",
+    "player_summary_default": "collapsed_on_each_required_decision",
+    "player_summary_investment_count": "invested_action_slots_with_free_action_investments_shown_separately",
+    "orientation_click_or_tap": "clockwise_60_degrees_on_the_system_being_oriented",
+    "orientation_requires_explicit_commit": true,
+    "black_hole_explore_result": "A black hole is added to this system. Existing Ships are unharmed."
   }
 }

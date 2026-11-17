@@ -83,8 +83,10 @@ test("Tech system previews show the committed board geometry and public pieces, 
     ),
   );
   assert.equal(
-    preview.querySelector(".system-snapshot > g").getAttribute("transform"),
-    board.firstElementChild.getAttribute("transform"),
+    preview.querySelector(".system-background > g").getAttribute("transform"),
+    h.root
+      .querySelector(`#galaxy [data-background-system="${s.id}"] > g`)
+      .getAttribute("transform"),
   );
   assert.match(preview.getAttribute("aria-label"), /3 Ships/);
   checkReferences(h);

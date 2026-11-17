@@ -105,7 +105,7 @@ export function createGame(
   );
   const g: Game = {
     schema: 9,
-    engine: "0.18.0",
+    engine: "0.19.0",
     content: "active-player-reserve-checks-6",
     config: { ...clone(config), events: config.events ?? "simpler" },
     seed: seed >>> 0,
@@ -1618,7 +1618,7 @@ function settlePlanet(
     if (effect === "blackHole") {
       s.extraHoles++;
       messages.push(
-        "A black hole remains in this system. Existing Ships are unharmed.",
+        "A black hole is added to this system. Existing Ships are unharmed.",
       );
     } else {
       const wanted = Number(effect.slice(-1)),
@@ -2623,7 +2623,7 @@ export function replayGame(
 export function assertInvariants(g: Game) {
   requireRule(
     g.schema === 9 &&
-      g.engine === "0.18.0" &&
+      g.engine === "0.19.0" &&
       g.content === "active-player-reserve-checks-6",
     "Unsupported saved-game version.",
   );

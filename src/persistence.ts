@@ -7,6 +7,7 @@ import {
   player,
   applyConfirmedTechRules,
   applyActiveReserveRules,
+  replayGame,
 } from "./engine.js";
 import type { Command, Game, GameConfig } from "./types.js";
 
@@ -25,6 +26,11 @@ export function restoreGame(value: unknown): Game {
     reserveRecoveryFrom?: number;
     confirmedTechRulesFrom?: number;
   };
+  if (stored.engine === "0.18.0") {
+    const compatible = { ...(value as Game), engine: "0.19.0" as const };
+    assertInvariants(compatible);
+    return replayGame(compatible);
+  }
   if (stored.engine === "0.14.0") {
     if (
       stored.schema !== 5 ||

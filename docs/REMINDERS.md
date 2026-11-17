@@ -17,6 +17,7 @@ Review priorities and next steps: [REVIEW_CHECKLIST.md](REVIEW_CHECKLIST.md).
 - [x] Implement all seven designer playtest batches, including Status history/S, compact legal-chip rings, explicit PLAN confirmation, Explore pauses/redistribution, Reserve warnings, allocation balancing and final-state views. See the [0.15 checklist](PLAYTEST_CHANGES_0.15.md).
 - [x] Add ten more Techs and selectable displays, with the R01 starting-Tech scenario, nested free-action checkpoints, shared Arcologies space, Patrol protection, Research Lab prices and Strategic Stall. The subsequent release completes all thirty Tech effects.
 - [x] Implement the last ten Techs, printed/random displays, before/after previews and results scrolling. Foresight is available in a labelled nonstandard test and excluded with legal replacement from normal simpler Events.
+- [x] Apply [0.19](PLAYTEST_CHANGES_0.19.md): global hex-background layer, supply-summary reset/invested counts, board tap/click orientation and revised black-hole result text.
 - [x] Apply [0.18](PLAYTEST_CHANGES_0.18.md): vertical Foresight heading, active-player-only Reserve interruptions and automatic failed rival gifts; retain distinct confirmation/recovery dialogs.
 - [x] Apply the [0.17 corrections](PLAYTEST_CHANGES_0.17.md): fixed Mercenaries/Rapid Advance order, Insurance eligibility/home rewards, Flexible economy subheading and Go back warnings, and Sabotage wording/payment.
 - [x] C01–C04 confirmed by the designer; record them with R01–R08 in the rules catalogue.

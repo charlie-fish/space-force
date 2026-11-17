@@ -1,5 +1,7 @@
 # Prototype 0.18 playtest guide
 
+Historical release: [0.19](PLAYTEST_CHANGES_0.19.md) adds board-layer fixes, player-summary updates, tap-to-rotate orientation and revised black-hole wording. The active-player Reserve policy below remains in effect.
+
 17 November 2026. This release changes Foresight layout and restricts Reserve interruptions to the active player. Existing confirmed Tech rules remain in effect.
 
 ## Changes

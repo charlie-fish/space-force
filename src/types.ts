@@ -182,7 +182,7 @@ export interface Score {
 }
 export interface Game {
   schema: 9;
-  engine: "0.18.0";
+  engine: "0.19.0";
   content: "active-player-reserve-checks-6";
   config: GameConfig;
   seed: number;

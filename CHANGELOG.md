@@ -1,5 +1,14 @@
 # Change log
 
+## 0.19.0 — 2026-11-17
+
+- Draw all hex artwork below placed components, fixing the five-player Clarke/asteroid overlap while retaining names on top. Reuse the same rendering parts for compact Tech previews.
+- Reset Players & supply at each required decision, including consecutive turns by one player, while preserving expansion during view/draft/Credit edits. Show invested-slot counts and separate free-action additions.
+- Add board click/tap clockwise orientation previews, retaining rotation buttons, explicit legal Commit, camera gestures and protection against duplicate touch clicks.
+- Change the black-hole Explore result to “A black hole is added to this system. Existing Ships are unharmed.” Engine 0.19 retains schema 9/content 6; version 0.18 saves replay with committed effects preserved.
+- Pass 220 rules/DOM/save/replay tests, including 126 complete seeded games, and production/portable packaging checks. Compressed JavaScript remains about 64 KB with 85 artwork files.
+- See the [0.19 playtest guide](docs/PLAYTEST_CHANGES_0.19.md). Real-browser/phone visual checks remain outstanding.
+
 ## 0.18.0 — 2026-11-17
 
 - Place Foresight's heading above its peek button using the same vertical layout as Flexible economy.
