@@ -1,6 +1,6 @@
 # Space Force: project brief
 
-Updated 16 November 2026 · Product specification with local, live and asynchronous play
+Updated 17 November 2026 · Product specification with local, live and asynchronous play
 
 ## Intended result
 
@@ -114,6 +114,8 @@ Run multiplayer integration tests with seven independent browser contexts, inclu
 
 ## Current implementation
 
+On 17 November 2026 the designer reported that all 30 Techs seem to be working as intended. The initial local Tech playtest is complete; full Event interactions and formal browser/device/remote verification remain outstanding. The recommended next coding milestone is all 30 Event effects and their auction locally, followed by authoritative online play.
+
 Prototype 0.19 provides a local normal-turn game for two to seven people on one device, using ten-card printed/random/playtest displays and Events as a round tracker. A labelled nonstandard Foresight test is available; normal simpler Events exclude that card with legal replacement. The five views through the final state, pre-commit editing, pending-choice autosave/resume, all thirty Tech effects including nested free-action and pre-scoring chains, complete Economy/scoring and command-record replay are implemented and tested. All designer playtest batches are incorporated, including decision history, explicit PLAN confirmation, compact chips, Explore redistribution and Reserve-shortfall acknowledgements. All 60 card faces/reference texts are prepared; Event effects/auctions remain to implement. The Status Box previews before/after effects before commitment and completion scrolls to the scores. The labelled R01 starting-Tech scenario permits immediate testing of the designer's full chain with all player counts. The chosen display/scenario is recorded; markers come from Reserve. C01–C04 are confirmed alongside R01–R08. The [0.19 guide](PLAYTEST_CHANGES_0.19.md) records global board layers, summary resets/invested counts, tap-to-rotate previews and the revised black-hole result. Earlier feedback includes vertical Foresight controls and active-player-only Reserve interruptions. Rival gifts fail automatically with no Reserve; the distinct confirmation/recovery dialogs are retained. Previous corrections include fixed Mercenaries-before-Rapid-Advance order, Insurance token eligibility/home rewards, simpler Reserve warnings and Sabotage without Research lab discounts. Earlier feedback includes exclusive Death Sun target groups, home double-confirmation and inline ongoing powers. Visual browser/device QA remains pending. This implements the local rules/UI milestone without claiming the server, full card content, or production features. See [PROTOTYPE.md](PROTOTYPE.md) for exact scope and validation.
 
 ## Delivery stages
@@ -122,8 +124,9 @@ Prototype 0.19 provides a local normal-turn game for two to seven people on one 
 | --- | --- | --- |
 | 0 — Organise | This brief, source catalogue, seven-player configuration, confirmed rulings, decision register, component design, and reminder list in GitHub. | Counts and page mappings checked; R01–R08 recorded; original hex versions confirmed; outstanding asset handoffs tracked. |
 | 1 — Rules foundation | Pure engine and an inspectable local board for normal turns, plus mode infrastructure. | Legal setup/actions, conservation, a complete base-flow game, scoring, and deterministic replay pass. |
+| 1a — Recommended next: full local normal-turn rules | All 30 Event effects and the auction, retaining simpler Events and making Foresight part of ordinary full-Event play. | Full games cover bidding/ties/payment, Event selection/expiry, forced decisions, Tech combinations and end timing; designer review agrees with intended rules. |
 | 2 — Remote play | Public/private lobby, protected seats, ready checks, seven connected clients, sealed auctions, save/resume, and undo. | Seven-client game, private listing isolation, final-seat/start races, disconnect/restart/retry, and reviewed majority-removal/last-player-win scenarios pass. |
-| 3 — Full base content and second mode | All 30 Techs/30 Events and presets; add the selectable simultaneous variant after normal-turn play works, with its 4+ player recommendation. | Card scenarios, rulings, interactions, and recommendation/host-choice checks pass; designer playtest agrees with intended rules. |
+| 3 — Additional modes and combined verification | Validate all base content online; add the selectable simultaneous variant with its 4+ recommendation, plus asynchronous play with a separately agreed timing/removal policy. | Card combinations, private choices, dependency handling, recommendation/host choice, asynchronous resume/removal and all supported player counts pass. |
 | 4 — Private beta | Owner login, game history, change log, feedback management, and optional consented news sign-up/export. | Authorisation and persistence checked; privacy details and real service configuration supplied. |
 | 5 — Release | Required first-play tutorial, responsive polish, animations, browser checks, deployment, monitoring, and backups. | A complete external playtest on phones/desktops; measured performance; successful backup restore. |
 

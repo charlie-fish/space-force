@@ -46,11 +46,15 @@ See [the 0.19 playtest changes](docs/PLAYTEST_CHANGES_0.19.md) and [prototype sc
 
 ## Next milestones
 
-1. Playtest this build on desktop and phones, review layouts/controls and provisional shapes, and fix usability issues.
-2. Add the authoritative server, public/private lobby, protected seats, seven independent clients, reconnect/recovery, and the confirmed five-minute majority-removal policy.
-3. Add the specified [asynchronous play option](docs/ASYNCHRONOUS_PLAY.md) with its own agreed response/removal policy; the live five-minute rule does not apply. Complete all 30 Event effects, auctions and remaining interactions; then add selectable simultaneous actions, recommended for four or more seated players.
-4. Build owner administration, game/score audit, feedback management, optional GDPR-aware news sign-up/export, and the complete personal first-play tutorial.
-5. Finish cross-browser/device, accessibility, performance, deployment, and recovery verification before public release.
+The designer reports that all 30 Techs seem to work as intended in local playtesting (17 November 2026). Keep v0.19 as the reviewed baseline. The recommended next coding milestone is full Events and the auction; combined interactions and real-device verification are still required.
+
+1. Implement all 30 Event effects and bidding in the local normal-turn game, retaining simpler Events as an option. Playtest Tech/Event combinations, duration/expiry, forced choices and end timing.
+2. Test real phones through an HTTP(S) preview alongside that work; see [phone instructions](docs/PHONE_TESTING.md). A narrow desktop window does not replace Safari/Chrome testing on a phone.
+3. Add the authoritative server, public/private lobby, protected seats, seven independent clients, private state/bids, durable game/audit records, reconnect/recovery and confirmed five-minute majority removal.
+4. Add selectable simultaneous actions, recommended for four or more players, and the specified [asynchronous option](docs/ASYNCHRONOUS_PLAY.md) with its own agreed response/removal policy. Retain normal turns and local play.
+5. Build owner administration, game/score history, feedback management and optional GDPR-aware news sign-up/export. Complete the personal tutorial and cross-browser/device, accessibility, performance, deployment and backup verification before public launch.
+
+Review status, remaining inputs and acceptance checks: [designer checklist](docs/REVIEW_CHECKLIST.md) and [reminders](docs/REMINDERS.md).
 
 The current local game stores the full state on the shared device. Server-owned secrets, access control, durable multi-game records, feedback and mailing data are later milestones. There are no room or sign-up forms in this build.
 

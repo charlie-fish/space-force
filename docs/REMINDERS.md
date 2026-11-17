@@ -13,6 +13,9 @@ Review priorities and next steps: [REVIEW_CHECKLIST.md](REVIEW_CHECKLIST.md).
 
 ## Project work to retain
 
+- [x] Designer reports all 30 Techs seem to work as intended in local playtesting (17 November 2026). Keep v0.19 as the reviewed baseline; combined Event interactions and formal browser/device checks remain outstanding.
+- [ ] Recommended next coding milestone: all 30 Event effects and the auction in local normal-turn play; retain the simpler variant and test Tech/Event combinations.
+
 - [x] Build local Board/Techs/Event/Actions and Supply/Player Aid navigation with persistent Reserve/Credits, touch camera/view gestures, and desktop shortcuts.
 - [x] Implement all seven designer playtest batches, including Status history/S, compact legal-chip rings, explicit PLAN confirmation, Explore pauses/redistribution, Reserve warnings, allocation balancing and final-state views. See the [0.15 checklist](PLAYTEST_CHANGES_0.15.md).
 - [x] Add ten more Techs and selectable displays, with the R01 starting-Tech scenario, nested free-action checkpoints, shared Arcologies space, Patrol protection, Research Lab prices and Strategic Stall. The subsequent release completes all thirty Tech effects.

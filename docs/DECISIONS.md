@@ -107,3 +107,9 @@ The latest Reserve warning design offers Go back to the Status Box with a Flexib
 Foresight uses the same heading-above-button layout as Flexible economy. Reserve limit/empty and Reserve shortfall have distinct confirmation versus recovery behaviour, so the designer’s conditional instruction leaves their existing names/controls in place. Older pending rival interruptions resume without awarding extra pieces.
 
 The 0.19 feedback places all hex artwork below every component and retains names on top. Players & supply starts collapsed per required decision, reports invested slots and shows free-action additions separately. Board clicks/taps preview clockwise orientation; explicit legal Commit and gesture separation remain required. The black-hole Explore message now says it is added, with existing Ships unharmed. Version 0.18 saves replay into engine 0.19 with their outcomes preserved.
+
+## Tech playtest status and recommended next milestone (17 November 2026)
+
+The designer reports that all 30 Techs seem to be working as intended. The initial local Tech playtest is recorded as complete, with v0.19 as the baseline. This is a designer playtest report, not a claim that all Event combinations, remote hidden information or real-phone behaviour have been verified.
+
+The recommended next implementation is all 30 Event effects and the auction in local normal-turn play. Preserve the simpler Events option; full Events make Foresight usable in ordinary play. Real-phone testing can run alongside this work. Authoritative online rooms/recovery follow, then simultaneous/asynchronous modes, private administration and release work. Normal turns still precede the simultaneous variant. The user has asked for next steps; this entry records the recommendation and does not mark those future milestones as implemented or approved for public deployment. See [the current checklist](REVIEW_CHECKLIST.md).

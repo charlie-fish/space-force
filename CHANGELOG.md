@@ -1,5 +1,10 @@
 # Change log
 
+## Unreleased
+
+- Record the designer’s report that all 30 Techs seem to work as intended in local playtesting; keep v0.19 as the reviewed baseline.
+- Update the recommended next steps: full local Event effects/auction and parallel phone testing, then online rooms/recovery, additional modes, private administration and release work. No application behaviour or release version changes.
+
 ## 0.19.0 — 2026-11-17
 
 - Draw all hex artwork below placed components, fixing the five-player Clarke/asteroid overlap while retaining names on top. Reuse the same rendering parts for compact Tech previews.
