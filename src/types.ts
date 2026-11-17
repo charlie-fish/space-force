@@ -181,9 +181,9 @@ export interface Score {
   total: number;
 }
 export interface Game {
-  schema: 8;
-  engine: "0.17.0";
-  content: "ordered-techs-shortfall-review-5";
+  schema: 9;
+  engine: "0.18.0";
+  content: "active-player-reserve-checks-6";
   config: GameConfig;
   seed: number;
   rng: number;
@@ -223,6 +223,7 @@ export interface Game {
   legacyRulesUntil: number;
   reserveRecoveryFrom: number;
   confirmedTechRulesFrom: number;
+  activeReserveChecksFrom: number;
 }
 export interface GameConfig {
   techPreset:

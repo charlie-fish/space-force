@@ -104,9 +104,9 @@ export function createGame(
     "Choose a supported test setup.",
   );
   const g: Game = {
-    schema: 8,
-    engine: "0.17.0",
-    content: "ordered-techs-shortfall-review-5",
+    schema: 9,
+    engine: "0.18.0",
+    content: "active-player-reserve-checks-6",
     config: { ...clone(config), events: config.events ?? "simpler" },
     seed: seed >>> 0,
     rng: seed >>> 0,
@@ -136,6 +136,7 @@ export function createGame(
     legacyRulesUntil: 0,
     reserveRecoveryFrom: 0,
     confirmedTechRulesFrom: 0,
+    activeReserveChecksFrom: 0,
   };
   g.players = Array.from({ length: count }, (_, id) => ({
     id,
@@ -575,6 +576,8 @@ function advanceActions(g: Game, after: number, remaining = g.players.length) {
 }
 const legacyRules = (g: Game) => g.revision < g.legacyRulesUntil;
 const historicalTechRules = (g: Game) => g.revision < g.confirmedTechRulesFrom;
+const reserveChecksApply = (g: Game, owner: number) =>
+  owner === g.turn || g.revision < g.activeReserveChecksFrom;
 function pauseReserve(
   g: Game,
   owner: number,
@@ -588,6 +591,7 @@ function pauseReserve(
   if (
     !remaining ||
     g.revision < g.reserveRecoveryFrom ||
+    !reserveChecksApply(g, owner) ||
     !hasTech(g, owner, "flexible-economy")
   )
     return false;
@@ -721,6 +725,25 @@ export function applyConfirmedTechRules(g: Game) {
   ) {
     const { after, remaining } = g.pending;
     advanceActions(g, after, remaining);
+  }
+  for (let i = logStart; i < g.log.length; i++) g.log[i].revision = g.revision;
+}
+
+/** Dismiss obsolete rival-gift interruptions, keeping already-applied rewards. */
+export function applyActiveReserveRules(g: Game) {
+  if (!g.activeReserveChecksFrom || g.revision !== g.activeReserveChecksFrom)
+    return;
+  const logStart = g.log.length;
+  if (g.pending?.kind === "reserve" && g.pending.owner !== g.turn)
+    finishReserve(g);
+  else if (
+    g.pending?.kind === "ack" &&
+    ["Reserve limit", "Reserve empty"].includes(g.pending.title) &&
+    g.pending.after.kind === "place"
+  ) {
+    const after = g.pending.after;
+    g.pending = null;
+    resumeContinuation(g, after);
   }
   for (let i = logStart; i < g.log.length; i++) g.log[i].revision = g.revision;
 }
@@ -2363,6 +2386,7 @@ export function applyCommand(
     integer(command.recipient, g.players.length - 1);
     requireRule(command.recipient !== actor, "Choose another player.");
     const other = player(g, command.recipient);
+    const checkReserve = reserveChecksApply(g, other.id);
     const s = system(g, pending.system);
     const planet = s.planets.find((p) => p.id === pending.planet)!;
     if (pending.effect === "otherShips") {
@@ -2371,10 +2395,13 @@ export function applyCommand(
       s.ships[other.id] += amount;
       log(
         g,
-        `Explore result: ${other.name} received ${amount} Ship${amount === 1 ? "" : "s"} in ${nameOf(s)}.`,
+        !amount && !checkReserve
+          ? `Explore result: the gift for ${other.name} failed because their Reserve was empty.`
+          : `Explore result: ${other.name} received ${amount} Ship${amount === 1 ? "" : "s"} in ${nameOf(s)}.`,
       );
       if (
         amount < 2 &&
+        checkReserve &&
         pauseReserve(
           g,
           other.id,
@@ -2393,7 +2420,7 @@ export function applyCommand(
         )
       ) {
         // Keep the active player's committed Settlement waiting for the recipient's reward.
-      } else if (amount < 2) {
+      } else if (amount < 2 && checkReserve) {
         notice(
           g,
           "Reserve limit",
@@ -2418,10 +2445,13 @@ export function applyCommand(
       planet.owners[other.id] += amount;
       log(
         g,
-        `Explore result: ${other.name} received ${amount} Settlement${amount === 1 ? "" : "s"} on this planet.`,
+        !amount && !other.reserve && !checkReserve
+          ? `Explore result: the gift for ${other.name} failed because their Reserve was empty.`
+          : `Explore result: ${other.name} received ${amount} Settlement${amount === 1 ? "" : "s"} on this planet.`,
       );
       if (
         amount < 1 &&
+        checkReserve &&
         other.reserve === 0 &&
         settlementSpace(g, planet, other.id) > 0 &&
         pauseReserve(
@@ -2444,6 +2474,7 @@ export function applyCommand(
         // The reward still occupies its space before the original Settlement resumes.
       } else if (
         amount < 1 &&
+        checkReserve &&
         other.reserve === 0 &&
         (legacyRules(g) || settlementSpace(g, planet, other.id) > 0)
       ) {
@@ -2532,6 +2563,7 @@ export function applyCommand(
   g.commands.push({ actor, command: clone(command) });
   g.revision++;
   applyConfirmedTechRules(g);
+  applyActiveReserveRules(g);
   if (g.phase !== "finished")
     g.decisions.push({
       player: command.type === "returnCredits" ? actor : g.turn,
@@ -2558,6 +2590,7 @@ export function replayGame(
     | "legacyRulesUntil"
     | "reserveRecoveryFrom"
     | "confirmedTechRulesFrom"
+    | "activeReserveChecksFrom"
   >,
 ): Game {
   let game = createGame(
@@ -2578,6 +2611,10 @@ export function replayGame(
     record.confirmedTechRulesFrom,
     record.commands.length,
   );
+  game.activeReserveChecksFrom = integer(
+    record.activeReserveChecksFrom,
+    record.commands.length,
+  );
   for (const { actor, command } of record.commands)
     game = applyCommand(game, actor, command);
   return game;
@@ -2585,9 +2622,9 @@ export function replayGame(
 
 export function assertInvariants(g: Game) {
   requireRule(
-    g.schema === 8 &&
-      g.engine === "0.17.0" &&
-      g.content === "ordered-techs-shortfall-review-5",
+    g.schema === 9 &&
+      g.engine === "0.18.0" &&
+      g.content === "active-player-reserve-checks-6",
     "Unsupported saved-game version.",
   );
   requireRule(
@@ -2691,12 +2728,14 @@ export function assertInvariants(g: Game) {
   integer(g.legacyRulesUntil, Number.MAX_SAFE_INTEGER);
   integer(g.reserveRecoveryFrom, Number.MAX_SAFE_INTEGER);
   integer(g.confirmedTechRulesFrom, Number.MAX_SAFE_INTEGER);
+  integer(g.activeReserveChecksFrom, Number.MAX_SAFE_INTEGER);
   if (g.pending?.kind === "reserve") {
     const recovery = g.pending;
     requireRule(
       Number.isInteger(recovery.owner) &&
         recovery.owner >= 0 &&
         recovery.owner < g.players.length &&
+        reserveChecksApply(g, recovery.owner) &&
         hasTech(g, recovery.owner, "flexible-economy") &&
         Number.isInteger(recovery.total) &&
         recovery.total > 0 &&

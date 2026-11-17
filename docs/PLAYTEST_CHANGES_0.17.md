@@ -1,5 +1,7 @@
 # Prototype 0.17 playtest guide
 
+Historical release: [0.18](PLAYTEST_CHANGES_0.18.md) supersedes rival Reserve-warning/refill handoffs. Only the active player receives Reserve interruptions; rivals use available Reserve and empty-Reserve gifts fail automatically.
+
 17 November 2026. This release applies the latest designer corrections to the local normal-turn prototype for 2–7 players. C01–C04 and R01–R08 remain confirmed.
 
 ## Tech timing and Insurance

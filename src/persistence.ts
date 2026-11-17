@@ -6,6 +6,7 @@ import {
   system,
   player,
   applyConfirmedTechRules,
+  applyActiveReserveRules,
 } from "./engine.js";
 import type { Command, Game, GameConfig } from "./types.js";
 
@@ -22,6 +23,7 @@ export function restoreGame(value: unknown): Game {
     config?: GameConfig;
     legacyRulesUntil?: number;
     reserveRecoveryFrom?: number;
+    confirmedTechRulesFrom?: number;
   };
   if (stored.engine === "0.14.0") {
     if (
@@ -39,18 +41,22 @@ export function restoreGame(value: unknown): Game {
       stored.players.map((p) => p.name),
       stored.config,
     );
+    game.activeReserveChecksFrom = stored.revision;
     for (const record of stored.commands)
       game = applyCommand(game, record.actor, record.command);
     return game;
   }
-  if (stored.engine === "0.15.0" || stored.engine === "0.16.0") {
-    const version16 = stored.engine === "0.16.0";
+  if (["0.15.0", "0.16.0", "0.17.0"].includes(stored.engine)) {
+    const version16 = stored.engine !== "0.15.0";
+    const version17 = stored.engine === "0.17.0";
     if (
-      stored.schema !== (version16 ? 7 : 6) ||
+      stored.schema !== (version17 ? 8 : version16 ? 7 : 6) ||
       stored.content !==
-        (version16
-          ? "confirmed-techs-reserve-recovery-4"
-          : "all-techs-event-tracker-3") ||
+        (version17
+          ? "ordered-techs-shortfall-review-5"
+          : version16
+            ? "confirmed-techs-reserve-recovery-4"
+            : "all-techs-event-tracker-3") ||
       !Array.isArray(stored.commands) ||
       stored.commands.length !== stored.revision ||
       !Array.isArray(stored.players) ||
@@ -69,7 +75,10 @@ export function restoreGame(value: unknown): Game {
     game.reserveRecoveryFrom = version16
       ? stored.reserveRecoveryFrom!
       : stored.revision;
-    game.confirmedTechRulesFrom = stored.revision;
+    game.confirmedTechRulesFrom = version17
+      ? stored.confirmedTechRulesFrom!
+      : stored.revision;
+    game.activeReserveChecksFrom = stored.revision;
     let recovery: { before: Game; index: number } | null = null;
     for (const [index, record] of stored.commands.entries()) {
       const before = game;
@@ -93,6 +102,7 @@ export function restoreGame(value: unknown): Game {
       if (upgraded.pending?.kind === "reserve") game = upgraded;
     }
     applyConfirmedTechRules(game);
+    applyActiveReserveRules(game);
     assertInvariants(game);
     return game;
   }
@@ -118,6 +128,8 @@ export function restoreGame(value: unknown): Game {
       stored.seed,
       stored.players.map((p) => p.name),
     );
+    // Older migrations can insert acknowledgements or remove obsolete commands.
+    game.activeReserveChecksFrom = Number.MAX_SAFE_INTEGER;
     const advanceAddedPauses = () => {
       if (stored.engine === "0.10.0" || stored.engine === "0.11.0") return;
       for (let i = 0; i < 100; i++) {
@@ -164,6 +176,11 @@ export function restoreGame(value: unknown): Game {
       game = applyCommand(game, record.actor, command);
     }
     advanceAddedPauses();
+    game.activeReserveChecksFrom = game.revision;
+    const previousTurn = game.turn;
+    applyActiveReserveRules(game);
+    if (game.turn !== previousTurn && game.decisions.length)
+      game.decisions[game.decisions.length - 1].player = game.turn;
     assertInvariants(game);
     return game;
   }

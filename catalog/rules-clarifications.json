@@ -1,6 +1,6 @@
 {
-  "schema_version": 5,
-  "clarification_id": "designer-clarifications-007",
+  "schema_version": 6,
+  "clarification_id": "designer-clarifications-008",
   "date": "2026-11-17",
   "authority": "Designer follow-up messages in the project conversation, including seven-player extension and playtest corrections",
   "printed_rules_version": "1.80",
@@ -193,14 +193,17 @@
       "interrupt_reminds_owner_to_use_status_control": true,
       "interrupt_offers_go_back": true,
       "go_back_may_undo_committed_reveals": false,
-      "accepted_shortfall_leaves_unfunded_remainder_uncompleted": true
+      "accepted_shortfall_leaves_unfunded_remainder_uncompleted": true,
+      "opponent_explore_gift_allows_reserve_recovery_interrupt": false,
+      "reserve_checks_only_for_active_player": true
     },
     "foresight_control": {
       "source": "Designer follow-up, 2026-11-17",
       "inline_status_control": "above_owners_reserve_and_credits_during_their_turn",
       "peek_next_events": 2,
       "separate_tech_powers_menu": false,
-      "publicly_log_peeked_names": false
+      "publicly_log_peeked_names": false,
+      "subheading_position": "above_peek_button_matching_flexible_economy"
     },
     "mercenaries_rapid_advance_order": {
       "source": "Designer correction, 2026-11-17",
@@ -221,9 +224,30 @@
         "own_home_system_even_without_settlement",
         "system_with_own_settlement"
       ]
+    },
+    "non_active_reserve_shortages": {
+      "source": "Designer correction, 2026-11-17",
+      "interrupt_active_player": false,
+      "offer_recipient_reserve_refill": false,
+      "apply_only_available_reserve": true,
+      "gift_fails_automatically_when_reserve_empty": true,
+      "log_failed_gift": true,
+      "continue_acting_players_committed_effect": true
+    },
+    "reserve_dialog_behaviour": {
+      "source": "Designer conditional request and implementation inspection, 2026-11-17",
+      "combine_only_if_functionally_identical": true,
+      "all_three_functionally_identical": false,
+      "retained_names": [
+        "Reserve limit",
+        "Reserve empty",
+        "Reserve shortfall"
+      ],
+      "limit_and_empty": "confirm_reduced_or_zero_result",
+      "shortfall": "also_allows_flexible_economy_owner_to_return_to_status_box_and_resume_unfinished_effect"
     }
   },
-  "supersedes": "designer-clarifications-006",
+  "supersedes": "designer-clarifications-007",
   "configuration_reference": "game-configuration.json",
   "confirmed_implementation_interpretations": {
     "C01": {

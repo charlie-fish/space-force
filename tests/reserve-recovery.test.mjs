@@ -194,7 +194,7 @@ test("a partial Explore Credit reward can recycle its first Credit to finish, th
 });
 
 for (const effect of ["otherShips", "otherSettlement"])
-  test(`an opponent's ${effect} Explore gift lets its owner refill, before the committed Settlement resumes`, () => {
+  test(`an opponent's ${effect} gift fails without a Reserve interruption even when they own Flexible economy`, () => {
     let g = fixture(),
       id = g.systems[0].id,
       p = g.systems[0].planets[1];
@@ -211,37 +211,18 @@ for (const effect of ["otherShips", "otherSettlement"])
       settlements: { [p.id]: 1 },
     });
     g = step(g, { type: "explore", recipient: 1 });
-    assert.equal(g.pending.kind, "reserve");
-    assert.equal(g.pending.owner, 1);
-    assert.equal(g.turn, 0);
-    assert.throws(
-      () => applyCommand(g, 0, { type: "returnCredits", count: 1 }),
-      /Flexible Economy/,
-    );
-    const required = effect === "otherShips" ? 2 : 1;
-    for (let i = 0; i < required; i++) {
-      g = refill(g, 1);
-      assert.equal(g.turn, 0);
-      g = step(g, { type: "useReserve" });
-    }
-    if (effect === "otherSettlement") {
-      assert.equal(system(g, id).planets[1].owners[1], 1);
-      if (g.pending?.kind === "redistribute")
-        g = step(g, {
-          type: "redistribute",
-          ships: g.pending.amount,
-          settlements: {},
-        });
-    } else assert.equal(system(g, id).ships[1], otherShips + 2);
+    assert.equal(g.pending, null);
     assert.equal(g.context, null);
-    assert.equal(g.players[1].credits, 2 - required);
-    assert.equal(
-      system(g, id).ships[0],
-      ownShips - system(g, id).planets[1].owners[0],
-    );
-    assert.equal(
-      g.log.filter((l) => l.text.startsWith("Explore result:")).length,
-      1,
+    assert.equal(g.turn, 1);
+    assert.equal(g.players[1].credits, 2);
+    assert.equal(g.players[1].reserve, 0);
+    assert.equal(system(g, id).ships[1], otherShips);
+    assert.equal(system(g, id).planets[1].owners[1], 0);
+    assert.equal(system(g, id).planets[1].owners[0], 1);
+    assert.equal(system(g, id).ships[0], ownShips - 1);
+    assert.match(
+      g.log.findLast((l) => l.text.startsWith("Explore result:")).text,
+      /gift.*failed.*Reserve was empty/,
     );
   });
 

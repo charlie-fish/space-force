@@ -2,7 +2,7 @@
 
 A browser implementation of Charlie Fish's board game, for desktop and mobile.
 
-**Current implementation: prototype 0.17.0, 17 November 2026.** A complete local pass-and-play game for **2–7 players sharing one device**, using normal turns, ten-card displays drawn from **all 30 implemented Techs**, and Events as a round tracker. Normal simpler Events exclude Foresight; a clearly labelled nonstandard option keeps it for private-peek testing. Event cards count rounds; their effects and auctions are disabled. This is the first implementation milestone; remote multiplayer is next.
+**Current implementation: prototype 0.18.0, 17 November 2026.** A complete local pass-and-play game for **2–7 players sharing one device**, using normal turns, ten-card displays drawn from **all 30 implemented Techs**, and Events as a round tracker. Normal simpler Events exclude Foresight; a clearly labelled nonstandard option keeps it for private-peek testing. Event cards count rounds; their effects and auctions are disabled. This is the first implementation milestone; remote multiplayer is next.
 
 ## Run the prototype
 
@@ -19,7 +19,7 @@ npm ci
 npm run dev
 ```
 
-Open **http://localhost:5173**. Choose the player count, names and Tech display, start a game, and select homes in player order. Double-click/double-tap chooses a home; the confirmation button remains available. **Last ten Techs** is the default display, with the labelled **Foresight test** option enabled. Disable that option for normal simpler Events and legal preset replacement. All five printed presets and a Random display are available. For the five-Tech PRODUCE example, enable **R01 chain test** before starting: everyone begins with those Techs, using five Reserve markers each. See the [0.17 playtest guide and Tech corrections](docs/PLAYTEST_CHANGES_0.17.md). The guide explains each phase. On a phone sharing the computer's network, use the Network URL printed by Vite.
+Open **http://localhost:5173**. Choose the player count, names and Tech display, start a game, and select homes in player order. Double-click/double-tap chooses a home; the confirmation button remains available. **Last ten Techs** is the default display, with the labelled **Foresight test** option enabled. Disable that option for normal simpler Events and legal preset replacement. All five printed presets and a Random display are available. For the five-Tech PRODUCE example, enable **R01 chain test** before starting: everyone begins with those Techs, using five Reserve markers each. See the [0.18 playtest guide](docs/PLAYTEST_CHANGES_0.18.md). The guide explains each phase. On a phone sharing the computer's network, use the Network URL printed by Vite.
 
 For a production static build, run `npm run build`; serve the generated `dist/` directory over HTTP(S). `npm run preview` serves that build locally on port 4173. `npm run package` also creates the portable playtest copy in `work/portable/`. The build supports hosting under a subpath. GitHub Actions runs the tests/build and provides a downloadable `space-force-static-prototype` artifact; it does not publish a live site.
 
@@ -31,7 +31,7 @@ For a production static build, run `npm run build`; serve the generated `dist/` 
 - Board, Techs, Event, Actions and Supply, and Player aid views, including after scoring. Both shared-aid faces appear together. Reserve and Credits stay visible; the player summary shows everyone's public supplies and current scores in order from the current first player.
 - Seven provisional rocket silhouettes and matching poker-chip rim motifs, with chips anchored to the printed suns.
 - A top Status Box with highlighted turn details, a clear prompt, selected system/stack order, before/after/chained Tech previews before commitment, and a “Since your last turn” history toggle. Completion/resume scrolls to the results once; later view navigation stays available.
-- Inline Foresight above the active owner’s Reserve/Credits and one-Credit Flexible Economy returns below. Reserve warnings offer Go back and a reminder to return Credits in the Status Box; unfinished effects preserve previous gains/hooks, and opponent gifts use the recipient’s resources. C01–C04 are confirmed.
+- Inline Foresight with its heading above its button, above the active owner’s Reserve/Credits and one-Credit Flexible Economy returns below. Reserve warnings offer Go back and a reminder to return Credits in the Status Box; unfinished effects preserve previous gains/hooks. Only the active player gets Reserve interruptions; rival gifts use available Reserve and fail automatically when it is empty. C01–C04 are confirmed.
 - Selected-only chip previews with button or double-click/double-tap confirmation, compact owner-coloured stacks, clear legal-chip rings, doubled Settlement rockets and circular black-hole artwork, plus the supplied asteroid-belt and warp tokens.
 - Linked vertical production quantities, target-first attacks, editable Settlement allocations, 60-degree orientation previews before exploration movement choices, and compact selected-first Tech choices with current-state system previews.
 - Map pan/pinch/zoom, grouped pan/zoom/Reset View controls, shortcuts that scroll to their destination (S for Status Box; B/T/E/A/P for views), a 10pt live-text minimum, reduced motion and a skippable contextual guide. Shortcut hints are hidden on phones.
@@ -41,7 +41,7 @@ For a production static build, run `npm run build`; serve the generated `dist/` 
 - Exportable local game records with version, setup seed, command history, final state and scores. Deterministic replay tests cover complete games.
 - Optimised, self-hosted artwork from the supplied PDFs, replaceable through stable IDs and an art manifest. No runtime framework, external fonts, Steam links, or 3D engine.
 
-See [the 0.17 playtest changes and Tech corrections](docs/PLAYTEST_CHANGES_0.17.md) and [prototype scope, controls, validation and limitations](docs/PROTOTYPE.md). The [0.16](docs/PLAYTEST_CHANGES_0.16.md), [0.15](docs/PLAYTEST_CHANGES_0.15.md), [0.14](docs/PLAYTEST_CHANGES_0.14.md), [0.13](docs/PLAYTEST_CHANGES_0.13.md), [0.12](docs/PLAYTEST_CHANGES_0.12.md), [0.11](docs/PLAYTEST_CHANGES_0.11.md), [0.10](docs/PLAYTEST_CHANGES_0.10.md) and [0.9](docs/PLAYTEST_CHANGES_0.9.md) checklists record previous iterations.
+See [the 0.18 playtest changes](docs/PLAYTEST_CHANGES_0.18.md) and [prototype scope, controls, validation and limitations](docs/PROTOTYPE.md). The [0.17](docs/PLAYTEST_CHANGES_0.17.md), [0.16](docs/PLAYTEST_CHANGES_0.16.md), [0.15](docs/PLAYTEST_CHANGES_0.15.md), [0.14](docs/PLAYTEST_CHANGES_0.14.md), [0.13](docs/PLAYTEST_CHANGES_0.13.md), [0.12](docs/PLAYTEST_CHANGES_0.12.md), [0.11](docs/PLAYTEST_CHANGES_0.11.md), [0.10](docs/PLAYTEST_CHANGES_0.10.md) and [0.9](docs/PLAYTEST_CHANGES_0.9.md) checklists record previous iterations.
 
 ## Next milestones
 
@@ -61,7 +61,7 @@ npm run check  # strict TypeScript
 npm run build  # production bundle, artwork references and compressed-JavaScript budget
 ```
 
-The 205 tests include 126 complete seeded games across all supported player counts. DOM tests run in JSDOM; they do not replace visual browser/device testing. See [the validation record](docs/PROTOTYPE.md#validation).
+The 214 tests include 126 complete seeded games across all supported player counts. DOM tests run in JSDOM; they do not replace visual browser/device testing. See [the validation record](docs/PROTOTYPE.md#validation).
 
 Code: [engine](src/engine.ts), [UI](src/ui.ts), [state and commands](src/types.ts). Data: [layouts](src/layouts-data.json), [art/anchors](src/art-data.json), [card reference text](src/cards-data.json). All thirty Tech effects are implemented, with printed/random/playtest displays and legal exclusions. All Event faces/text are available as references; Event effects and auctions remain to implement.
 

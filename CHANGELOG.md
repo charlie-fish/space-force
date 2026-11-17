@@ -1,5 +1,14 @@
 # Change log
 
+## 0.18.0 — 2026-11-17
+
+- Place Foresight's heading above its peek button using the same vertical layout as Flexible economy.
+- Limit Reserve interruptions to the active player. Rival Explore gifts use available Reserve and automatically fail when it is empty, including for Flexible economy owners; retain the acting player's normal subsequent checks.
+- Retain the existing Reserve limit/empty confirmation and Reserve shortfall recovery dialogs because their behaviour differs, satisfying the designer's conditional merge instruction.
+- Upgrade to engine 0.18.0/schema 9 and preserve historical commands/results. Older pending rival-gift warnings/recovery resume without further rewards; active-player recovery and exact replay remain available.
+- Pass 214 rules/DOM/save/replay tests, including 126 complete seeded games, and production/portable build checks. Compressed JavaScript remains about 64 KB with 85 artwork files.
+- See the [0.18 playtest guide](docs/PLAYTEST_CHANGES_0.18.md). Real-browser/phone visual checks remain outstanding.
+
 ## 0.17.0 — 2026-11-17
 
 - Always resolve Mercenaries before Rapid Advance and remove the ordering chooser. Correct Insurance to require own tokens still on the board, and allow Ship rewards at home even without a Settlement.

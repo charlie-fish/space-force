@@ -267,7 +267,7 @@ test("an empty-Credits shortfall can be accepted without adjustment controls or 
   h.close();
 });
 
-test("opponent Explore shortfalls return to recipient controls in the Status Box without advancing the acting turn", () => {
+test("selecting an empty-Reserve rival resolves the gift without a confirmation or resource handoff", () => {
   const h = harness();
   let g = fixture(),
     id = g.systems[0].id,
@@ -282,24 +282,17 @@ test("opponent Explore shortfalls return to recipient controls in the Status Box
     system: id,
     settlements: { [p.id]: 1 },
   });
-  g = step(g, { type: "explore", recipient: 1 });
   h.app.setGame(g);
-  assert.equal(
-    h.root.querySelector('.reserve-recovery [data-action="return-credit"]'),
-    null,
-  );
-  h.click('[data-action="back-to-reserve"]');
-  const selector = '.reserve-effect [data-action="return-credit"]';
-  assert.equal(h.root.querySelector(selector).dataset.owner, "1");
-  for (let i = 0; i < 2; i++) {
-    h.click(selector);
-    assert.equal(h.app.getGame().turn, 0);
-  }
-  h.click('[data-action="complete-reserve"]');
-  assert.equal(h.app.getGame().players[1].credits, 0);
-  assert.equal(h.app.getGame().players[0].credits, 0);
-  assert.equal(h.app.getGame().turn, 1);
-  assert.equal(system(h.app.getGame(), id).ships[1], 2);
+  h.click('[data-action="recipient"][data-recipient="1"]');
+  const next = h.app.getGame();
+  assert.equal(h.root.querySelector(".modal"), null);
+  assert.equal(h.root.querySelector(".reserve-effect"), null);
+  assert.equal(next.pending, null);
+  assert.equal(next.turn, 1);
+  assert.equal(next.players[1].credits, 2);
+  assert.equal(next.players[1].reserve, 0);
+  assert.equal(system(next, id).ships[1], 0);
+  assert.equal(system(next, id).planets[1].owners[0], 1);
   h.close();
 });
 

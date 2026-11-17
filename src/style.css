@@ -337,14 +337,12 @@ small {
 .foresight-inline {
   margin: 10px 0;
 }
-.flexible-inline {
+.flexible-inline,
+.foresight-inline {
   display: flex;
   flex-direction: column;
   gap: 8px;
   align-items: flex-start;
-}
-.foresight-inline > strong {
-  margin-right: 10px;
 }
 .foresight-inline .foresight-cards {
   max-width: 400px;
