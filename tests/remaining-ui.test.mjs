@@ -251,16 +251,16 @@ test("Death Sun target-first controls calculate mixed target costs and still war
   h.click('[data-kind="attack"]');
   h.input('[data-number="target-ships"][data-id="1"]', "2");
   h.input(`[data-number="target-colony"][data-planet="${p.id}"]`, "1");
-  assert.equal(h.root.querySelector('[data-number="sacrifice"]').value, "1");
-  assert.match(h.root.querySelector(".attack-budget").textContent, /1 \/ 1/);
-  h.input('[data-number="sacrifice"]', "2");
+  assert.equal(h.root.querySelector('[data-number="sacrifice"]').value, "2");
+  assert.match(h.root.querySelector(".attack-budget").textContent, /2 \/ 2/);
+  h.input('[data-number="sacrifice"]', "3");
   h.click('[data-action="commit-action"]');
   assert.match(
     h.root.querySelector(".modal").textContent,
-    /targets need only 1/,
+    /targets need only 2/,
   );
   h.click('[data-action="cancel-confirmation"]');
-  h.input('[data-number="sacrifice"]', "1");
+  h.input('[data-number="sacrifice"]', "2");
   h.click('[data-action="commit-action"]');
   assert.equal(system(h.app.getGame(), s.id).ships[1], 0);
   assert.equal(system(h.app.getGame(), s.id).planets[1].owners[1], 0);
@@ -425,7 +425,7 @@ test("Sabotage controls keep nominal value separate from discounted payment and 
   assert.match(
     h.root.querySelector('[data-action="buy"][data-tech="tech.sabotage"]')
       .textContent,
-    /for 2 Credits/,
+    /for 5 Credits/,
   );
   h.input('[data-number="sabotage-value"]', "4");
   assert.ok(
@@ -433,9 +433,7 @@ test("Sabotage controls keep nominal value separate from discounted payment and 
       .disabled,
   );
   h.input('[data-number="sabotage-value"]', "5");
-  h.click(
-    '[data-action="buy"][data-tech="tech.sabotage"][data-full-price="true"]',
-  );
+  h.click('[data-action="buy"][data-tech="tech.sabotage"]');
   assert.equal(h.app.getGame().players[0].credits, 5);
   assert.equal(
     h.app.getGame().players[1].techs.includes("tech.arcologies"),
@@ -444,39 +442,35 @@ test("Sabotage controls keep nominal value separate from discounted payment and 
   h.close();
 });
 
-test("off-turn Flexible Economy preserves an action draft and Foresight cards stay behind an owner-only handoff", () => {
+test("inline Flexible Economy preserves an action draft and Foresight stays private to the active owner", () => {
   const h = harness(),
     g = fixture(),
     s = g.systems[0];
   g.config.events = "foresight-test";
-  tech(g, 1, "flexible-economy");
-  tech(g, 1, "foresight");
-  credits(g, 1, 4);
+  tech(g, 0, "flexible-economy");
+  tech(g, 0, "foresight");
+  credits(g, 0, 4);
   h.app.setGame(g);
   h.click(tile(s.id));
   h.click('[data-kind="produce"]');
-  h.click('[data-action="ongoing-techs"]');
-  assert.equal(h.root.querySelector(".foresight-cards"), null);
-  assert.match(
-    h.root.querySelector(".ongoing-modal").textContent,
-    /Pass the device/,
-  );
-  h.input('[data-number="return-credits"]', "2");
-  h.click('[data-action="return-credits"]');
-  assert.equal(h.app.getGame().players[1].credits, 2);
+  assert.equal(h.root.querySelector('[data-action="ongoing-techs"]'), null);
+  h.click('.status-box [data-action="return-credit"]');
+  h.click('.status-box [data-action="return-credit"]');
+  assert.equal(h.app.getGame().players[0].credits, 2);
   assert.equal(h.app.getGame().turn, 0);
-  h.click('[data-action="show-peek"]');
-  const privateTitles = g.events.slice(0, 2).map((id) => CARD_MAP[id].title);
-  for (const title of privateTitles)
+  h.click('.status-box [data-action="show-peek"]');
+  for (const id of g.events.slice(0, 2))
     assert.ok(
-      h.root.querySelector(".foresight-cards").textContent.includes(title),
+      h.root
+        .querySelector(".foresight-cards")
+        .textContent.includes(CARD_MAP[id].title),
     );
-  const publicText =
-    h.root.querySelector(".status-box").textContent +
-    h.root.querySelector(".history").textContent;
-  for (const title of privateTitles)
-    assert.equal(publicText.includes(title), false);
-  h.click('[data-action="close-overlay"]');
+  for (const id of g.events.slice(0, 2))
+    assert.equal(
+      h.root.querySelector(".history").textContent.includes(CARD_MAP[id].title),
+      false,
+    );
+  h.click('.status-box [data-action="hide-peek"]');
   assert.equal(h.root.querySelector(".foresight-cards"), null);
   assert.equal(
     h.root.querySelector('[data-kind="produce"]').getAttribute("aria-pressed"),

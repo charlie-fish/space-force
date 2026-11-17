@@ -2057,7 +2057,7 @@
       "name": "Death Sun",
       "kind": "tech",
       "cost": 11,
-      "text": "During ATTACK, each Ship you sacrifice may remove 1 extra opposing Ship or Settlement.",
+      "text": "During ATTACK, each sacrificed Ship removes up to 3 opposing Ships OR 2 opposing Settlements. A single sacrifice cannot mix the two target types.",
       "image": "/art/tech/death-sun.webp",
       "width": 240,
       "height": 388,
@@ -2065,7 +2065,8 @@
       "source": {
         "filename": "SpaceForce Cards v1.80.pdf",
         "page": 22
-      }
+      },
+      "rulesOverride": "Designer clarification, 17 November 2026; supersedes the original card wording."
     },
     "tech.cloaking": {
       "id": "tech.cloaking",
@@ -2177,7 +2178,7 @@
       "name": "Sabotage",
       "kind": "tech",
       "cost": "X",
-      "text": "Choose an undiscounted value X and buy this Tech. Remove another player’s Tech worth up to X, returning its marker to Reserve. Cannot target Sabotage or be bought in the final round. Research Lab discounts payment without reducing destruction value.",
+      "text": "Choose an undiscounted value X and buy this Tech. Remove another player’s Tech worth up to X, returning its marker to Reserve. Cannot target Sabotage or be bought in the final round. Research Lab cannot reduce payment below the selected target’s full printed price.",
       "image": "/art/tech/sabotage.webp",
       "width": 240,
       "height": 388,
@@ -2185,7 +2186,8 @@
       "source": {
         "filename": "SpaceForce Cards v1.80.pdf",
         "page": 30
-      }
+      },
+      "rulesOverride": "Designer clarification, 17 November 2026; supersedes the original card wording."
     },
     "tech.flexible-economy": {
       "id": "tech.flexible-economy",

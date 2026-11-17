@@ -114,7 +114,7 @@ Source: the designer's follow-up message on 13 November 2026, with subsequent co
 | R04 | A player may choose an otherwise empty action solely to trigger its before/after Tech effects. | pp8–11. Do not require a nonzero main effect as a prerequisite for these triggers. |
 | R05 | Arcologies provides one shared extra space per planet. A planet with its printed capacity or capacity plus one Settlements is full for PRODUCE and Soylent Green. | pp15,19. Multiple Arcologies owners do not create further spaces. Apply Explore rewards before the acting player's settlement. |
 | R06 | Only token/slot choices are secret. After reveal, players act simultaneously, or any player may declare a dependency and activate ordered resolution for all players. | p14. Action parameters are chosen during resolution; use the four-action priority and player order when disambiguating. |
-| R07 | With Research Lab, Sabotage's destruction value is its undiscounted value. Sabotage cannot target Sabotage. | pp18–19. Keep nominal value separate from Credits actually paid. |
+| R07 | With Research Lab, Sabotage's destruction value is its undiscounted value. Sabotage cannot target Sabotage. The designer additionally confirmed on 17 November 2026 that actual payment cannot be below the target's printed price. | pp18–19 plus designer follow-up. Keep nominal value separate from Credits actually paid; enforce the target-price floor. |
 | R08 | Replace each excluded preset Tech with a random legal Tech of value 2 or 3. | pp12,14,24. Preserve a ten-card, distinct, legal preset display and record replacements. |
 
 ### Confirmed R01 example
@@ -139,6 +139,12 @@ Assume the player owns Population Explosion, Government Incentives, Frontier Pio
 
 All eight original questions are answered, and the original hex versions are confirmed. Outstanding artwork/STL preparation and file handoffs are tracked in [REMINDERS.md](REMINDERS.md). Further rule interactions can be checked during playtests without reopening settled rulings.
 
+## Additional confirmed Tech rulings (17 November 2026)
+
+C01–C04 are confirmed: Gravity Drive origins/routes and chosen casualty ownership; Eminent Domain in player order with Banking only during ACTIONS; Soylent fullness rechecked after placements/Explore, ignoring blocked planets; and mandatory legal Sabotage targets without reversing earlier effects. The [0.16 guide](PLAYTEST_CHANGES_0.16.md#confirmed-interpretations) and [structured catalogue](../catalog/rules-clarifications.json) record the details.
+
+Death Sun replaces normal attack capacity with up to three opposing Ships OR two Settlements per sacrifice; a single sacrifice cannot mix these types. Cost is `ceil(Ships/3) + ceil(Settlements/2)`. Sabotage must actually pay at least the selected target’s full printed price even with Research Lab; nominal X still governs destruction eligibility. Flexible Economy can return Credits one at a time to complete an unfinished Reserve-limited effect without repeating its completed gains or action hooks. These designer rulings override conflicting printed wording.
+
 ## Verification cases to preserve
 
 - Four action slots, actual stack order, skipped turns, and component conservation, including Tech markers and Investments.
@@ -159,4 +165,4 @@ All eight original questions are answered, and the original hex versions are con
 - Event selection/expiry boundaries, Politics through PLAN cleanup, Ragnarök, last-round Sabotage prohibition, endgame settlement, and shared wins.
 - Simultaneous token/slot secrecy, parameters chosen after reveal, a dependency declaration switching all participants to ordered resolution, stale submissions, disconnects, and the confirmed pre-commit/no-reveal Undo boundary.
 
-Include the reviewed idle-removal scenarios for every phase, majority thresholds, hidden choices, token-stack unblocking, preservation of the starting setup, and last-player completion. No rules-engine tests have been run at this planning stage; the engine does not yet exist.
+Include the reviewed idle-removal scenarios for every phase, majority thresholds, hidden choices, token-stack unblocking, preservation of the starting setup, and last-player completion. The local normal-turn engine and its rules/DOM/replay checks are implemented; see [current validation](PROTOTYPE.md#validation). Remote-only scenarios remain acceptance requirements for later milestones.

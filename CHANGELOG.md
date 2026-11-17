@@ -1,5 +1,15 @@
 # Change log
 
+## 0.16.0 — 2026-11-17
+
+- Record designer confirmation of C01–C04. Correct Death Sun to exclusive three-Ship OR two-Settlement groups per sacrifice and enforce Sabotage's selected-target printed-price payment floor even with Research Lab.
+- Add home double-click/double-tap, with button alternatives and protection against pan/pinch/cancelled gestures and accidental next-player claims. Mark Filibuster top/bottom tokens, darken selected Sabotage text and reset X to each selected target's printed value.
+- Replace the Tech powers menu/modal with active-owner Foresight above Status Box resources and one-Credit Flexible Economy returns below, preserving drafts and hiding private peeks at handoff.
+- Resume only the unfinished part of Reserve-limited production, Explore gifts, before-effects, Banking/Investing, Insurance, Genesis and reinforcements. Recipient rewards use their owner's resources; prior gains, hidden reveals, allocations and nested R01 hooks stay committed and run once.
+- Upgrade to engine 0.16.0/schema 7 with resumable recovery checkpoints. Genuine 0.15 history retains prior payments/combat/scores, unfinished shortages upgrade, and exported compatibility boundaries support exact replay. Earlier supported saves remain compatible.
+- Pass 197 rules/DOM/persistence/replay tests including 126 seeded completed games, and production/portable build checks. Compressed JavaScript is about 63 KB with 85 self-hosted artwork files. Real-browser/phone visual verification remains outstanding.
+- See the [0.16 playtest guide and confirmed rulings](docs/PLAYTEST_CHANGES_0.16.md).
+
 ## 0.15.0 — 2026-11-17
 
 - Implement the final ten Techs: Death Sun, Gravity Drive, Soylent Green, Mercenaries, Filibuster, Insurance, Eminent Domain, Sabotage, Flexible Economy and Foresight. All thirty Tech effects now work for local normal turns; all printed presets and Random are selectable.

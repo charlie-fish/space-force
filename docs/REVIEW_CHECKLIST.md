@@ -1,17 +1,17 @@
 # Designer review, reminders, and next steps
 
-Updated 17 November 2026 · Local prototype v0.15
+Updated 17 November 2026 · Local prototype v0.16
 
-The [local prototype](PROTOTYPE.md) implements normal turns, all thirty Tech effects, ten-card printed/random/playtest displays and Events as a round tracker for two to seven people sharing a device. Review a complete game on desktop and phone. Remote play and full Event effects remain later milestones. Review the labelled Foresight test and the provisional C01–C04 implementation conventions in the latest guide. These checks do not reopen resolved R01–R08 or the confirmed original-hex versions.
+The [local prototype](PROTOTYPE.md) implements normal turns, all thirty Tech effects, ten-card printed/random/playtest displays and Events as a round tracker for two to seven people sharing a device. Review a complete game on desktop and phone. Remote play and full Event effects remain later milestones. C01–C04 are designer-confirmed. Test the labelled Foresight setup, inline powers and resumable Reserve shortfalls in the latest guide. These checks do not reopen resolved R01–R08 or the confirmed original-hex versions.
 
-Implemented feedback: [prototype 0.15 changes and rule interpretations](PLAYTEST_CHANGES_0.15.md), with [0.14](PLAYTEST_CHANGES_0.14.md), [0.13](PLAYTEST_CHANGES_0.13.md), [0.12](PLAYTEST_CHANGES_0.12.md), [0.11](PLAYTEST_CHANGES_0.11.md), [0.10](PLAYTEST_CHANGES_0.10.md) and [0.9](PLAYTEST_CHANGES_0.9.md) retained as history. The designer has tested desktop/narrow-window layouts; real-phone testing remains outstanding. See [phone instructions](PHONE_TESTING.md).
+Implemented feedback: [prototype 0.16 changes and confirmed rulings](PLAYTEST_CHANGES_0.16.md), with [0.15](PLAYTEST_CHANGES_0.15.md), [0.14](PLAYTEST_CHANGES_0.14.md), [0.13](PLAYTEST_CHANGES_0.13.md), [0.12](PLAYTEST_CHANGES_0.12.md), [0.11](PLAYTEST_CHANGES_0.11.md), [0.10](PLAYTEST_CHANGES_0.10.md) and [0.9](PLAYTEST_CHANGES_0.9.md) retained as history. The designer has tested desktop/narrow-window layouts; real-phone testing remains outstanding. See [phone instructions](PHONE_TESTING.md).
 
 ## Check next
 
 | Priority | Item | Where to review |
 | --- | --- | --- |
 | 1 | P01–P05 are confirmed, including inactivity, warnings, voting eligibility, stack cleanup, delegation, bids, and forfeit results. Verify these behaviours when the remote-play milestone is implemented. | [Dropout rule](DROPOUTS.md) |
-| 2 | Test the last ten Techs and C01–C04 conventions: Gravity passengers/casualties, Death Sun, Soylent replacements, Insurance, Filibuster, endgame SETTLE, Sabotage and ongoing powers. Check before/after previews, results scrolling and the R01 starting-Tech scenario, free-action/Explore/Reserve/reload interruptions and non-recursive Spice/Rapid Advance. Also review Ship-first production and blocked-system inspection. Status Box/S and B/T/E/A/P scrolling; mobile titles, 10pt text, compact twelve-chip stacks/rings, larger Settlements, decision history, editable PLAN confirmation and phone gestures. Check compact Tech target choices/current-state previews, chip side outlines, confirmation pop-ups and all five final-state views. | [0.15 playtest checklist](PLAYTEST_CHANGES_0.15.md), [gameplay interface](GAMEPLAY_UI.md) |
+| 2 | Test all Techs under confirmed C01–C04: Gravity passengers/casualties, Death Sun, Soylent replacements, Insurance, Filibuster, endgame SETTLE, Sabotage and inline ongoing powers. Check home double-click/double-tap, the Sabotage payment floor, separate Death Sun target groups and recoverable Reserve output. Check before/after previews, results scrolling and the R01 starting-Tech scenario, free-action/Explore/Reserve/reload interruptions and non-recursive Spice/Rapid Advance. Also review Ship-first production and blocked-system inspection. Status Box/S and B/T/E/A/P scrolling; mobile titles, 10pt text, compact twelve-chip stacks/rings, larger Settlements, decision history, editable PLAN confirmation and phone gestures. Check compact Tech target choices/current-state previews, chip side outlines, confirmation pop-ups and all five final-state views. | [0.16 playtest checklist](PLAYTEST_CHANGES_0.16.md), [gameplay interface](GAMEPLAY_UI.md) |
 | 3 | Confirm the provisional seventh player's orange colour, twin-pod silhouette, and triangular chip rim; check the final six/seven shape-to-colour mapping when STLs arrive. | [Component design](COMPONENT_DESIGN.md), [game configuration](../catalog/game-configuration.json) |
 | 4 | Verify the confirmed Undo boundary in the prototype: uncommitted moves only, with no hidden-information reveal. Committed moves cannot be undone. | [Project brief: undo](PROJECT_BRIEF.md#undo-policy) |
 | 5 | Public/private lobby, ready/start behaviour, the 4+ recommendation with host choice, and proposed waiting-room handover/expiry defaults. Those waiting-room timers are separate from confirmed five-minute in-game inactivity. | [Lobby](LOBBY.md), [lobby configuration](../catalog/lobby-configuration.json) |
@@ -37,11 +37,11 @@ The live checklist is [REMINDERS.md](REMINDERS.md). TTS review: [TTS_REVIEW.md](
 
 ## Next development steps
 
-1. Playtest the implemented deterministic normal-turn game, including all Techs, the Foresight test option and the R01 scenario. The 175 automated tests include 126 seeded full games, all player counts, rocket conservation, command replay and old-save migration.
+1. Playtest the implemented deterministic normal-turn game, including all Techs, the Foresight test option and the R01 scenario. The 197 automated tests include 126 seeded full games, all player counts, rocket conservation, command replay and old-save migration.
 2. Review the implemented five-view board, supplies, gestures/shortcuts, draft Undo, autosave/resume, both aid faces and provisional replaceable art on a phone and desktop. Visual browser/device QA is pending.
 3. Add server-authoritative public/private rooms, seven independent clients, secret bids, save/rejoin, undo, and the reviewed five-minute majority-removal policy.
-4. Complete all Techs/Events and combinations; add selectable simultaneous actions, dependency handling, and the four-plus-player recommendation.
+4. Complete Event effects/auctions and combinations; add selectable simultaneous actions, dependency handling, and the four-plus-player recommendation.
 5. Add owner administration, game/result audit, feedback, and optional newsletter consent/export, using real deployment/privacy configuration.
 6. Deliver the required tutorial and finish accessibility, browser/device, load, deployment/recovery, and backup-restore verification before release.
 
-R01–R08 remain settled; C01–C04 record provisional interpretations of the newly implemented edge cases for designer review. The first local prototype is implemented; asset handoffs and visual refinement can continue alongside the remaining development milestones.
+R01–R08 and C01–C04 are confirmed; no further ruling on those items is outstanding. The first local prototype is implemented; asset handoffs and visual refinement can continue alongside the remaining development milestones.

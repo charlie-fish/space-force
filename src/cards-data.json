@@ -326,14 +326,20 @@
       "title": "Death Sun",
       "type": "tech",
       "cost": 11,
-      "text": "When you do an ATTACK action, for each Ship of yours you remove, you may remove 1 extra opponent Ship or Settlement.",
+      "text": "When you do an ATTACK action, each Ship you sacrifice removes up to 3 opposing Ships OR 2 opposing Settlements. A single sacrifice cannot mix Ships and Settlements.",
       "timing": "during_attack",
-      "restrictions": [],
+      "restrictions": [
+        "Assign each sacrificed Ship to one target type: Ships or Settlements."
+      ],
       "simultaneousAllowed": true,
       "source": {
         "cardsPdfPage": 22,
         "rulebookPdfPage": 15
-      }
+      },
+      "ruleNotes": [
+        "Designer clarification 2026-11-17 supersedes the printed extra-target wording: three Ships OR two Settlements per sacrifice, never a mixture for one sacrifice."
+      ],
+      "rulesOverride": "Designer clarification, 17 November 2026."
     },
     {
       "id": "tech.cloaking",
@@ -448,12 +454,13 @@
       "title": "Sabotage",
       "type": "tech",
       "cost": "X",
-      "text": "Choose an undiscounted Credit value to buy this Tech. Immediately remove another player’s Tech up to that value, returning its ownership rocket to that player’s Reserve. Research Lab can discount payment but does not reduce the destruction value. Sabotage cannot target Sabotage and cannot be bought in the last round.",
+      "text": "Choose a Credit value X and remove another player’s non-Sabotage Tech worth up to X. You must pay at least the target’s full printed price, including with Research Lab. Return its ownership rocket to its owner’s Reserve. Sabotage cannot be bought in the last round.",
       "timing": "on_acquisition",
       "restrictions": [
         "Cannot be bought in the last round.",
         "Cannot target Sabotage.",
-        "Use undiscounted value for destruction with Research Lab; return the removed ownership marker to Reserve."
+        "A legal opponent target is required. Payment cannot fall below that target’s full printed value, including with Research Lab.",
+        "Removing ownership does not undo previously placed pieces or conversions."
       ],
       "simultaneousAllowed": true,
       "source": {
@@ -461,8 +468,9 @@
         "rulebookPdfPage": 19
       },
       "ruleNotes": [
-        "R07: destruction value with Research Lab is undiscounted value; cannot target Sabotage."
-      ]
+        "R07: nominal value remains separate from actual payment; designer 2026-11-17 additionally requires payment at least the target’s printed value, including with Research Lab."
+      ],
+      "rulesOverride": "Designer clarification, 17 November 2026: minimum actual payment is the selected target’s full printed value."
     },
     {
       "id": "tech.flexible-economy",

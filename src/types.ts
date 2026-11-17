@@ -89,7 +89,25 @@ export interface ActionContext {
   afterOrderChosen?: boolean;
 }
 export type SettlementResume = "settle" | "genesis" | "rapid";
+export type ReserveEffect =
+  | { kind: "ships"; system: string }
+  | { kind: "credits" }
+  | { kind: "production"; system: string; credits: number }
+  | { kind: "settlement"; system: string; planet: string }
+  | { kind: "investment"; action: Action; banking: boolean; free: boolean }
+  | { kind: "reinforce" };
+export interface ReserveRecovery {
+  kind: "reserve";
+  owner: number;
+  label: string;
+  total: number;
+  remaining: number;
+  effect: ReserveEffect;
+  after: Continuation;
+  messages: string[];
+}
 export type Continuation =
+  | { kind: "productionDone" }
   | { kind: "actionDone"; actor: number }
   | { kind: "techDone" }
   | { kind: "allocationDone" }
@@ -106,6 +124,7 @@ export type Continuation =
     }
   | { kind: "settlementNext"; system: string; resume: SettlementResume };
 export type Pending =
+  | ReserveRecovery
   | { kind: "filibuster"; remaining: number[] }
   | { kind: "insurance"; after: number; remaining: number }
   | { kind: "eminent" }
@@ -162,9 +181,9 @@ export interface Score {
   total: number;
 }
 export interface Game {
-  schema: 6;
-  engine: "0.15.0";
-  content: "all-techs-event-tracker-3";
+  schema: 7;
+  engine: "0.16.0";
+  content: "confirmed-techs-reserve-recovery-4";
   config: GameConfig;
   seed: number;
   rng: number;
@@ -201,6 +220,8 @@ export interface Game {
   scores: Score[];
   winners: number[];
   endgameQueue: number[];
+  legacyRulesUntil: number;
+  reserveRecoveryFrom: number;
 }
 export interface GameConfig {
   techPreset:
@@ -228,6 +249,8 @@ export interface ActionChoices {
   replacements?: Replacements;
 }
 export type Command =
+  | { type: "useReserve"; credits?: number; ships?: Record<string, number> }
+  | { type: "finishReserve" }
   | { type: "home"; system: string }
   | { type: "plan"; system: string }
   | { type: "planPass" }

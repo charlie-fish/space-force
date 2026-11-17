@@ -1,5 +1,7 @@
 # Prototype 0.15 playtest guide
 
+Historical release: see [0.16](PLAYTEST_CHANGES_0.16.md) for the current inline powers/Reserve recovery and corrected Death Sun/Sabotage rules. C01–C04 below were subsequently confirmed by the designer on 17 November 2026.
+
 17 November 2026. All **30 Tech effects** are now implemented for local normal-turn play with 2–7 people on one device. Event effects/auctions and remote multiplayer remain separate milestones.
 
 ## Start a test
@@ -33,9 +35,9 @@ Mercenaries/Rapid Advance ordering is a real choice: Mercenaries can create a Sh
 - Committed Reserve interruptions with no **Go back** omit **Is this the outcome you intended?** Editable pre-commit confirmations keep their decision question.
 - Completion automatically scrolls and moves focus to **Expedition results**, beneath the sticky header. Resuming a completed game does the same. Switching views afterward remains possible without being pulled back to the results.
 
-## Provisional rule interpretations to review
+## C01–C04 interpretations (subsequently confirmed)
 
-These address details not explicitly settled by the printed rules. They are **implemented conventions**, not additional designer-confirmed rulings. R01–R08 remain unchanged.
+These address details not explicitly settled by the printed rules. The designer has now **confirmed C01–C04**. R01–R08 remain settled. See the current guide for the subsequent Death Sun grouping and Sabotage payment corrections.
 
 | ID | Implemented convention |
 | --- | --- |

@@ -37,7 +37,7 @@ TECH_TEXT = {
     'foresight': 'You may always privately peek at the top 2 face-down Event cards.',
     'patents': 'Other players cannot acquire a Tech you already own.',
     'research-lab': 'You may buy Techs at half price, rounded down, or voluntarily pay full price.',
-    'death-sun': 'During ATTACK, each Ship you sacrifice may remove 1 extra opposing Ship or Settlement.',
+    'death-sun': 'During ATTACK, each sacrificed Ship removes up to 3 opposing Ships OR 2 opposing Settlements. A single sacrifice cannot mix the two target types.',
     'cloaking': 'Before ATTACK, add 1 Ship from your Reserve into the active system.',
     'strategic-stall': 'Once per round during PLAN, you may pass instead of placing an action token.',
     'filibuster': 'At the end of PLAN, in player order, you may move 1 of your action tokens to the top of its current stack.',
@@ -45,7 +45,7 @@ TECH_TEXT = {
     'insurance': 'During ACTIONS, whenever you are skipped because none of your action tokens is on top of a stack, gain 1 Credit or 1 Ship in a system where you have a Settlement.',
     'eminent-domain': 'Before normal endgame scoring, you may do a free SETTLE action in your home system.',
     'disruptor': 'Immediately choose a system. Opponents cannot place action tokens there next round. Multiple buyers in the same round choose distinct systems in player order.',
-    'sabotage': 'Choose an undiscounted value X and buy this Tech. Remove another player’s Tech worth up to X, returning its marker to Reserve. Cannot target Sabotage or be bought in the final round. Research Lab discounts payment without reducing destruction value.',
+    'sabotage': 'Choose an undiscounted value X and buy this Tech. Remove another player’s Tech worth up to X, returning its marker to Reserve. Cannot target Sabotage or be bought in the final round. Research Lab cannot reduce payment below the selected target’s full printed price.',
     'flexible-economy': 'You may always move Credits back to your Reserve.',
     'government-incentives': 'Before SETTLE, do a free MOVE INTO action in the active system.',
 }
@@ -376,6 +376,7 @@ if __name__ == '__main__':
             target=OUTPUT/'public/art'/('tech' if row['kind']=='tech' else 'events')/(slug+'.webp')
             result={'id':row['card_id'],'name':row['name'],'kind':row['kind'],'cost':None if not row['cost'] else row['cost'] if row['cost']=='X' else int(row['cost']),'text':text,**save_webp(page_image(page,page.rect,240),target,quality=82),'source':{'filename':'SpaceForce Cards v1.80.pdf','page':int(row['cards_pdf_page'])}}
             if slug=='rapid-advance':result['rulesOverride']='Use the almanac/direct-conversion wording; the printed card uses SETTLE.'
+            if slug in ('death-sun','sabotage'):result['rulesOverride']='Designer clarification, 17 November 2026; supersedes the original card wording.'
             manifest['cards'][row['card_id']]=result
     for name,page_number in [('tech',2),('event',34)]:
         page=cards[page_number-1]

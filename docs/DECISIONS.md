@@ -92,6 +92,12 @@ No hosting provider, paid service, final privacy text, or application deployment
 
 Asynchronous online play is required alongside live and local play. Agree its response window, grace period, removal-vote deadline/electorate and reminder policy before implementing that mode. These do not inherit the confirmed live five-minute rule. See [ASYNCHRONOUS_PLAY.md](ASYNCHRONOUS_PLAY.md).
 
-## New Tech implementation conventions (17 November 2026)
+## Confirmed Tech interpretations and controls (17 November 2026)
 
-All thirty Tech effects are implemented in local prototype 0.15. Confirmed R01–R08 remain unchanged. [C01–C04](PLAYTEST_CHANGES_0.15.md#provisional-rule-interpretations-to-review) separately record provisional choices for Gravity Drive origins/casualties, Eminent Domain order and ACTIONS-only Banking, Soylent eligibility timing/blocked planets, and mandatory Sabotage targets. These are available for designer review and do not block the playable test build. Owners choose Mercenaries/Rapid Advance order. The nonstandard Foresight test is explicitly labelled; normal simpler Events exclude that card and apply R08 replacement.
+The designer confirmed C01–C04: Gravity Drive carrier origins/routes and casualty ownership, Eminent Domain player order with ACTIONS-only Banking, Soylent fullness timing/excluded destroyed planets, and Sabotage's mandatory legal target with no reversal of earlier effects. R01–R08 remain settled. See [the confirmed table](PLAYTEST_CHANGES_0.16.md#confirmed-interpretations) and [structured rules](../catalog/rules-clarifications.json).
+
+The designer also corrected Death Sun to three opposing Ships OR two Settlements per sacrifice, prohibiting mixed types within one sacrifice, and required Sabotage to pay at least the target's full printed value even with Research Lab. Nominal X still governs target eligibility under R07. Payment is the greater of that floor and the ordinary discounted X; deliberately higher payment remains available. Original card art is retained with updated semantic text and designer-override provenance.
+
+Prototype 0.16 puts active-owner Foresight above Status Box resources and one-Credit Flexible Economy returns below them, replacing the Tech powers menu. Reserve-limited effects can use returned Credits to complete their unfinished part without repeating gains, reveals or nested action hooks. Foreign Explore gifts use the recipient's own resources while retaining the acting turn. Home double-click/double-tap and Filibuster top/bottom labels are implemented.
+
+All thirty Tech effects remain implemented for local normal turns. Owners choose Mercenaries/Rapid Advance order. The nonstandard Foresight test is explicitly labelled; normal simpler Events exclude that card and apply R08 replacement. Historical completed 0.15 records preserve prior combat/payment outcomes; future commands use the corrected rules, and unfinished Reserve warnings upgrade to recovery continuations.

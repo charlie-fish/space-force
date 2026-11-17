@@ -700,8 +700,8 @@ test("game export downloads a versioned JSON record with setup, commands, and cu
     h.click('[data-action="export"]');
     const record = JSON.parse(await blob.text());
     assert.match(download, /^space-force-/);
-    assert.equal(record.game.engine, "0.15.0");
-    assert.equal(record.game.content, "all-techs-event-tracker-3");
+    assert.equal(record.game.engine, "0.16.0");
+    assert.equal(record.game.content, "confirmed-techs-reserve-recovery-4");
     assert.equal(record.game.commands.length, record.game.revision);
     assert.equal(record.game.seed, h.app.getGame().seed);
     assert.equal(record.game.phase, "plan");

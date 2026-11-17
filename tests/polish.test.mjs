@@ -310,7 +310,7 @@ test("genuine 0.10 final Disruptor saves resume without a dead-end choice and ke
     commands: oldGame.commands.slice(0, checkpoint),
     revision: checkpoint,
   });
-  assert.equal(pending.engine, "0.15.0");
+  assert.equal(pending.engine, "0.16.0");
   assert.equal(pending.pending, null);
   assert.equal(pending.phase, "tech");
   const completed = restoreGame(oldGame);

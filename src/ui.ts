@@ -60,6 +60,7 @@ import type {
   Game,
   System,
   GameConfig,
+  ReserveRecovery,
   Replacements,
   MovePayload,
 } from "./types.js";
@@ -84,6 +85,8 @@ interface Draft {
   tokenIndex?: number;
   sabotageValue?: number;
   sabotageTarget?: { player: number; tech: string };
+  recoveryCredits?: number;
+  recoveryShips?: Record<string, number>;
 }
 const freshDraft = (): Draft => ({
   action: null,
@@ -197,8 +200,9 @@ export function mountApp(
     reserveAccepted: boolean;
   } | null = null;
   let rosterOpen = false;
-  let planTap: {
+  let placementTap: {
     system: string;
+    phase: "homes" | "plan";
     actor: number;
     revision: number;
     time: number;
@@ -207,6 +211,14 @@ export function mountApp(
     source: string;
   } | null = null;
   let snapSystem: string | null = null;
+  let homeTouch: {
+    id: number;
+    system: string;
+    x: number;
+    y: number;
+    actor: number;
+    revision: number;
+  } | null = null;
   let placementDrag: {
     id: number;
     x: number;
@@ -221,9 +233,7 @@ export function mountApp(
   let count = 2;
   let techPreset: GameConfig["techPreset"] = "remaining";
   let eventMode: NonNullable<GameConfig["events"]> = "foresight-test";
-  let utilityOwner: number | null = null;
   let privatePeek = false;
-  let utilityAmount = 0;
   let displayedFinishedGame: Game | null = null;
   let scenario: GameConfig["scenario"] = "standard";
   let names = Array.from({ length: 7 }, (_, i) => `Player ${i + 1}`);
@@ -272,7 +282,7 @@ export function mountApp(
   }
   function setView(next: View) {
     cancelPlacement();
-    planTap = null;
+    placementTap = null;
     scrollView = view;
     previousScroll = root.querySelector(".main-panel")?.scrollTop ?? 0;
     view = next;
@@ -288,7 +298,6 @@ export function mountApp(
   }
   function closeOverlay() {
     showHelp = false;
-    utilityOwner = null;
     privatePeek = false;
     activeCard = null;
     confirmation = null;
@@ -318,8 +327,6 @@ export function mountApp(
       let next = applyCommand(game, actor!, command, revision);
       if (command.type === "returnCredits") {
         game = next;
-        utilityAmount = 0;
-        privatePeek = false;
         error = "";
         if (game.pending?.kind === "mercenaries")
           draft.techCount = Math.min(draft.techCount, player(game).credits);
@@ -346,7 +353,14 @@ export function mountApp(
       if (predictable && accepted?.reserve)
         next = applyCommand(next, next.turn, { type: "acknowledge" });
       game = next;
-      planTap = null;
+      if (
+        game.turn !== old.turn ||
+        game.events.length !== old.events.length ||
+        game.pending?.kind === "reserve" ||
+        game.phase === "finished"
+      )
+        privatePeek = false;
+      placementTap = null;
       snapSystem = command.type === "plan" ? command.system : null;
       if (game.phase === "plan") selected = null;
       error = "";
@@ -373,6 +387,7 @@ export function mountApp(
           "filibuster",
           "insurance",
           "eminent",
+          "reserve",
         ].includes(game.pending.kind)
       ) {
         view = "board";
@@ -395,7 +410,7 @@ export function mountApp(
       save();
       render();
       (
-        root.querySelector<HTMLElement>(".modal button") ??
+        root.querySelector<HTMLElement>(".modal button:not(:disabled)") ??
         (game.phase === "finished"
           ? root.querySelector<HTMLElement>("#expedition-results")
           : root.querySelector<HTMLElement>(".turn-bar"))
@@ -407,6 +422,7 @@ export function mountApp(
     }
   }
   function start() {
+    privatePeek = false;
     game = createGame(count, seedFrom(mapCode || String(Date.now())), names, {
       techPreset,
       scenario,
@@ -494,6 +510,8 @@ export function mountApp(
   }
   function instruction(g: Game) {
     const pending = g.pending;
+    if (pending?.kind === "reserve")
+      return "Use Flexible Economy to replenish Reserve, or continue with the current result.";
     if (pending?.kind === "filibuster")
       return "Filibuster: lift one of your tokens to the top of its stack, or pass.";
     if (pending?.kind === "insurance")
@@ -562,7 +580,7 @@ export function mountApp(
     return `<aside class="guide" aria-label="Learn as you play"><div><span class="eyebrow">Learn as you play</span><p>${escape(g.pending ? instruction(g) : tips[g.phase])}</p></div>${button("Hide guide", "guide-off", "", false, "quiet")}</aside>`;
   }
   function landing() {
-    return `<main class="landing"><div class="landing-art"><img src="${ART.cover.image}" width="562" height="768" alt="Space Force cover: rocket fleets above a ringed planet"/><span class="cover-credit">A game by Charlie Fish</span></div><section class="landing-copy"><div class="eyebrow">Local pass-and-play · Prototype 0.15</div><h1>Claim your<br/><span>corner of space.</span></h1><p class="lead">Plan your moves. Explore new systems. Settle the galaxy.</p><div class="scope-note"><strong>This build: ${TECH_PRESETS[techPreset].label} · ${eventMode === "foresight-test" ? "Tech playtest Events" : "simpler Events"}.</strong><span>A complete local game for 2–7 players on one device. Event cards count rounds; their effects and auctions are disabled. Remote rooms and full Event effects follow later.</span></div><form id="setup-form"><fieldset><legend>How many players?</legend><div class="player-counts">${Array.from({ length: 6 }, (_, i) => button(String(i + 2), "count", `data-count="${i + 2}" aria-pressed="${count === i + 2}"`, false, count === i + 2 ? "selected" : "")).join("")}</div></fieldset><fieldset class="setup-options"><legend>Tech display</legend><label>Preset <select data-setting="tech-preset">${Object.entries(
+    return `<main class="landing"><div class="landing-art"><img src="${ART.cover.image}" width="562" height="768" alt="Space Force cover: rocket fleets above a ringed planet"/><span class="cover-credit">A game by Charlie Fish</span></div><section class="landing-copy"><div class="eyebrow">Local pass-and-play · Prototype 0.16</div><h1>Claim your<br/><span>corner of space.</span></h1><p class="lead">Plan your moves. Explore new systems. Settle the galaxy.</p><div class="scope-note"><strong>This build: ${TECH_PRESETS[techPreset].label} · ${eventMode === "foresight-test" ? "Tech playtest Events" : "simpler Events"}.</strong><span>A complete local game for 2–7 players on one device. Event cards count rounds; their effects and auctions are disabled. Remote rooms and full Event effects follow later.</span></div><form id="setup-form"><fieldset><legend>How many players?</legend><div class="player-counts">${Array.from({ length: 6 }, (_, i) => button(String(i + 2), "count", `data-count="${i + 2}" aria-pressed="${count === i + 2}"`, false, count === i + 2 ? "selected" : "")).join("")}</div></fieldset><fieldset class="setup-options"><legend>Tech display</legend><label>Preset <select data-setting="tech-preset">${Object.entries(
       TECH_PRESETS,
     )
       .map(
@@ -1245,43 +1263,56 @@ export function mountApp(
     if (!before.length && !after.length && !nested.size) return "";
     return `<aside class="tech-effect-preview" aria-label="Tech effects for this action"><strong>Tech effects</strong>${before.length ? `<p><strong>Before this action:</strong> ${names(before)}.</p>` : ""}${after.length ? `<p><strong>After this action:</strong> ${names(after)}.</p>` : ""}${nested.size ? `<p><strong>Through free actions:</strong> ${names(nested)}.</p>` : ""}<p>These effects still trigger if the main action is empty. Free actions use no additional token or action slot.</p></aside>`;
   }
-  function ongoingButton(g: Game) {
-    return g.phase !== "finished" &&
-      g.players.some(
-        (p) =>
-          hasTech(g, p.id, "flexible-economy") || hasTech(g, p.id, "foresight"),
-      )
-      ? button("Tech powers", "ongoing-techs", "", false, "quiet")
-      : "";
-  }
-  function ongoingModal(g: Game) {
-    const owner = player(g, utilityOwner!);
-    const allowed = g.players.filter(
-      (p) =>
-        hasTech(g, p.id, "flexible-economy") || hasTech(g, p.id, "foresight"),
-    );
-    return `<div class="modal-scrim"><section class="modal ongoing-modal" role="dialog" aria-modal="true" aria-label="Ongoing Tech powers">${button("Close ×", "close-overlay", "", false, "quiet close")}<h2>Ongoing Tech powers</h2><p>These powers can be used between decisions, including on another player's turn. Pass the device to the selected owner before opening private information.</p><div class="owner-options">${allowed.map((p) => button(`${rocket(p.style)} ${escape(p.name)}`, "utility-owner", `data-owner="${p.id}" aria-pressed="${p.id === owner.id}"`, false, p.id === owner.id ? "selected" : "secondary")).join("")}</div><h3>${escape(owner.name)}</h3>${hasTech(g, owner.id, "flexible-economy") ? `<div><h3>Flexible Economy</h3><p>${owner.credits} Credits · ${owner.reserve} Reserve. Returning Credits is not an action and does not change the current turn.</p>${numberControl("Credits to return", "return-credits", Math.min(utilityAmount, owner.credits), owner.credits)}${button("Return to Reserve", "return-credits", "", utilityAmount <= 0 || utilityAmount > owner.credits, "primary")}</div>` : ""}${
-      hasTech(g, owner.id, "foresight")
-        ? `<div><h3>Foresight · private peek</h3>${
-            privatePeek
-              ? `<div class="foresight-cards">${
-                  peekEvents(g, owner.id)
-                    .map(
-                      (id, i) =>
-                        `<figure><img src="${ART.cards[id].image}" width="180" height="291" alt="${attrs(CARD_MAP[id].title)}"/><figcaption>${i + 1}. ${escape(CARD_MAP[id].title)}</figcaption></figure>`,
-                    )
-                    .join("") || "<p>No face-down Events remain.</p>"
-                }</div>${button("Hide private cards", "hide-peek", "", false, "secondary")}`
-              : button(
-                  `I am ${escape(owner.name)} · show top two Events`,
-                  "show-peek",
-                  "",
-                  false,
-                  "primary",
-                )
-          }<p>The peek is never copied into public history or the Status Box. This local prototype uses a trusted shared device.</p></div>`
+  function foresightControl(g: Game, reveal = g.pending?.kind !== "reserve") {
+    if (g.phase === "finished" || !hasTech(g, g.turn, "foresight")) return "";
+    return `<div class="foresight-inline" aria-label="Foresight"><strong>Foresight</strong>${button(privatePeek ? "Hide private peek" : "Peek at next two Events", privatePeek ? "hide-peek" : "show-peek", "", false, "secondary")}${
+      privatePeek && reveal
+        ? `<div class="foresight-cards">${
+            peekEvents(g, g.turn)
+              .map(
+                (id, i) =>
+                  `<figure><img src="${ART.cards[id].image}" width="180" height="291" alt="${attrs(CARD_MAP[id].title)}"/><figcaption>${i + 1}. ${escape(CARD_MAP[id].title)}</figcaption></figure>`,
+              )
+              .join("") || "<p>No face-down Events remain.</p>"
+          }</div><p class="muted">Private peek for ${escape(player(g).name)}. Hide it before passing the device.</p>`
         : ""
-    }</section></div>`;
+    }</div>`;
+  }
+  function flexibleControl(g: Game, owner = g.turn) {
+    if (g.phase === "finished" || !hasTech(g, owner, "flexible-economy"))
+      return "";
+    return `<div class="flexible-inline" aria-label="Flexible Economy">${button("Return 1 Credit to Reserve", "return-credit", `data-owner="${owner}"`, player(g, owner).credits === 0, "secondary")}<small>Flexible Economy · one Credit at a time</small></div>`;
+  }
+  function recoveryAllocations(g: Game, pending: ReserveRecovery) {
+    const owner = player(g, pending.owner),
+      n = Math.min(owner.reserve, pending.remaining);
+    return draft.recoveryShips ?? { [owner.home!]: n };
+  }
+  function reserveRecoveryModal(g: Game, pending: ReserveRecovery) {
+    const owner = player(g, pending.owner),
+      available = Math.min(owner.reserve, pending.remaining),
+      effect = pending.effect;
+    let quantity = available,
+      controls = "";
+    if (effect.kind === "production") {
+      const credits = draft.recoveryCredits ?? effect.credits;
+      controls = `<p>Allocate the ${pending.remaining} unfinished production. Only available Reserve is applied; later top-ups keep the remaining allocation.</p>${numberControl("Remaining Ships", "recovery-ships", pending.remaining - credits, pending.remaining)}${numberControl("Remaining Credits", "recovery-credits", credits, pending.remaining)}`;
+    } else if (effect.kind === "reinforce") {
+      const allocations = recoveryAllocations(g, pending);
+      quantity = sumOwners(Object.values(allocations));
+      controls = availableSystems(g, pending.owner)
+        .map((s) =>
+          numberControl(
+            `Additional Ships in ${escape(nameOf(s))}`,
+            "recovery-source",
+            allocations[s.id] ?? 0,
+            Math.max(0, available - quantity + (allocations[s.id] ?? 0)),
+            `data-id="${s.id}"`,
+          ),
+        )
+        .join("");
+    }
+    return `<div class="modal-scrim"><section class="modal reserve-recovery" role="dialog" aria-modal="true" aria-label="Reserve recovery"><h2>${escape(pending.label)} · Reserve shortfall</h2>${badge(owner.style, owner.name)}${owner.id === g.turn ? foresightControl(g, true) : ""}<div class="resource-pills"><span><small>Reserve</small><strong>${owner.reserve}</strong></span><span><small>Credits</small><strong>${owner.credits}</strong></span></div>${flexibleControl(g, owner.id)}${error ? `<p class="error" role="alert">${escape(error)}</p>` : ""}<p><strong>${pending.total - pending.remaining} / ${pending.total}</strong> completed; <strong>${pending.remaining}</strong> still to complete. Earlier gains and commitments stay in place.</p>${pending.messages.map((message) => `<p>${escape(message)}</p>`).join("")}${controls}<div class="commit-row">${button(quantity >= pending.remaining ? "Complete effect" : `Apply ${quantity} Reserve`, "use-reserve", "", quantity === 0, "primary")}${button("Continue with current result", "finish-reserve", "", false, "secondary")}</div><p>Return Credits one at a time, then apply the available Reserve. Continue with the current result to leave the remainder uncompleted.</p></section></div>`;
   }
   function actionForm(g: Game, s: System) {
     const p = player(g);
@@ -1308,7 +1339,7 @@ export function mountApp(
     if (draft.action === "attack") {
       const totals = attackTotals(),
         used = attackCost(g, totals.ships, totals.settlements);
-      return `<div class="attack-controls"><p>Each sacrificed Ship removes up to two opposing Ships <strong>or</strong> one Settlement.${hasTech(g, g.turn, "death-sun") ? " Death Sun adds one extra opposing Ship or Settlement per sacrifice." : ""} All casualties become Credits.</p>${numberControl(`Your Ships to sacrifice (out of ${s.ships[g.turn]})`, "sacrifice", draft.sacrifice, s.ships[g.turn])}<p class="attack-budget">${draft.sacrifice} / ${used} sacrifices needed by these targets.</p><div class="attack-columns"><div><h4>Opposing Ships</h4>${
+      return `<div class="attack-controls"><p>${hasTech(g, g.turn, "death-sun") ? "Each sacrificed Ship removes up to three opposing Ships <strong>or</strong> two Settlements. A sacrifice cannot mix the two target types." : "Each sacrificed Ship removes up to two opposing Ships <strong>or</strong> one Settlement."} All casualties become Credits.</p>${numberControl(`Your Ships to sacrifice (out of ${s.ships[g.turn]})`, "sacrifice", draft.sacrifice, s.ships[g.turn])}<p class="attack-budget">${draft.sacrifice} / ${used} sacrifices needed by these targets.</p><div class="attack-columns"><div><h4>Opposing Ships</h4>${
         g.players
           .filter((other) => other.id !== p.id && s.ships[other.id] > 0)
           .map((other) => {
@@ -1366,14 +1397,14 @@ export function mountApp(
     return "";
   }
   function inspector(g: Game) {
-    if (reserveNotice(g)) return "";
+    if (reserveNotice(g) || g.pending?.kind === "reserve") return "";
     if (g.pending?.kind === "filibuster") {
       const choices = g.systems.flatMap((s) =>
         s.tokens.flatMap((owner, index) =>
           owner === g.turn ? [{ s, index }] : [],
         ),
       );
-      return `<section class="console"><div class="eyebrow">After PLAN · Filibuster</div><h2>Move one of your tokens to the top</h2><p>Select the exact token to lift, or pass. Token numbers count from the top of each stack.</p><div class="feature-options">${choices.map(({ s, index }) => button(`${systemIllustration(g, s)}<span>${escape(nameOf(s))} · token #${s.tokens.length - index}</span>`, "filibuster-option", `data-system-id="${s.id}" data-index="${index}" aria-pressed="${selected === s.id && draft.tokenIndex === index}"`, false, `secondary system-target ${selected === s.id && draft.tokenIndex === index ? "selected" : ""}`)).join("")}</div>${button("Pass", "skip-filibuster", "", false, "quiet")}${button("Lift token to top", "commit-filibuster", "", !choices.some((o) => o.s.id === selected && o.index === draft.tokenIndex), "primary")}</section>`;
+      return `<section class="console"><div class="eyebrow">After PLAN · Filibuster</div><h2>Move one of your tokens to the top</h2><p>Select the exact token to lift, or pass. Token numbers count from the top of each stack.</p><div class="feature-options">${choices.map(({ s, index }) => button(`${systemIllustration(g, s)}<span>${escape(nameOf(s))} · token #${s.tokens.length - index}${index === s.tokens.length - 1 ? " (top)" : ""}${index === 0 ? " (bottom)" : ""}</span>`, "filibuster-option", `data-system-id="${s.id}" data-index="${index}" aria-pressed="${selected === s.id && draft.tokenIndex === index}"`, false, `secondary system-target ${selected === s.id && draft.tokenIndex === index ? "selected" : ""}`)).join("")}</div>${button("Pass", "skip-filibuster", "", false, "quiet")}${button("Lift token to top", "commit-filibuster", "", !choices.some((o) => o.s.id === selected && o.index === draft.tokenIndex), "primary")}</section>`;
     }
     if (g.pending?.kind === "insurance") {
       const p = player(g),
@@ -1639,10 +1670,20 @@ export function mountApp(
           ? "Increase the undiscounted value"
           : null;
       const reason =
-          targetReason ?? purchaseReason(g, id, g.turn, false, value),
-        fullReason = targetReason ?? purchaseReason(g, id, g.turn, true, value);
-      const cost = purchaseCost(g, id, g.turn, false, value);
-      return `<div class="sabotage-controls"><h4>Choose the Tech to remove</h4><div class="sabotage-targets">${targets.map((t) => button(`${escape(player(g, t.player).name)} · ${escape(CARD_MAP[t.tech].title)} (${CARD_MAP[t.tech].cost})`, "sabotage-target", `data-owner="${t.player}" data-tech="${t.tech}" aria-pressed="${t === selectedTarget}"`, false, t === selectedTarget ? "selected" : "secondary")).join("") || "<p>No legal opponent Tech is available.</p>"}</div>${numberControl("Undiscounted value (X)", "sabotage-value", value, hasTech(g, g.turn, "research-lab") ? 81 : 40)}<p>Remove a Tech of printed value up to X. Its ownership rocket returns to its owner's Reserve. Sabotage cannot target Sabotage or be bought in the last round.</p>${button(reason ?? `Buy Sabotage for ${cost} Credits${hasTech(g, g.turn, "research-lab") ? " · Research Lab" : ""}`, "buy", `data-tech="${id}"`, Boolean(reason), "primary")}${hasTech(g, g.turn, "research-lab") ? button(fullReason ?? `Pay full price · ${value} Credits`, "buy", `data-tech="${id}" data-full-price="true"`, Boolean(fullReason), "secondary") : ""}</div>`;
+          targetReason ??
+          purchaseReason(g, id, g.turn, false, value, selectedTarget),
+        fullReason =
+          targetReason ??
+          purchaseReason(g, id, g.turn, true, value, selectedTarget);
+      const cost = purchaseCost(
+        g,
+        id,
+        g.turn,
+        false,
+        value,
+        selectedTarget ? Number(CARD_MAP[selectedTarget.tech].cost) : 0,
+      );
+      return `<div class="sabotage-controls"><h4>Choose the Tech to remove</h4><div class="sabotage-targets">${targets.map((t) => button(`${escape(player(g, t.player).name)} · ${escape(CARD_MAP[t.tech].title)} (${CARD_MAP[t.tech].cost})`, "sabotage-target", `data-owner="${t.player}" data-tech="${t.tech}" aria-pressed="${t === selectedTarget}"`, false, t === selectedTarget ? "selected" : "secondary")).join("") || "<p>No legal opponent Tech is available.</p>"}</div>${numberControl("Undiscounted value (X)", "sabotage-value", value, hasTech(g, g.turn, "research-lab") ? 81 : 40)}<p>Pay at least the selected Tech’s full printed value, including with Research Lab. Remove a Tech of printed value up to X. Its ownership rocket returns to its owner's Reserve. Sabotage cannot target Sabotage or be bought in the last round.</p>${button(reason ?? `Buy Sabotage for ${cost} Credits${cost < value ? " · Research Lab" : ""}`, "buy", `data-tech="${id}"`, Boolean(reason), "primary")}${hasTech(g, g.turn, "research-lab") && cost < value ? button(fullReason ?? `Pay full price · ${value} Credits`, "buy", `data-tech="${id}" data-full-price="true"`, Boolean(fullReason), "secondary") : ""}</div>`;
     }
     const card = CARD_MAP[id],
       reason = purchaseReason(g, id),
@@ -1661,12 +1702,12 @@ export function mountApp(
       .map((id) => {
         const card = CARD_MAP[id],
           owners = g.players.filter((p) => p.techs.includes(id));
-        return `<article class="tech-card" data-tech-id="${id}" data-tech-value="${techValue(id)}"><button class="card-art-button" data-action="card" data-card="${id}" aria-label="Read ${attrs(card.title)}"><img src="${ART.cards[id].image}" width="240" height="388" loading="lazy" alt="${attrs(card.title)} original card artwork"/></button><div class="tech-body"><div class="tech-title"><h3>${escape(card.title)}</h3><span class="cost">${card.cost} <small>Credits</small></span></div><p>${escape(card.text)}</p>${id === "tech.disruptor" && isFinalRound(g) ? '<p class="token-used">Disruptor has no effect in the last round. It still scores 1 point.</p>' : ""}${id === "tech.sabotage" && isFinalRound(g) ? '<p class="token-used">Sabotage cannot be bought in the last round.</p>' : ""}${id === "tech.foresight" ? '<p class="token-used">Foresight test setup: use Tech powers for the owner’s private peek. Event effects and auctions remain disabled.</p>' : ""}${featureUsed(g, id) ? `<p class="token-used">${featureUsed(g, id)} token already on the board. Buying this Tech has no token effect.</p>` : ""}<div class="ownership">${owners.length ? owners.map((p) => badge(p.style, p.name)).join("") : '<span class="muted">No owners yet</span>'}</div>${purchaseButtons(g, id)}</div></article>`;
+        return `<article class="tech-card" data-tech-id="${id}" data-tech-value="${techValue(id)}"><button class="card-art-button" data-action="card" data-card="${id}" aria-label="Read ${attrs(card.title)}"><img src="${ART.cards[id].image}" width="240" height="388" loading="lazy" alt="${attrs(card.title)} original card artwork"/></button><div class="tech-body"><div class="tech-title"><h3>${escape(card.title)}</h3><span class="cost">${card.cost} <small>Credits</small></span></div><p>${escape(card.text)}</p>${id === "tech.disruptor" && isFinalRound(g) ? '<p class="token-used">Disruptor has no effect in the last round. It still scores 1 point.</p>' : ""}${id === "tech.sabotage" && isFinalRound(g) ? '<p class="token-used">Sabotage cannot be bought in the last round.</p>' : ""}${id === "tech.foresight" ? '<p class="token-used">Foresight test setup: use the Status Box for the owner’s private peek. Event effects and auctions remain disabled.</p>' : ""}${featureUsed(g, id) ? `<p class="token-used">${featureUsed(g, id)} token already on the board. Buying this Tech has no token effect.</p>` : ""}<div class="ownership">${owners.length ? owners.map((p) => badge(p.style, p.name)).join("") : '<span class="muted">No owners yet</span>'}</div>${purchaseButtons(g, id)}</div></article>`;
       })
       .join("")}</div></section>`;
   }
   function eventView(g: Game) {
-    return `<section class="event-view"><div class="section-heading"><span class="eyebrow">${g.config.events === "foresight-test" ? "Tech playtest Events" : "Rulebook’s simpler Events variant"}</span><h2>The galaxy keeps time.</h2><p>Event cards count rounds in this build. Their text has no effect and the sealed auction is skipped. ${g.config.events === "foresight-test" ? "This nonstandard Tech test setup keeps Foresight so owners can test private peeks using Tech powers." : "The normal simpler Events variant excludes Foresight; preset replacements use random legal value-2/3 Techs."}</p></div><div class="event-status"><strong>${g.events.length}</strong><span>cards remain in the draw pile</span><strong>${g.players.length <= 3 ? 6 : 5}</strong><span>rounds in this game</span></div>${g.revealedEvents.length ? `<h3>Latest round-tracker pair</h3><div class="event-pair">${g.revealedEvents.map((id) => `<button class="event-card" data-action="card" data-card="${id}"><img src="${ART.cards[id].image}" width="240" height="388" loading="lazy" alt="${attrs(CARD_MAP[id].title)}"/><span>${escape(CARD_MAP[id].title)}</span><small>Effect disabled in this variant</small></button>`).join("")}</div>` : '<div class="empty-state">No Event pair has been drawn yet, or the final Tech step is in progress.</div>'}<p class="muted">Drawing the last pair does not immediately end the game. Play continues until a later Economy cannot draw another pair; then complete Tech purchases and score.</p></section>`;
+    return `<section class="event-view"><div class="section-heading"><span class="eyebrow">${g.config.events === "foresight-test" ? "Tech playtest Events" : "Rulebook’s simpler Events variant"}</span><h2>The galaxy keeps time.</h2><p>Event cards count rounds in this build. Their text has no effect and the sealed auction is skipped. ${g.config.events === "foresight-test" ? "This nonstandard Tech test setup keeps Foresight so owners can test private peeks in the Status Box." : "The normal simpler Events variant excludes Foresight; preset replacements use random legal value-2/3 Techs."}</p></div><div class="event-status"><strong>${g.events.length}</strong><span>cards remain in the draw pile</span><strong>${g.players.length <= 3 ? 6 : 5}</strong><span>rounds in this game</span></div>${g.revealedEvents.length ? `<h3>Latest round-tracker pair</h3><div class="event-pair">${g.revealedEvents.map((id) => `<button class="event-card" data-action="card" data-card="${id}"><img src="${ART.cards[id].image}" width="240" height="388" loading="lazy" alt="${attrs(CARD_MAP[id].title)}"/><span>${escape(CARD_MAP[id].title)}</span><small>Effect disabled in this variant</small></button>`).join("")}</div>` : '<div class="empty-state">No Event pair has been drawn yet, or the final Tech step is in progress.</div>'}<p class="muted">Drawing the last pair does not immediately end the game. Play continues until a later Economy cannot draw another pair; then complete Tech purchases and score.</p></section>`;
   }
   function aidView() {
     return `<section class="aid-view"><div class="section-heading"><h2>Player aid</h2></div><div class="aid-faces"><article><h3>Actions</h3><img src="${ART.aids.actions.image}" width="530" height="810" loading="lazy" alt="Player aid Actions face"/><dl><dt>Move into</dt><dd>Bring Ships from adjacent systems. Warps connect; asteroid belts block unless you have Agility. Each destination black hole destroys one incoming Ship, returned as a Credit.</dd><dt>Settle</dt><dd>Convert Ships into Settlements within capacity; resolve Explore tokens first.</dd><dt>Produce</dt><dd>One Ship or Credit per planet you settle, plus one for each such planet that is full.</dd><dt>Attack</dt><dd>Each sacrificed Ship destroys up to two opposing Ships or one Settlement. All casualties become Credits. You cannot attack Settlements on a planet you share.</dd></dl></article><article><h3>Play sequence & scoring</h3><img src="${ART.aids.sequence.image}" width="530" height="810" loading="lazy" alt="Player aid play sequence and scoring face"/><dl><dt>Plan</dt><dd>Place all four chips in player order.</dd><dt>Actions</dt><dd>Resolve top chips into unused slots, acting or Investing. Turns without an eligible top chip are skipped.</dd><dt>Economy</dt><dd>Cash Investments, draw Events, buy one Tech, reinforce, and pass first player. This build uses Events only as a round tracker.</dd><dt>Score</dt><dd>One point per settled planet, system with your Ships, and owned Tech. Credits break ties; remaining ties share victory.</dd></dl></article></div></section>`;
@@ -1686,16 +1727,18 @@ export function mountApp(
   function overlay() {
     if (confirmation)
       return `<div class="modal-scrim"><section class="modal" role="dialog" aria-modal="true" aria-label="${confirmation.reserveAccepted ? escape(confirmation.title) : "Confirm decision"}"><h2>${escape(confirmation.title)}</h2>${confirmation.reserveAccepted ? "<p>This is the expected outcome if you commit:</p>" : ""}${confirmation.messages.map((m) => `<p>${escape(m)}</p>`).join("")}<p>Is this what you intended?</p><div class="commit-row">${button("Go back", "cancel-confirmation", "", false, "secondary")}${button("Confirm and commit", "confirm-command", "", false, "primary")}</div></section></div>`;
+    if (game?.pending?.kind === "reserve")
+      return reserveRecoveryModal(game, game.pending);
     const reserve = game ? reserveNotice(game) : null;
     if (reserve)
       return `<div class="modal-scrim"><section class="modal reserve-notice" role="dialog" aria-modal="true" aria-label="${escape(reserve.title)}"><h2>${escape(reserve.title)}</h2>${reserve.messages.map((m) => `<p>${escape(m)}</p>`).join("")}<p>Confirm this committed outcome to continue. Committed moves and hidden reveals cannot be undone.</p>${button("Confirm outcome", "acknowledge", "", false, "primary")}</section></div>`;
-    if (utilityOwner !== null && game) return ongoingModal(game);
+
     if (activeCard) {
       const card = CARD_MAP[activeCard];
       return `<div class="modal-scrim"><section class="modal card-modal" role="dialog" aria-modal="true" aria-label="${attrs(card.title)}">${button("Close ×", "close-overlay", "", false, "quiet close")}<img src="${ART.cards[activeCard].image}" width="240" height="388" alt="${attrs(card.title)}"/><div><span class="eyebrow">${card.type === "tech" ? `${card.cost} Credits` : "Event reference"}</span><h2>${escape(card.title)}</h2><p>${escape(card.text)}</p>${activeCard === "tech.disruptor" && game && isFinalRound(game) ? '<p class="token-used">Disruptor has no effect in the last round. It still scores 1 point.</p>' : ""}${card.type === "event" ? '<p class="scope-note">Event effects are disabled in this local prototype.</p>' : ""}</div></section></div>`;
     }
     if (!showHelp) return "";
-    return `<div class="modal-scrim"><section class="modal" role="dialog" aria-modal="true" aria-label="Rules and prototype scope">${button("Close ×", "close-overlay", "", false, "quiet close")}<span class="eyebrow">Space Force · Charlie Fish</span><h2>One galaxy. Plenty of possibilities.</h2><p>This is a local pass-and-play prototype for two to seven people sharing one device. It implements normal turns, ten-card displays drawn from all thirty implemented Techs, and the rulebook's simpler Events variant. Choose a printed preset, either new-Tech display, a mix or Random at setup. The labelled Foresight test keeps that card for private-peek testing while Event effects/auctions remain disabled; normal simpler Events exclude it. the optional R01 scenario starts each player with the five chain Techs and their five Reserve markers. There are no remote rooms, full Event effects/auctions, simultaneous turns, newsletter forms, or private admin service in this build.</p><p>Use Board, Techs, Event, Actions and Supply, and Player Aid. The aid shows both faces together. Select chips in PLAN; later resolve top chips into each of four action slots, or Invest. Complete Economy between rounds.</p><h3>Undo and secrets</h3><p>Reset drafts before Commit. A committed move or hidden reveal cannot be undone. This trusted-device prototype stores the full game locally; authoritative remote privacy will be added with the server.</p><h3>Keyboard</h3><p>S Status Box (scroll to top) · B Board · T Techs · E Event · A Actions and Supply · P Player aid. View shortcuts scroll to the chosen view. With the map focused: R resets the view, +/− zoom, arrows pan. Escape closes details; ? opens Help. Shortcuts ignore editable fields and browser modifiers.</p><label class="check-row"><input type="checkbox" data-check="shortcuts" ${shortcuts ? "checked" : ""}/>Enable character shortcuts while the game has focus</label><div class="commit-row">${button(guide ? "Restart contextual guide" : "Show contextual guide", "guide-on", "", false, "secondary")}${game ? button("Export local game", "export", "", false, "quiet") : ""}</div><p class="muted">Public/private rooms, full Event effects, simultaneous mode, server-owned idle votes, and private administration remain later milestones. Rocket art is provisional and replaceable.</p></section></div>`;
+    return `<div class="modal-scrim"><section class="modal" role="dialog" aria-modal="true" aria-label="Rules and prototype scope">${button("Close ×", "close-overlay", "", false, "quiet close")}<span class="eyebrow">Space Force · Charlie Fish</span><h2>One galaxy. Plenty of possibilities.</h2><p>This is a local pass-and-play prototype for two to seven people sharing one device. It implements normal turns, ten-card displays drawn from all thirty implemented Techs, and the rulebook's simpler Events variant. Choose a printed preset, either new-Tech display, a mix or Random at setup. The labelled Foresight test keeps that card for private-peek testing while Event effects/auctions remain disabled; normal simpler Events exclude it. The optional R01 scenario starts each player with the five chain Techs and their five Reserve markers. There are no remote rooms, full Event effects/auctions, simultaneous turns, newsletter forms, or private admin service in this build.</p><p>Use Board, Techs, Event, Actions and Supply, and Player Aid. The aid shows both faces together. Select chips in PLAN; later resolve top chips into each of four action slots, or Invest. Complete Economy between rounds.</p><h3>Undo and secrets</h3><p>Reset drafts before Commit. A committed move or hidden reveal cannot be undone. This trusted-device prototype stores the full game locally; authoritative remote privacy will be added with the server.</p><h3>Keyboard</h3><p>S Status Box (scroll to top) · B Board · T Techs · E Event · A Actions and Supply · P Player aid. View shortcuts scroll to the chosen view. With the map focused: R resets the view, +/− zoom, arrows pan. Escape closes details; ? opens Help. Shortcuts ignore editable fields and browser modifiers.</p><label class="check-row"><input type="checkbox" data-check="shortcuts" ${shortcuts ? "checked" : ""}/>Enable character shortcuts while the game has focus</label><div class="commit-row">${button(guide ? "Restart contextual guide" : "Show contextual guide", "guide-on", "", false, "secondary")}${game ? button("Export local game", "export", "", false, "quiet") : ""}</div><p class="muted">Public/private rooms, full Event effects, simultaneous mode, server-owned idle votes, and private administration remain later milestones. Rocket art is provisional and replaceable.</p></section></div>`;
   }
   function economyTracker(g: Game) {
     if (
@@ -1714,7 +1757,7 @@ export function mountApp(
         ...g.players.slice(g.first),
         ...g.players.slice(0, g.first),
       ];
-    return `<section id="status-box" class="status-box" tabindex="-1" aria-label="Status Box"><div class="status-overview"><h2 class="status-title"><button data-action="to-status">Status Box<span class="shortcut-hint"> (S)</span></button></h2><div class="eyebrow status-phase">${phaseLabel(g)}</div><div class="turn-bar" tabindex="-1" aria-live="polite">${badge(p.style, p.name)}<span class="turn-instruction">${escape(instruction(g))}</span></div><div class="status-supply resource-pills"><span><small>Reserve</small><strong>${p.reserve}</strong></span><span><small>Credits</small><strong>${p.credits}</strong></span></div><details class="player-roster" ${rosterOpen ? "open" : ""}><summary>Players & supply</summary><ul>${orderedPlayers.map((other) => `<li data-player="${other.id}">${badge(other.style, other.name)}<span>${other.reserve} Reserve</span><span>${other.credits} Credits</span><span>${other.techs.length} Techs</span><strong>${scores.find((s) => s.player === other.id)!.total} points${g.phase === "finished" ? "" : " currently"}</strong><span>${other.used.length}/4 slots used</span></li>`).join("")}</ul></details>${economyTracker(g)}</div><div class="status-decision">${error ? `<div class="error" role="alert">${escape(error)}</div>` : ""}<details class="since-last-turn"><summary>Since your last turn</summary>${history.length ? `<ol>${history.map((l) => `<li data-log-revision="${l.revision}"><span>Round ${l.round}</span> ${l.player === null ? "" : `<strong>${escape(player(g, l.player).name)}:</strong> `}${escape(l.text)}</li>`).join("")}</ol>` : "<p>No actions have happened since your previous decision.</p>"}</details>${inspector(g)}${g.phase === "plan" && hasTech(g, g.turn, "strategic-stall") ? `<div class="stall-choice">${button("Pass once · Strategic Stall", "plan-pass", "", player(g).stalledRound === g.round, "secondary")}</div>` : ""}</div></section>`;
+    return `<section id="status-box" class="status-box" tabindex="-1" aria-label="Status Box"><div class="status-overview"><h2 class="status-title"><button data-action="to-status">Status Box<span class="shortcut-hint"> (S)</span></button></h2><div class="eyebrow status-phase">${phaseLabel(g)}</div><div class="turn-bar" tabindex="-1" aria-live="polite">${badge(p.style, p.name)}<span class="turn-instruction">${escape(instruction(g))}</span></div>${foresightControl(g)}<div class="status-supply resource-pills"><span><small>Reserve</small><strong>${p.reserve}</strong></span><span><small>Credits</small><strong>${p.credits}</strong></span></div>${flexibleControl(g)}<details class="player-roster" ${rosterOpen ? "open" : ""}><summary>Players & supply</summary><ul>${orderedPlayers.map((other) => `<li data-player="${other.id}">${badge(other.style, other.name)}<span>${other.reserve} Reserve</span><span>${other.credits} Credits</span><span>${other.techs.length} Techs</span><strong>${scores.find((s) => s.player === other.id)!.total} points${g.phase === "finished" ? "" : " currently"}</strong><span>${other.used.length}/4 slots used</span></li>`).join("")}</ul></details>${economyTracker(g)}</div><div class="status-decision">${error ? `<div class="error" role="alert">${escape(error)}</div>` : ""}<details class="since-last-turn"><summary>Since your last turn</summary>${history.length ? `<ol>${history.map((l) => `<li data-log-revision="${l.revision}"><span>Round ${l.round}</span> ${l.player === null ? "" : `<strong>${escape(player(g, l.player).name)}:</strong> `}${escape(l.text)}</li>`).join("")}</ol>` : "<p>No actions have happened since your previous decision.</p>"}</details>${inspector(g)}${g.phase === "plan" && hasTech(g, g.turn, "strategic-stall") ? `<div class="stall-choice">${button("Pass once · Strategic Stall", "plan-pass", "", player(g).stalledRound === g.round, "secondary")}</div>` : ""}</div></section>`;
   }
 
   function render() {
@@ -1752,7 +1795,7 @@ export function mountApp(
         actions: "A",
         player_aid: "P",
       };
-      root.innerHTML = `<div class="game-shell">${sharedArt(g)}<header class="game-header"><button class="wordmark" data-action="help" aria-label="Space Force help"><span>SPACE</span><span>FORCE</span></button><div class="round-status"><span class="eyebrow">Local ${TECH_PRESETS[g.config.techPreset].label} game · ${g.config.events === "foresight-test" ? "Tech playtest Events" : "simpler Events"}${g.config.scenario === "five-tech-chain" ? " · R01 scenario" : ""}</span><strong>Round ${g.round} / ${g.players.length <= 3 ? 6 : 5}</strong><span>${phaseLabel(g)}</span></div><div class="header-player">${badge(p.style, p.name)}<div class="resource-pills"><span><small>Reserve</small><strong>${p.reserve}</strong></span><span><small>Credits</small><strong>${p.credits}</strong></span></div></div><div class="header-tools">${ongoingButton(g)}${button("?", "help", 'aria-label="Open Help"')}${button("New", "new-game", "", false, "quiet")}</div></header>${statusBox(g)}${g.phase === "finished" ? finalScores(g) : tutorial(g)}<nav class="view-tabs" aria-label="Game views" role="tablist">${(Object.keys(VIEW_LABELS) as View[]).map((v) => `<button id="tab-${v}" role="tab" aria-selected="${view === v}" aria-controls="game-panel" data-view="${v}" class="${view === v ? "active" : ""}"><span aria-hidden="true">${{ board: "⬡", techs: "✧", event: "◷", actions: "↗", player_aid: "▤" }[v]}</span>${VIEW_LABELS[v]}<span class="shortcut-hint"> (${shortcuts[v]})</span></button>`).join("")}</nav><main id="game-panel" class="main-panel" role="tabpanel" aria-labelledby="tab-${view}" tabindex="-1">${panel}</main><footer class="game-footer"><span>${autosave ? "Autosaved on this device" : "Session only · local storage unavailable"}</span><span>Normal turns · ${g.players.length} players · revision ${g.revision}</span>${button("Game record ↓", "export", "", false, "text-link")}<details class="history"><summary>Recent game history</summary><ol>${g.log
+      root.innerHTML = `<div class="game-shell">${sharedArt(g)}<header class="game-header"><button class="wordmark" data-action="help" aria-label="Space Force help"><span>SPACE</span><span>FORCE</span></button><div class="round-status"><span class="eyebrow">Local ${TECH_PRESETS[g.config.techPreset].label} game · ${g.config.events === "foresight-test" ? "Tech playtest Events" : "simpler Events"}${g.config.scenario === "five-tech-chain" ? " · R01 scenario" : ""}</span><strong>Round ${g.round} / ${g.players.length <= 3 ? 6 : 5}</strong><span>${phaseLabel(g)}</span></div><div class="header-player">${badge(p.style, p.name)}<div class="resource-pills"><span><small>Reserve</small><strong>${p.reserve}</strong></span><span><small>Credits</small><strong>${p.credits}</strong></span></div></div><div class="header-tools">${button("?", "help", 'aria-label="Open Help"')}${button("New", "new-game", "", false, "quiet")}</div></header>${statusBox(g)}${g.phase === "finished" ? finalScores(g) : tutorial(g)}<nav class="view-tabs" aria-label="Game views" role="tablist">${(Object.keys(VIEW_LABELS) as View[]).map((v) => `<button id="tab-${v}" role="tab" aria-selected="${view === v}" aria-controls="game-panel" data-view="${v}" class="${view === v ? "active" : ""}"><span aria-hidden="true">${{ board: "⬡", techs: "✧", event: "◷", actions: "↗", player_aid: "▤" }[v]}</span>${VIEW_LABELS[v]}<span class="shortcut-hint"> (${shortcuts[v]})</span></button>`).join("")}</nav><main id="game-panel" class="main-panel" role="tabpanel" aria-labelledby="tab-${view}" tabindex="-1">${panel}</main><footer class="game-footer"><span>${autosave ? "Autosaved on this device" : "Session only · local storage unavailable"}</span><span>Normal turns · ${g.players.length} players · revision ${g.revision}</span>${button("Game record ↓", "export", "", false, "text-link")}<details class="history"><summary>Recent game history</summary><ol>${g.log
         .slice(-30)
         .reverse()
         .map(
@@ -1827,7 +1870,7 @@ export function mountApp(
     const modal = root.querySelector<HTMLElement>(".modal");
     if (modal && !modal.contains(root.ownerDocument.activeElement))
       modal
-        .querySelector<HTMLElement>("button")
+        .querySelector<HTMLElement>("button:not(:disabled)")
         ?.focus({ preventScroll: true });
   }
 
@@ -1837,7 +1880,7 @@ export function mountApp(
       [
         JSON.stringify(
           {
-            application: "Space Force local prototype 0.15.0",
+            application: "Space Force local prototype 0.16.0",
             exportedAt: new Date().toISOString(),
             game,
           },
@@ -1888,7 +1931,7 @@ export function mountApp(
   }
   function selectLocation(target: Element) {
     if (!game) return;
-    planTap = null;
+    placementTap = null;
     const tile = target.closest<SVGElement>("[data-system]");
     if (!tile) return;
     const id = tile.dataset.system!;
@@ -1910,13 +1953,25 @@ export function mountApp(
       adjustAllocation(game, id, (draft.allocation[id] ?? 0) + 1);
     render();
   }
-  function selectPlanSystem(id: string, source: string, x: number, y: number) {
-    if (!game || game.phase !== "plan" || game.pending) {
-      planTap = null;
+  function selectPlacementSystem(
+    id: string,
+    source: string,
+    x: number,
+    y: number,
+  ) {
+    if (!game || !["homes", "plan"].includes(game.phase) || game.pending) {
+      placementTap = null;
       return;
     }
-    if (!canPlan(game, system(game, id))) {
-      planTap = null;
+    const candidate = system(game, id);
+    const legal =
+      game.phase === "homes"
+        ? candidate.revealed &&
+          candidate.planets.some((p) => p.home) &&
+          !game.players.some((p) => p.home === id)
+        : canPlan(game, candidate);
+    if (!legal) {
+      placementTap = null;
       selected = id;
       selectedPlanet = null;
       selectedEdge = null;
@@ -1925,10 +1980,11 @@ export function mountApp(
       return;
     }
     const time = Date.now(),
-      previous = planTap;
+      previous = placementTap;
     if (
       previous &&
       previous.system === id &&
+      previous.phase === game.phase &&
       previous.actor === game.turn &&
       previous.revision === game.revision &&
       previous.source === source &&
@@ -1936,12 +1992,13 @@ export function mountApp(
       time - previous.time <= 450 &&
       Math.hypot(x - previous.x, y - previous.y) <= 24
     ) {
-      perform({ type: "plan", system: id });
+      perform({ type: game.phase === "homes" ? "home" : "plan", system: id });
       suppressClickUntil = time + 350;
       return;
     }
-    planTap = {
+    placementTap = {
       system: id,
+      phase: game.phase as "homes" | "plan",
       actor: game.turn,
       revision: game.revision,
       time,
@@ -1990,7 +2047,7 @@ export function mountApp(
       reserveAccepted,
     };
     render();
-    root.querySelector<HTMLElement>(".modal button")?.focus();
+    root.querySelector<HTMLElement>(".modal button:not(:disabled)")?.focus();
   }
   function commitDraft() {
     if (!game || !selected || !draft.action) return;
@@ -2044,9 +2101,14 @@ export function mountApp(
     const control = target.closest<HTMLElement>("[data-action]");
     if (!control && !dragged) {
       const tile = target.closest<SVGElement>("#galaxy [data-system]");
-      if (tile && game?.phase === "plan" && !game.pending) {
+      if (
+        tile &&
+        game &&
+        ["homes", "plan"].includes(game.phase) &&
+        !game.pending
+      ) {
         const pointer = event as MouseEvent;
-        selectPlanSystem(
+        selectPlacementSystem(
           tile.dataset.system!,
           "mouse",
           pointer.clientX,
@@ -2056,7 +2118,7 @@ export function mountApp(
       return;
     }
     if (!control || (control as HTMLButtonElement).disabled) return;
-    planTap = null;
+    placementTap = null;
     const data = control.dataset,
       action = data.action;
     if (action === "count") {
@@ -2067,7 +2129,7 @@ export function mountApp(
       overlayReturn = { action: "help" };
       showHelp = true;
       render();
-      root.querySelector<HTMLElement>(".modal button")?.focus();
+      root.querySelector<HTMLElement>(".modal button:not(:disabled)")?.focus();
     } else if (action === "close-overlay" || action === "cancel-confirmation")
       closeOverlay();
     else if (action === "confirm-command" && confirmation) {
@@ -2105,37 +2167,29 @@ export function mountApp(
         render();
       }
     } else if (action === "export") exportGame();
-    else if (action === "ongoing-techs" && game) {
-      utilityOwner =
-        hasTech(game, game.turn, "flexible-economy") ||
-        hasTech(game, game.turn, "foresight")
-          ? game.turn
-          : game.players.find(
-              (p) =>
-                hasTech(game!, p.id, "flexible-economy") ||
-                hasTech(game!, p.id, "foresight"),
-            )!.id;
-      utilityAmount = Math.min(1, player(game, utilityOwner).credits);
-      privatePeek = false;
-      render();
-    } else if (action === "utility-owner" && game) {
-      utilityOwner = Number(data.owner);
-      utilityAmount = Math.min(1, player(game, utilityOwner).credits);
-      privatePeek = false;
-      render();
-    } else if (action === "show-peek") {
+    else if (action === "show-peek") {
       privatePeek = true;
       render();
     } else if (action === "hide-peek") {
       privatePeek = false;
       render();
-    } else if (action === "return-credits" && game && utilityOwner !== null)
+    } else if (action === "return-credit" && game)
       perform(
-        { type: "returnCredits", count: utilityAmount },
+        { type: "returnCredits", count: 1 },
         game.revision,
         undefined,
-        utilityOwner,
+        Number(data.owner),
       );
+    else if (action === "use-reserve" && game?.pending?.kind === "reserve")
+      perform({
+        type: "useReserve",
+        credits: draft.recoveryCredits,
+        ships:
+          game.pending.effect.kind === "reinforce"
+            ? recoveryAllocations(game, game.pending)
+            : undefined,
+      });
+    else if (action === "finish-reserve") perform({ type: "finishReserve" });
     else if (action === "to-status") scrollToStatus();
     else if (action === "zoom-in") zoomBy(1.25);
     else if (action === "zoom-out") zoomBy(0.8);
@@ -2157,7 +2211,7 @@ export function mountApp(
       overlayReturn = { action, card: data.card };
       activeCard = data.card!;
       render();
-      root.querySelector<HTMLElement>(".modal button")?.focus();
+      root.querySelector<HTMLElement>(".modal button:not(:disabled)")?.focus();
     } else if (action === "step-number") {
       const el = control
         .closest(".quantity-row")
@@ -2242,10 +2296,7 @@ export function mountApp(
       else if (action === "continue-event") perform({ type: "continueEvent" });
       else if (action === "sabotage-target") {
         draft.sabotageTarget = { player: Number(data.owner), tech: data.tech! };
-        draft.sabotageValue = Math.max(
-          draft.sabotageValue ?? 0,
-          Number(CARD_MAP[data.tech!].cost),
-        );
+        draft.sabotageValue = Number(CARD_MAP[data.tech!].cost);
         render();
       } else if (action === "buy") {
         const command: Command = {
@@ -2380,7 +2431,20 @@ export function mountApp(
       normalizePassengerLosses();
     }
     if (el.dataset.number === "mercenaries") draft.techCount = n;
-    if (el.dataset.number === "return-credits") utilityAmount = n;
+    if (el.dataset.number === "recovery-credits") draft.recoveryCredits = n;
+    if (
+      el.dataset.number === "recovery-ships" &&
+      game.pending?.kind === "reserve"
+    )
+      draft.recoveryCredits = game.pending.remaining - n;
+    if (
+      el.dataset.number === "recovery-source" &&
+      game.pending?.kind === "reserve"
+    )
+      draft.recoveryShips = {
+        ...recoveryAllocations(game, game.pending),
+        [id]: n,
+      };
     if (el.dataset.number === "sabotage-value") draft.sabotageValue = n;
     if (el.dataset.number === "replacement") {
       draft.replacements[el.dataset.planet!] ??= {};
@@ -2464,7 +2528,7 @@ export function mountApp(
       trimReplacementDraft();
     if (
       JSON.stringify(draft) !== before ||
-      ["return-credits", "sabotage-value"].includes(el.dataset.number)
+      ["sabotage-value"].includes(el.dataset.number)
     )
       render();
     else el.value = String(n);
@@ -2487,8 +2551,7 @@ export function mountApp(
     const modal = root.querySelector(".modal");
     if (event.key === "Escape" && modal) {
       event.preventDefault();
-      if (showHelp || activeCard || confirmation || utilityOwner !== null)
-        closeOverlay();
+      if (showHelp || activeCard || confirmation) closeOverlay();
       return;
     }
     if (event.key === "Tab" && modal) {
@@ -2543,15 +2606,7 @@ export function mountApp(
       selectLocation(target);
       return;
     }
-    if (
-      !shortcuts ||
-      !game ||
-      showHelp ||
-      activeCard ||
-      confirmation ||
-      utilityOwner !== null
-    )
-      return;
+    if (!shortcuts || !game || showHelp || activeCard || confirmation) return;
     const shortcut: Record<string, View> = {
       b: "board",
       t: "techs",
@@ -2571,7 +2626,7 @@ export function mountApp(
       overlayReturn = null;
       showHelp = true;
       render();
-      root.querySelector<HTMLElement>(".modal button")?.focus();
+      root.querySelector<HTMLElement>(".modal button:not(:disabled)")?.focus();
     } else if (target.closest(".map-viewport")) {
       if (event.key.toLowerCase() === "r") {
         event.preventDefault();
@@ -2595,6 +2650,7 @@ export function mountApp(
     }
   };
   function cancelPlacement() {
+    homeTouch = null;
     placementDrag = null;
     root.querySelector("#placement-chip")?.remove();
     root
@@ -2611,12 +2667,16 @@ export function mountApp(
     const target = event.target as Element;
     const modal = root.querySelector(".modal");
     if (modal && !modal.contains(target)) return;
+    if (homeTouch && homeTouch.id !== event.pointerId) {
+      homeTouch = null;
+      placementTap = null;
+    }
     if (target.closest(".view-tabs") && event.pointerType === "touch") {
       swipe = { id: event.pointerId, x: event.clientX, y: event.clientY };
       return;
     }
     if (placementDrag && placementDrag.id !== event.pointerId) {
-      planTap = null;
+      placementTap = null;
       pointerPositions.set(placementDrag.id, {
         x: placementDrag.x,
         y: placementDrag.y,
@@ -2625,6 +2685,20 @@ export function mountApp(
       suppressClickUntil = Date.now() + 350;
     }
     const tile = target.closest<SVGElement>("[data-system]");
+    if (
+      game?.phase === "homes" &&
+      event.pointerType === "touch" &&
+      tile &&
+      pointerPositions.size === 0
+    )
+      homeTouch = {
+        id: event.pointerId,
+        system: tile.dataset.system!,
+        x: event.clientX,
+        y: event.clientY,
+        actor: game.turn,
+        revision: game.revision,
+      };
     if (
       game?.phase === "plan" &&
       !game.pending &&
@@ -2734,7 +2808,7 @@ export function mountApp(
       panY += before.y - after.y;
     }
     if (dragged) {
-      planTap = null;
+      placementTap = null;
       event.preventDefault();
       root.setPointerCapture?.(event.pointerId);
       suppressClickUntil = Date.now() + 350;
@@ -2742,6 +2816,28 @@ export function mountApp(
     }
   };
   const up = (event: PointerEvent) => {
+    if (event.type === "pointercancel") placementTap = null;
+    if (homeTouch?.id === event.pointerId) {
+      const tapped = homeTouch;
+      homeTouch = null;
+      if (
+        event.type !== "pointercancel" &&
+        !dragged &&
+        pointerPositions.size === 1 &&
+        Math.hypot(event.clientX - tapped.x, event.clientY - tapped.y) <= 7 &&
+        game?.phase === "homes" &&
+        game.turn === tapped.actor &&
+        game.revision === tapped.revision
+      ) {
+        selectPlacementSystem(
+          tapped.system,
+          "touch",
+          event.clientX,
+          event.clientY,
+        );
+        suppressClickUntil = Date.now() + 350;
+      }
+    }
     if (placementDrag?.id === event.pointerId) {
       const placement = placementDrag,
         id = placementTarget(event.clientX, event.clientY);
@@ -2749,7 +2845,7 @@ export function mountApp(
       if (root.hasPointerCapture?.(event.pointerId))
         root.releasePointerCapture(event.pointerId);
       if (placement.moved) {
-        planTap = null;
+        placementTap = null;
         suppressClickUntil = Date.now() + 350;
         if (
           event.type !== "pointercancel" &&
@@ -2769,7 +2865,7 @@ export function mountApp(
         game.revision === placement.revision &&
         id
       ) {
-        selectPlanSystem(id, "touch", event.clientX, event.clientY);
+        selectPlacementSystem(id, "touch", event.clientX, event.clientY);
         suppressClickUntil = Date.now() + 350;
       }
       return;
@@ -2829,9 +2925,8 @@ export function mountApp(
       previewCache = new WeakMap();
       featureCache = new WeakMap();
       game = value;
-      utilityOwner = null;
       privatePeek = false;
-      planTap = null;
+      placementTap = null;
       draft = freshDraft();
       selected =
         value.pending && "system" in value.pending

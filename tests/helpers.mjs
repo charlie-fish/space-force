@@ -120,6 +120,7 @@ export function botCommand(g) {
   if (pending?.kind === "afterOrder")
     return { type: "orderAfter", tech: "mercenaries" };
   if (pending?.kind === "eminent") return { type: "eminent", use: true };
+  if (pending?.kind === "reserve") return { type: "finishReserve" };
   if (pending?.kind === "ack") return { type: "acknowledge" };
   if (pending?.kind === "redistribute")
     return { type: "redistribute", ships: pending.amount, settlements: {} };
@@ -250,6 +251,7 @@ export function botCommand(g) {
             g.turn,
             false,
             t === "tech.sabotage" ? value : undefined,
+            target,
           ),
       ) ?? null;
     return {

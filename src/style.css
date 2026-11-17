@@ -321,11 +321,42 @@ small {
   padding-top: 12px;
   border-top: 1px solid #66533a55;
 }
-.owner-options,
 .sabotage-targets {
   display: flex;
   flex-wrap: wrap;
   gap: 8px;
+  margin: 12px 0;
+}
+.sabotage-targets button.selected {
+  color: #211d32;
+  background: #f1c98b;
+  border-color: #634a2b;
+  font-weight: 700;
+}
+.flexible-inline,
+.foresight-inline {
+  margin: 10px 0;
+}
+.flexible-inline {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+}
+.foresight-inline > strong {
+  margin-right: 10px;
+}
+.foresight-inline .foresight-cards {
+  max-width: 400px;
+  margin-top: 10px;
+}
+.status-box .flexible-inline button,
+.status-box .foresight-inline button {
+  color: #242034;
+  background: #f7e5bf;
+  border-color: #735b3f;
+}
+.reserve-recovery .resource-pills {
   margin: 12px 0;
 }
 .sabotage-targets {

@@ -40,6 +40,48 @@ export function restoreGame(value: unknown): Game {
       game = applyCommand(game, record.actor, record.command);
     return game;
   }
+  if (stored.engine === "0.15.0") {
+    if (
+      stored.schema !== 6 ||
+      stored.content !== "all-techs-event-tracker-3" ||
+      !Array.isArray(stored.commands) ||
+      stored.commands.length !== stored.revision ||
+      !Array.isArray(stored.players) ||
+      !stored.config
+    )
+      throw Error("Invalid legacy save.");
+    let game = createGame(
+      stored.players.length,
+      stored.seed,
+      stored.players.map((p) => p.name),
+      stored.config,
+    );
+    game.legacyRulesUntil = stored.revision;
+    game.reserveRecoveryFrom = stored.revision;
+    let recovery: { before: Game; index: number } | null = null;
+    for (const [index, record] of stored.commands.entries()) {
+      const before = game;
+      game = applyCommand(game, record.actor, record.command);
+      if (
+        game.pending?.kind === "ack" &&
+        game.pending.messages.some((m) => m.includes("Reserve"))
+      ) {
+        if (record.command.type !== "returnCredits")
+          recovery = { before, index };
+      } else recovery = null;
+    }
+    // An unacknowledged old shortfall can use the new continuation, without undoing its gains.
+    if (recovery) {
+      let upgraded = {
+        ...recovery.before,
+        reserveRecoveryFrom: recovery.before.revision,
+      };
+      for (const record of stored.commands.slice(recovery.index))
+        upgraded = applyCommand(upgraded, record.actor, record.command);
+      if (upgraded.pending?.kind === "reserve") game = upgraded;
+    }
+    return game;
+  }
   if (["0.8.0", "0.9.0", "0.10.0", "0.11.0"].includes(stored.engine)) {
     const expected =
       stored.engine === "0.8.0"

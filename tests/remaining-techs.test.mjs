@@ -82,27 +82,22 @@ test("all thirty Techs are available; simpler Events replaces Foresight legally 
   assert.deepEqual(laboratory.market, REMAINING_TECHS);
 });
 
-test("Death Sun's sacrifice formula matches every allocation of ordinary and bonus targets", () => {
+test("Death Sun sacrifices allocate exclusively to Ship groups or Settlement groups", () => {
   const g = fixture();
   tech(g, 0, "death-sun");
   for (let ships = 0; ships <= 10; ships++)
     for (let settlements = 0; settlements <= 10; settlements++) {
       let minimum;
       for (let own = 0; own <= 20 && minimum === undefined; own++)
-        for (let baseSettlements = 0; baseSettlements <= own; baseSettlements++)
-          for (
-            let bonusSettlements = 0;
-            bonusSettlements <= own;
-            bonusSettlements++
+        for (let shipGroups = 0; shipGroups <= own; shipGroups++) {
+          if (
+            ships <= 3 * shipGroups &&
+            settlements <= 2 * (own - shipGroups)
           ) {
-            if (
-              settlements <= baseSettlements + bonusSettlements &&
-              ships <= 2 * (own - baseSettlements) + (own - bonusSettlements)
-            ) {
-              minimum = own;
-              break;
-            }
+            minimum = own;
+            break;
           }
+        }
       assert.equal(
         attackCost(g, ships, settlements),
         minimum,
@@ -111,7 +106,7 @@ test("Death Sun's sacrifice formula matches every allocation of ordinary and bon
     }
 });
 
-test("Death Sun destroys two Ships plus one Settlement per sacrifice and keeps normal protection rules", () => {
+test("Death Sun requires separate sacrifices for Ships and Settlements and keeps normal protections", () => {
   const g = fixture(),
     s = g.systems[0],
     p = s.planets[1];
@@ -123,12 +118,12 @@ test("Death Sun destroys two Ships plus one Settlement per sacrifice and keeps n
     system: s.id,
     action: "attack",
     attack: {
-      sacrifice: 1,
+      sacrifice: 2,
       ships: { 1: 2 },
       settlements: { [p.id]: { 1: 1 } },
     },
   });
-  assert.equal(result.players[0].credits, 1);
+  assert.equal(result.players[0].credits, 2);
   assert.equal(result.players[1].credits, 3);
   assert.equal(system(result, s.id).ships[1], 0);
   assert.equal(system(result, s.id).planets[1].owners[1], 0);
@@ -511,7 +506,7 @@ test("Insurance Ships require a current Settlement and an empty Reserve can be r
     /Settlement/,
   );
   const empty = step(g, { type: "insurance" });
-  assert.equal(empty.pending.title, "Reserve empty");
+  assert.equal(empty.pending.kind, "reserve");
   g = step(g, { type: "returnCredits", count: 2 });
   assert.equal(g.pending.kind, "insurance");
   g = step(g, { type: "insurance" });
@@ -610,7 +605,7 @@ test("Sabotage uses undiscounted value with Research Lab, allows deliberate over
   tech(g, 0, "research-lab");
   tech(g, 1, "arcologies");
   credits(g, 0, 20);
-  assert.equal(purchaseCost(g, "tech.sabotage", 0, false, 5), 2);
+  assert.equal(purchaseCost(g, "tech.sabotage", 0, false, 5), 5);
   const reserve = g.players[1].reserve;
   const result = step(g, {
     type: "buy",
@@ -618,7 +613,7 @@ test("Sabotage uses undiscounted value with Research Lab, allows deliberate over
     value: 5,
     target: { player: 1, tech: "tech.arcologies" },
   });
-  assert.equal(result.players[0].credits, 18);
+  assert.equal(result.players[0].credits, 15);
   assert.equal(result.players[1].reserve, reserve + 1);
   assert.equal(result.players[1].techs.includes("tech.arcologies"), false);
   assert.equal(result.players[0].techs.includes("tech.sabotage"), true);
@@ -708,7 +703,7 @@ test("genuine 0.14 nested-chain saves migrate at intermediate choices and retain
     });
     assert.equal(g.pending.kind, point.pending);
     assert.equal(g.phase, point.phase);
-    assert.equal(g.engine, "0.15.0");
+    assert.equal(g.engine, "0.16.0");
     assert.ok(g.context);
   }
   const done = restoreGame(oldChain);

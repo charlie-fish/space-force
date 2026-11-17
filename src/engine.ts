@@ -25,6 +25,7 @@ import type {
   Replacements,
   SettlementPlacement,
   MovePayload,
+  ReserveEffect,
 } from "./types.js";
 import {
   findOpenSpace,
@@ -103,9 +104,9 @@ export function createGame(
     "Choose a supported test setup.",
   );
   const g: Game = {
-    schema: 6,
-    engine: "0.15.0",
-    content: "all-techs-event-tracker-3",
+    schema: 7,
+    engine: "0.16.0",
+    content: "confirmed-techs-reserve-recovery-4",
     config: { ...clone(config), events: config.events ?? "simpler" },
     seed: seed >>> 0,
     rng: seed >>> 0,
@@ -132,6 +133,8 @@ export function createGame(
     scores: [],
     winners: [],
     endgameQueue: [],
+    legacyRulesUntil: 0,
+    reserveRecoveryFrom: 0,
   };
   g.players = Array.from({ length: count }, (_, id) => ({
     id,
@@ -380,6 +383,7 @@ export function purchaseReason(
   id = g.turn,
   fullPrice = false,
   value?: number,
+  target?: { player: number; tech: string },
 ): string | null {
   const p = player(g, id);
   const card = CARD_MAP[tech];
@@ -408,7 +412,17 @@ export function purchaseReason(
     )
       return "No opponent Tech can be removed at this value.";
   }
-  const cost = purchaseCost(g, tech, id, fullPrice, value);
+  const minimum =
+    tech === "tech.sabotage"
+      ? target
+        ? Number(CARD_MAP[target.tech]?.cost)
+        : Math.min(
+            ...sabotageTargets(g, id)
+              .filter((t) => Number(CARD_MAP[t.tech].cost) <= value!)
+              .map((t) => Number(CARD_MAP[t.tech].cost)),
+          )
+      : 0;
+  const cost = purchaseCost(g, tech, id, fullPrice, value, minimum);
   if (p.credits < cost) return `You need ${cost} Credits.`;
   if (p.reserve + cost < 1)
     return "A Reserve rocket is needed to mark ownership.";
@@ -420,15 +434,30 @@ export function purchaseCost(
   id = g.turn,
   fullPrice = false,
   sabotageValue = 0,
+  minimum?: number,
 ) {
   const value =
     tech === "tech.sabotage"
       ? integer(sabotageValue, 81)
       : CARD_MAP[tech]?.cost;
   requireRule(typeof value === "number", "Unknown Tech value.");
-  return hasTech(g, id, "research-lab") && !fullPrice
-    ? Math.floor(value / 2)
-    : value;
+  const cost =
+    hasTech(g, id, "research-lab") && !fullPrice
+      ? Math.floor(value / 2)
+      : value;
+  const floor =
+    minimum ??
+    (tech === "tech.sabotage"
+      ? Math.min(
+          value,
+          ...sabotageTargets(g, id)
+            .map((t) => Number(CARD_MAP[t.tech].cost))
+            .filter((n) => n <= value),
+        )
+      : 0);
+  return tech === "tech.sabotage" && !legacyRules(g)
+    ? Math.max(cost, floor)
+    : cost;
 }
 export function sabotageTargets(g: Game, id = g.turn) {
   return g.players.flatMap((p) =>
@@ -467,10 +496,12 @@ export function attackCost(
   id = g.turn,
 ) {
   return hasTech(g, id, "death-sun")
-    ? Math.max(
-        Math.ceil((ships + settlements) / 3),
-        Math.ceil((ships + 2 * settlements) / 4),
-      )
+    ? legacyRules(g)
+      ? Math.max(
+          Math.ceil((ships + settlements) / 3),
+          Math.ceil((ships + 2 * settlements) / 4),
+        )
+      : Math.ceil(ships / 3) + Math.ceil(settlements / 2)
     : Math.ceil(ships / 2) + settlements;
 }
 export function afterActionHooks(
@@ -536,6 +567,115 @@ function advanceActions(g: Game, after: number, remaining = g.players.length) {
   }
   throw Error("A token stack has no valid owner.");
 }
+const legacyRules = (g: Game) => g.revision < g.legacyRulesUntil;
+function pauseReserve(
+  g: Game,
+  owner: number,
+  label: string,
+  total: number,
+  remaining: number,
+  effect: ReserveEffect,
+  after: Continuation,
+  messages: string[] = [],
+): boolean {
+  if (
+    !remaining ||
+    g.revision < g.reserveRecoveryFrom ||
+    !hasTech(g, owner, "flexible-economy")
+  )
+    return false;
+  const warning = reserveWarning(label, total, total - remaining);
+  log(g, `Reserve limit: ${warning}`, owner);
+  g.pending = {
+    kind: "reserve",
+    owner,
+    label,
+    total,
+    remaining,
+    effect,
+    after,
+    messages: [...messages, warning],
+  };
+  return true;
+}
+function useRecoveredReserve(
+  g: Game,
+  command: Extract<Command, { type: "useReserve" }>,
+) {
+  requireRule(g.pending?.kind === "reserve", "No Reserve recovery is pending.");
+  const pending = g.pending,
+    p = player(g, pending.owner),
+    effect = pending.effect;
+  let amount = Math.min(pending.remaining, p.reserve);
+  let placements: Record<string, number> = {};
+  if (effect.kind === "reinforce") {
+    placements = command.ships ?? { [p.home!]: amount };
+    const legal = new Set(availableSystems(g, p.id).map((s) => s.id));
+    let selected = 0;
+    for (const [id, n] of Object.entries(placements)) {
+      integer(n, 40);
+      requireRule(
+        !n || legal.has(id),
+        "Place Ships at home or where you have a Settlement.",
+      );
+      selected += n;
+    }
+    requireRule(
+      selected <= amount,
+      "Reinforcements cannot exceed the unfinished allowance or available Reserve.",
+    );
+    amount = selected;
+  }
+  if (effect.kind === "settlement") {
+    const target = system(g, effect.system).planets.find(
+      (planet) => planet.id === effect.planet,
+    );
+    requireRule(target, "The target planet no longer exists.");
+    amount = Math.min(amount, settlementSpace(g, target, p.id));
+  }
+  requireRule(
+    amount > 0,
+    "Return a Credit to Reserve, or continue with the current result.",
+  );
+  if (effect.kind === "production") {
+    const credits = integer(command.credits ?? effect.credits, 40);
+    requireRule(
+      credits <= pending.remaining,
+      "Allocate only the unfinished production.",
+    );
+    const earned = Math.min(amount, credits);
+    effect.credits = credits - earned;
+    p.credits += earned;
+    system(g, effect.system).ships[p.id] += amount - earned;
+  } else if (effect.kind === "credits") p.credits += amount;
+  else if (effect.kind === "ships")
+    system(g, effect.system).ships[p.id] += amount;
+  else if (effect.kind === "settlement")
+    system(g, effect.system).planets.find(
+      (planet) => planet.id === effect.planet,
+    )!.owners[p.id] += amount;
+  else if (effect.kind === "investment") {
+    p.invested += amount;
+    if (effect.banking) {
+      if (effect.free) p.freeInvestments.push(effect.action);
+      else p.investedActions.push(effect.action);
+    }
+  } else
+    for (const [id, n] of Object.entries(placements))
+      system(g, id).ships[p.id] += n;
+  p.reserve -= amount;
+  pending.remaining -= amount;
+  log(
+    g,
+    `${pending.label}: completed ${amount} more with returned Reserve (${pending.total - pending.remaining}/${pending.total} total).`,
+    p.id,
+  );
+  if (!pending.remaining) {
+    g.pending = null;
+    resumeContinuation(g, pending.after);
+  }
+}
+
 function reserveWarning(label: string, wanted: number, available: number) {
   return `${label} needed ${wanted} rocket${wanted === 1 ? "" : "s"}, but only ${available} ${available === 1 ? "was" : "were"} available in Reserve. The effect could not be completed in full.`;
 }
@@ -626,6 +766,19 @@ function runBeforeHooks(g: Game) {
     g,
     `${CARD_MAP[`tech.${hook}`].title}: added ${amount} Ship from Reserve in ${nameOf(s)}.`,
   );
+  if (
+    !amount &&
+    pauseReserve(
+      g,
+      p.id,
+      CARD_MAP[`tech.${hook}`].title,
+      1,
+      1,
+      { kind: "ships", system: s.id },
+      { kind: "beforeHooks" },
+    )
+  )
+    return;
   if (!amount)
     notice(
       g,
@@ -699,7 +852,27 @@ function finishAction(g: Game, messages: string[] = []) {
       if (c.parent) player(g).freeInvestments.push(c.kind);
       else player(g).investedActions.push(c.kind);
       log(g, "Banking: invested one Reserve rocket.");
-    } else messages.push(reserveWarning("Banking", 1, 0));
+    } else {
+      if (
+        pauseReserve(
+          g,
+          c.actor,
+          "Banking",
+          1,
+          1,
+          {
+            kind: "investment",
+            action: c.kind,
+            banking: true,
+            free: Boolean(c.parent),
+          },
+          { kind: "afterHooks" },
+          messages,
+        )
+      )
+        return;
+      messages.push(reserveWarning("Banking", 1, 0));
+    }
   }
   if (messages.length)
     notice(g, "Reserve limit", messages, { kind: "afterHooks" });
@@ -733,6 +906,19 @@ function resolveActionBody(g: Game, choices: ActionChoices) {
       g,
       `Produced ${credits} Credits and ${total - credits} Ships in ${nameOf(s)}.`,
     );
+    if (
+      total < wanted &&
+      pauseReserve(
+        g,
+        p.id,
+        "Production",
+        wanted,
+        wanted - total,
+        { kind: "production", system: s.id, credits: 0 },
+        { kind: "productionDone" },
+      )
+    )
+      return;
     finishAction(
       g,
       total < wanted ? [reserveWarning("Production", wanted, available)] : [],
@@ -799,6 +985,19 @@ function advanceAllocation(g: Game) {
 }
 function skipEmptyAllocation(g: Game) {
   if (g.phase === "reinforce") {
+    if (
+      reinforceCount(g) === 0 &&
+      pauseReserve(
+        g,
+        g.turn,
+        "Reinforcements",
+        reinforceAllowance(g),
+        reinforceAllowance(g),
+        { kind: "reinforce" },
+        { kind: "allocationDone" },
+      )
+    )
+      return;
     if (reinforceCount(g) === 0)
       notice(
         g,
@@ -848,7 +1047,8 @@ function nextRound(g: Game) {
   log(g, `Round ${g.round}: plan four action tokens each.`, null);
 }
 function resumeContinuation(g: Game, after: Continuation) {
-  if (after.kind === "insuranceNext")
+  if (after.kind === "productionDone") finishAction(g);
+  else if (after.kind === "insuranceNext")
     advanceActions(g, after.after, after.remaining);
   else if (after.kind === "beforeHooks") runBeforeHooks(g);
   else if (after.kind === "afterHooks") runAfterHooks(g);
@@ -1281,6 +1481,18 @@ function place(
     return;
   }
   if (from === "reserve" && actual < Math.min(count, room)) {
+    if (
+      pauseReserve(
+        g,
+        g.turn,
+        "Genesis Settlement",
+        Math.min(count, room),
+        Math.min(count, room) - actual,
+        { kind: "settlement", system: s.id, planet: planet.id },
+        { kind: "settlementNext", system: s.id, resume },
+      )
+    )
+      return;
     notice(
       g,
       "Reserve limit",
@@ -1344,6 +1556,31 @@ function settlePlanet(
       messages.push(
         `+${wanted} Credits: gained ${amount} Credit${amount === 1 ? "" : "s"} from Reserve.`,
       );
+      if (
+        amount < wanted &&
+        pauseReserve(
+          g,
+          g.turn,
+          "Explore Credits",
+          wanted,
+          wanted - amount,
+          { kind: "credits" },
+          {
+            kind: "place",
+            system: s.id,
+            planet: planet.id,
+            count,
+            from,
+            resume,
+          },
+          messages,
+        )
+      ) {
+        messages.forEach((message) =>
+          log(g, `Explore token revealed: ${message}`),
+        );
+        return;
+      }
       if (amount < wanted)
         messages.push(reserveWarning("Explore Credits", wanted, available));
     }
@@ -1493,8 +1730,9 @@ function buy(
     return;
   }
   requireRule(
-    !purchaseReason(g, tech, g.turn, fullPrice, value),
-    purchaseReason(g, tech, g.turn, fullPrice, value) ?? "Cannot buy Tech.",
+    !purchaseReason(g, tech, g.turn, fullPrice, value, sabotageTarget),
+    purchaseReason(g, tech, g.turn, fullPrice, value, sabotageTarget) ??
+      "Cannot buy Tech.",
   );
   const p = player(g);
   if (tech === "tech.sabotage")
@@ -1508,7 +1746,14 @@ function buy(
         ),
       "Choose a legal opposing Tech within the undiscounted Sabotage value.",
     );
-  const cost = purchaseCost(g, tech, g.turn, fullPrice, value);
+  const cost = purchaseCost(
+    g,
+    tech,
+    g.turn,
+    fullPrice,
+    value,
+    tech === "tech.sabotage" ? Number(CARD_MAP[sabotageTarget!.tech].cost) : 0,
+  );
   p.credits -= cost;
   p.reserve += cost - 1;
   p.techs.push(tech);
@@ -1655,7 +1900,21 @@ export function applyCommand(
   command = clone(command);
   const g = clone(state);
   const p = player(g, actor);
-  if (command.type === "returnCredits") {
+  if (command.type === "useReserve") useRecoveredReserve(g, command);
+  else if (command.type === "finishReserve") {
+    requireRule(
+      g.pending?.kind === "reserve",
+      "No Reserve recovery is pending.",
+    );
+    const pending = g.pending;
+    g.pending = null;
+    log(
+      g,
+      `${pending.label}: continued with ${pending.total - pending.remaining}/${pending.total}; ${pending.remaining} left uncompleted.`,
+      pending.owner,
+    );
+    resumeContinuation(g, pending.after);
+  } else if (command.type === "returnCredits") {
     requireRule(
       hasTech(g, actor, "flexible-economy"),
       "Flexible Economy is required to return Credits.",
@@ -1763,6 +2022,20 @@ export function applyCommand(
         `Insurance: gained 1 ${command.system ? `Ship in ${nameOf(system(g, command.system))}` : "Credit"} from Reserve.`,
       );
       advanceActions(g, after, remaining);
+    } else if (
+      pauseReserve(
+        g,
+        actor,
+        "Insurance",
+        1,
+        1,
+        command.system
+          ? { kind: "ships", system: command.system }
+          : { kind: "credits" },
+        { kind: "insuranceNext", after, remaining },
+      )
+    ) {
+      // The skipped-turn reward resumes only after recovery is completed or declined.
     } else
       notice(g, "Reserve empty", [reserveWarning("Insurance", 1, 0)], {
         kind: "insuranceNext",
@@ -1834,7 +2107,25 @@ export function applyCommand(
         p.invested++;
       }
       log(g, `Invested the ${command.action} slot.`);
-      if (available === 0)
+      if (
+        available === 0 &&
+        pauseReserve(
+          g,
+          actor,
+          "Investment",
+          1,
+          1,
+          {
+            kind: "investment",
+            action: command.action,
+            banking: false,
+            free: false,
+          },
+          { kind: "actionDone", actor },
+        )
+      ) {
+        // The used slot stays committed while its missing rocket is recovered.
+      } else if (available === 0)
         notice(g, "Reserve empty", [reserveWarning("Investment", 1, 0)], {
           kind: "actionDone",
           actor,
@@ -2015,7 +2306,27 @@ export function applyCommand(
         g,
         `Explore result: ${other.name} received ${amount} Ship${amount === 1 ? "" : "s"} in ${nameOf(s)}.`,
       );
-      if (amount < 2) {
+      if (
+        amount < 2 &&
+        pauseReserve(
+          g,
+          other.id,
+          `${other.name}'s Explore Ships`,
+          2,
+          2 - amount,
+          { kind: "ships", system: s.id },
+          {
+            kind: "place",
+            system: s.id,
+            planet: planet.id,
+            count: pending.count,
+            from: pending.from,
+            resume: pending.resume,
+          },
+        )
+      ) {
+        // Keep the active player's committed Settlement waiting for the recipient's reward.
+      } else if (amount < 2) {
         notice(
           g,
           "Reserve limit",
@@ -2042,7 +2353,33 @@ export function applyCommand(
         g,
         `Explore result: ${other.name} received ${amount} Settlement${amount === 1 ? "" : "s"} on this planet.`,
       );
-      if (amount < 1 && other.reserve === 0) {
+      if (
+        amount < 1 &&
+        other.reserve === 0 &&
+        settlementSpace(g, planet, other.id) > 0 &&
+        pauseReserve(
+          g,
+          other.id,
+          `${other.name}'s Explore Settlement`,
+          1,
+          1,
+          { kind: "settlement", system: s.id, planet: planet.id },
+          {
+            kind: "place",
+            system: s.id,
+            planet: planet.id,
+            count: pending.count,
+            from: pending.from,
+            resume: pending.resume,
+          },
+        )
+      ) {
+        // The reward still occupies its space before the original Settlement resumes.
+      } else if (
+        amount < 1 &&
+        other.reserve === 0 &&
+        (legacyRules(g) || settlementSpace(g, planet, other.id) > 0)
+      ) {
         notice(
           g,
           "Reserve empty",
@@ -2092,7 +2429,21 @@ export function applyCommand(
     for (const [id, n] of Object.entries(command.ships))
       if (n) system(g, id).ships[p.id] += n;
     log(g, `Allocated ${credits} Credits and ${shipTotal} Ships.`);
-    if (g.phase === "reinforce" && available < reinforceAllowance(g))
+    if (
+      g.phase === "reinforce" &&
+      available < reinforceAllowance(g) &&
+      pauseReserve(
+        g,
+        p.id,
+        "Reinforcements",
+        reinforceAllowance(g),
+        reinforceAllowance(g) - shipTotal,
+        { kind: "reinforce" },
+        { kind: "allocationDone" },
+      )
+    ) {
+      // Already allocated Ships remain fixed; top-ups use only the remaining allowance.
+    } else if (g.phase === "reinforce" && available < reinforceAllowance(g))
       notice(
         g,
         "Reserve limit",
@@ -2128,11 +2479,42 @@ export function sinceLastDecision(g: Game) {
   return g.log.filter((l) => l.revision > start && l.revision <= g.revision);
 }
 
+/** Replay saved commands with the recorded historical-rule boundary. */
+export function replayGame(
+  record: Pick<
+    Game,
+    | "players"
+    | "seed"
+    | "config"
+    | "commands"
+    | "legacyRulesUntil"
+    | "reserveRecoveryFrom"
+  >,
+): Game {
+  let game = createGame(
+    record.players.length,
+    record.seed,
+    record.players.map((p) => p.name),
+    record.config,
+  );
+  game.legacyRulesUntil = integer(
+    record.legacyRulesUntil,
+    record.commands.length,
+  );
+  game.reserveRecoveryFrom = integer(
+    record.reserveRecoveryFrom,
+    record.commands.length,
+  );
+  for (const { actor, command } of record.commands)
+    game = applyCommand(game, actor, command);
+  return game;
+}
+
 export function assertInvariants(g: Game) {
   requireRule(
-    g.schema === 6 &&
-      g.engine === "0.15.0" &&
-      g.content === "all-techs-event-tracker-3",
+    g.schema === 7 &&
+      g.engine === "0.16.0" &&
+      g.content === "confirmed-techs-reserve-recovery-4",
     "Unsupported saved-game version.",
   );
   requireRule(
@@ -2233,6 +2615,26 @@ export function assertInvariants(g: Game) {
     context = context.parent ?? null;
   }
   integer(g.revision, Number.MAX_SAFE_INTEGER);
+  integer(g.legacyRulesUntil, Number.MAX_SAFE_INTEGER);
+  integer(g.reserveRecoveryFrom, Number.MAX_SAFE_INTEGER);
+  if (g.pending?.kind === "reserve") {
+    const recovery = g.pending;
+    requireRule(
+      Number.isInteger(recovery.owner) &&
+        recovery.owner >= 0 &&
+        recovery.owner < g.players.length &&
+        hasTech(g, recovery.owner, "flexible-economy") &&
+        Number.isInteger(recovery.total) &&
+        recovery.total > 0 &&
+        recovery.total <= 40 &&
+        Number.isInteger(recovery.remaining) &&
+        recovery.remaining > 0 &&
+        recovery.remaining <= recovery.total,
+      "Invalid Reserve recovery checkpoint.",
+    );
+    if (recovery.effect.kind === "production")
+      integer(recovery.effect.credits, recovery.remaining);
+  }
   integer(g.round, 6);
   integer(g.first, g.players.length - 1);
   requireRule(

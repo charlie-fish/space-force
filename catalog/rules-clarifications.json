@@ -1,7 +1,7 @@
 {
-  "schema_version": 3,
-  "clarification_id": "designer-clarifications-005",
-  "date": "2026-11-16",
+  "schema_version": 4,
+  "clarification_id": "designer-clarifications-006",
+  "date": "2026-11-17",
   "authority": "Designer follow-up messages in the project conversation, including seven-player extension and playtest corrections",
   "printed_rules_version": "1.80",
   "status": "confirmed_specification_all_techs_local_event_effects_pending",
@@ -92,7 +92,9 @@
     "R07": {
       "status": "resolved",
       "sabotage_destruction_value_with_research_lab": "undiscounted_value",
-      "sabotage_can_target_sabotage": false
+      "sabotage_can_target_sabotage": false,
+      "sabotage_minimum_actual_payment": "selected_target_full_printed_value_even_with_research_lab",
+      "payment_floor_confirmed_date": "2026-11-17"
     },
     "R08": {
       "status": "resolved",
@@ -167,8 +169,71 @@
       "requires_placement_decision": false,
       "ownership_still_scores": true,
       "explain_on_card": true
+    },
+    "death_sun_attack": {
+      "source": "Designer follow-up, 2026-11-17",
+      "ships_per_sacrifice": 3,
+      "settlements_per_sacrifice": 2,
+      "mix_target_types_within_single_sacrifice": false,
+      "minimum_sacrifices": "ceil(opponent_ships/3) + ceil(opponent_settlements/2)"
+    },
+    "flexible_economy_reserve_recovery": {
+      "source": "Designer follow-up, 2026-11-17",
+      "inline_status_control": "below_owners_reserve_and_credits_during_their_turn",
+      "return_credits_one_at_a_time": true,
+      "allow_recovery_of_unfinished_reserve_limited_effects": true,
+      "keep_completed_gains_and_commitments": true,
+      "repeat_initial_rewards_or_action_hooks": false,
+      "opponent_explore_gift_uses_recipients_own_resources": true,
+      "continue_without_full_completion_allowed": true
+    },
+    "foresight_control": {
+      "source": "Designer follow-up, 2026-11-17",
+      "inline_status_control": "above_owners_reserve_and_credits_during_their_turn",
+      "peek_next_events": 2,
+      "separate_tech_powers_menu": false,
+      "publicly_log_peeked_names": false
     }
   },
-  "supersedes": "designer-clarifications-004",
-  "configuration_reference": "game-configuration.json"
+  "supersedes": "designer-clarifications-005",
+  "configuration_reference": "game-configuration.json",
+  "confirmed_implementation_interpretations": {
+    "C01": {
+      "status": "confirmed",
+      "confirmed_date": "2026-11-17",
+      "tech": "tech.gravity-drive",
+      "passengers_share_carrier_origin_and_legal_route": true,
+      "transport_before_destination_losses": true,
+      "carrier_loss_causes_extra_passenger_loss": false,
+      "incoming_losses_per_destination_hole": 1,
+      "losses_capped_by_all_incoming_carriers_and_passengers": true,
+      "casualty_ownership_chosen_by": "moving_player"
+    },
+    "C02": {
+      "status": "confirmed",
+      "confirmed_date": "2026-11-17",
+      "tech": "tech.eminent-domain",
+      "owner_order": "current_player_order_starting_first_player",
+      "before_scoring": true,
+      "banking_applies_outside_actions": false,
+      "applicable_R01_hooks_apply": true
+    },
+    "C03": {
+      "status": "confirmed",
+      "confirmed_date": "2026-11-17",
+      "tech": "tech.soylent-green",
+      "recheck_fullness_before_each_placement_and_after_explore": true,
+      "exclude_blocked_destroyed_planets": true,
+      "fullness": "settlements_at_least_printed_capacity"
+    },
+    "C04": {
+      "status": "confirmed",
+      "confirmed_date": "2026-11-17",
+      "tech": "tech.sabotage",
+      "legal_opponent_non_sabotage_target_required": true,
+      "targetless_zero_cost_ownership_allowed": false,
+      "remove_ongoing_ownership_effects": true,
+      "undo_earlier_placements_conversions_or_arcologies_overflow": false
+    }
+  }
 }

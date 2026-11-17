@@ -17,7 +17,8 @@ Review priorities and next steps: [REVIEW_CHECKLIST.md](REVIEW_CHECKLIST.md).
 - [x] Implement all seven designer playtest batches, including Status history/S, compact legal-chip rings, explicit PLAN confirmation, Explore pauses/redistribution, Reserve warnings, allocation balancing and final-state views. See the [0.15 checklist](PLAYTEST_CHANGES_0.15.md).
 - [x] Add ten more Techs and selectable displays, with the R01 starting-Tech scenario, nested free-action checkpoints, shared Arcologies space, Patrol protection, Research Lab prices and Strategic Stall. The subsequent release completes all thirty Tech effects.
 - [x] Implement the last ten Techs, printed/random displays, before/after previews and results scrolling. Foresight is available in a labelled nonstandard test and excluded with legal replacement from normal simpler Events.
-- [ ] Review provisional C01–C04 conventions in [the 0.15 guide](PLAYTEST_CHANGES_0.15.md). These do not reopen confirmed R01–R08.
+- [x] C01–C04 confirmed by the designer; record them with R01–R08 in the rules catalogue.
+- [x] Implement home double-click/double-tap, inline Foresight/Flexible Economy, resumable Reserve-limited effects, Filibuster stack-position labels, Sabotage contrast/X reset/minimum payment and corrected Death Sun groups. See [the 0.16 guide](PLAYTEST_CHANGES_0.16.md).
 - [ ] Complete Event effects/auctions and remaining interactions; test their remote/simultaneous behaviour.
 - [ ] Complete formal browser/phone and accessibility playtests. The designer has tested desktop/narrow-window layouts; a real Safari phone run remains outstanding. See [phone instructions](PHONE_TESTING.md) and [validation](PROTOTYPE.md#validation).
 - [ ] Implement the confirmed five-minute majority-removal core with reviewed phase handling, skipped turns, audit records, and automatic last-player victory.
