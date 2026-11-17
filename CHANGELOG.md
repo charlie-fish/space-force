@@ -1,5 +1,15 @@
 # Change log
 
+## 0.17.0 — 2026-11-17
+
+- Always resolve Mercenaries before Rapid Advance and remove the ordering chooser. Correct Insurance to require own tokens still on the board, and allow Ship rewards at home even without a Settlement.
+- Put the Flexible economy subheading above its Status Box button and remove the footer. Simplify Reserve shortfall warnings to a reminder plus Go back/Confirm outcome, with resource adjustments outside the interrupt. Preserve hidden reveals, completed gains and nested continuations.
+- Update Sabotage to “(cannot be discounted by Research lab)” and “Credit value (X)”; remove the paragraph below X and redundant payment choice. Pay chosen X without a Research lab discount, while retaining the target-price minimum.
+- Reuse validated confirmation previews only while their source game is unchanged, avoiding duplicate command calculation. Remove obsolete UI branches without adding runtime dependencies.
+- Upgrade to engine 0.17.0/schema 8. Genuine completed 0.16 games preserve historical choices, rewards and scores; unresolved decisions adopt the new rules. Earlier supported saves and exact replay remain compatible.
+- Pass 205 rules/DOM/save/replay tests, including 126 complete seeded games. Production/portable packaging passes with 85 artwork files and about 64 KB compressed JavaScript.
+- See the [0.17 playtest guide](docs/PLAYTEST_CHANGES_0.17.md). Real-browser/phone visual checks remain outstanding.
+
 ## 0.16.0 — 2026-11-17
 
 - Record designer confirmation of C01–C04. Correct Death Sun to exclusive three-Ship OR two-Settlement groups per sacrifice and enforce Sabotage's selected-target printed-price payment floor even with Research Lab.

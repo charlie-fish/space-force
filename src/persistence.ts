@@ -5,6 +5,7 @@ import {
   production,
   system,
   player,
+  applyConfirmedTechRules,
 } from "./engine.js";
 import type { Command, Game, GameConfig } from "./types.js";
 
@@ -19,6 +20,8 @@ export function restoreGame(value: unknown): Game {
     players: { name: string }[];
     commands: { actor: number; command: Command }[];
     config?: GameConfig;
+    legacyRulesUntil?: number;
+    reserveRecoveryFrom?: number;
   };
   if (stored.engine === "0.14.0") {
     if (
@@ -40,10 +43,14 @@ export function restoreGame(value: unknown): Game {
       game = applyCommand(game, record.actor, record.command);
     return game;
   }
-  if (stored.engine === "0.15.0") {
+  if (stored.engine === "0.15.0" || stored.engine === "0.16.0") {
+    const version16 = stored.engine === "0.16.0";
     if (
-      stored.schema !== 6 ||
-      stored.content !== "all-techs-event-tracker-3" ||
+      stored.schema !== (version16 ? 7 : 6) ||
+      stored.content !==
+        (version16
+          ? "confirmed-techs-reserve-recovery-4"
+          : "all-techs-event-tracker-3") ||
       !Array.isArray(stored.commands) ||
       stored.commands.length !== stored.revision ||
       !Array.isArray(stored.players) ||
@@ -56,8 +63,13 @@ export function restoreGame(value: unknown): Game {
       stored.players.map((p) => p.name),
       stored.config,
     );
-    game.legacyRulesUntil = stored.revision;
-    game.reserveRecoveryFrom = stored.revision;
+    game.legacyRulesUntil = version16
+      ? stored.legacyRulesUntil!
+      : stored.revision;
+    game.reserveRecoveryFrom = version16
+      ? stored.reserveRecoveryFrom!
+      : stored.revision;
+    game.confirmedTechRulesFrom = stored.revision;
     let recovery: { before: Game; index: number } | null = null;
     for (const [index, record] of stored.commands.entries()) {
       const before = game;
@@ -71,7 +83,7 @@ export function restoreGame(value: unknown): Game {
       } else recovery = null;
     }
     // An unacknowledged old shortfall can use the new continuation, without undoing its gains.
-    if (recovery) {
+    if (recovery && !version16) {
       let upgraded = {
         ...recovery.before,
         reserveRecoveryFrom: recovery.before.revision,
@@ -80,6 +92,8 @@ export function restoreGame(value: unknown): Game {
         upgraded = applyCommand(upgraded, record.actor, record.command);
       if (upgraded.pending?.kind === "reserve") game = upgraded;
     }
+    applyConfirmedTechRules(game);
+    assertInvariants(game);
     return game;
   }
   if (["0.8.0", "0.9.0", "0.10.0", "0.11.0"].includes(stored.engine)) {

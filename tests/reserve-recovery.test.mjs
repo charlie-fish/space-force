@@ -426,7 +426,7 @@ test("Sabotage payment floor applies to the selected target and Death Sun cannot
     value: 12,
     target,
   });
-  assert.equal(paid.players[0].credits, 6);
+  assert.equal(paid.players[0].credits, 0);
   const combat = fixture(),
     s = combat.systems[0],
     p = s.planets[1];

@@ -267,7 +267,7 @@ test("Death Sun target-first controls calculate mixed target costs and still war
   h.close();
 });
 
-test("Mercenaries and Rapid Advance ordering is selectable and the direct conversion controls follow the chosen order", () => {
+test("Mercenaries conversion appears before Rapid Advance without an ordering choice", () => {
   const h = harness();
   let { g, from, target } = movement(2);
   tech(g, 0, "mercenaries");
@@ -280,7 +280,7 @@ test("Mercenaries and Rapid Advance ordering is selectable and the direct conver
     sources: { [from.id]: 2 },
   });
   h.app.setGame(g);
-  h.click('[data-action="order-after"][data-tech="mercenaries"]');
+  assert.equal(h.root.querySelector('[data-action="order-after"]'), null);
   assert.equal(h.root.querySelector('[data-number="mercenaries"]').max, "3");
   h.input('[data-number="mercenaries"]', "3");
   h.click('[data-action="commit-mercenaries"]');
@@ -358,7 +358,7 @@ test("Filibuster exposes exact tokens and Insurance offers eligible Ship locatio
   g = fixture();
   tech(g, 0, "insurance");
   g.systems.forEach((s) => (s.tokens = []));
-  g.systems[1].tokens = [1, 1];
+  g.systems[1].tokens = [0, 1, 1];
   g.turn = 1;
   g = step(g, {
     type: "resolve",
@@ -368,6 +368,10 @@ test("Filibuster exposes exact tokens and Insurance offers eligible Ship locatio
   });
   const home = system(g, g.players[0].home),
     before = home.ships[0];
+  for (const p of home.planets) {
+    g.players[0].reserve += p.owners[0];
+    p.owners[0] = 0;
+  }
   h.app.setGame(g);
   h.click(`[data-action="insurance-ship"][data-system-id="${home.id}"]`);
   assert.equal(system(h.app.getGame(), home.id).ships[0], before + 1);
@@ -400,7 +404,7 @@ test("Eminent Domain offers a free action before results and hides ACTIONS-only 
   h.close();
 });
 
-test("Sabotage controls keep nominal value separate from discounted payment and support full price", () => {
+test("Sabotage controls charge chosen Credit value with Research Lab and enforce the target price", () => {
   const h = harness(),
     g = setup(2, 9, {
       techPreset: "remaining",

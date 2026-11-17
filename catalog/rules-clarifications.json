@@ -1,6 +1,6 @@
 {
-  "schema_version": 4,
-  "clarification_id": "designer-clarifications-006",
+  "schema_version": 5,
+  "clarification_id": "designer-clarifications-007",
   "date": "2026-11-17",
   "authority": "Designer follow-up messages in the project conversation, including seven-player extension and playtest corrections",
   "printed_rules_version": "1.80",
@@ -94,7 +94,9 @@
       "sabotage_destruction_value_with_research_lab": "undiscounted_value",
       "sabotage_can_target_sabotage": false,
       "sabotage_minimum_actual_payment": "selected_target_full_printed_value_even_with_research_lab",
-      "payment_floor_confirmed_date": "2026-11-17"
+      "payment_floor_confirmed_date": "2026-11-17",
+      "sabotage_can_be_discounted_by_research_lab": false,
+      "sabotage_actual_payment": "chosen_credit_value_X_at_least_selected_target_printed_value"
     },
     "R08": {
       "status": "resolved",
@@ -185,7 +187,13 @@
       "keep_completed_gains_and_commitments": true,
       "repeat_initial_rewards_or_action_hooks": false,
       "opponent_explore_gift_uses_recipients_own_resources": true,
-      "continue_without_full_completion_allowed": true
+      "continue_without_full_completion_allowed": true,
+      "status_subheading": "Flexible economy",
+      "interrupt_contains_reserve_adjustment_controls": false,
+      "interrupt_reminds_owner_to_use_status_control": true,
+      "interrupt_offers_go_back": true,
+      "go_back_may_undo_committed_reveals": false,
+      "accepted_shortfall_leaves_unfunded_remainder_uncompleted": true
     },
     "foresight_control": {
       "source": "Designer follow-up, 2026-11-17",
@@ -193,9 +201,29 @@
       "peek_next_events": 2,
       "separate_tech_powers_menu": false,
       "publicly_log_peeked_names": false
+    },
+    "mercenaries_rapid_advance_order": {
+      "source": "Designer correction, 2026-11-17",
+      "order": [
+        "tech.mercenaries",
+        "tech.rapid-advance"
+      ],
+      "player_may_choose_order": false,
+      "applies_to_free_actions": true
+    },
+    "insurance": {
+      "source": "Designer correction, 2026-11-17",
+      "phase": "actions",
+      "requires_own_action_token_remaining_on_board": true,
+      "trigger": "turn_skipped_because_no_own_token_on_top",
+      "reward_from_reserve": "one_credit_or_ship",
+      "ship_destinations": [
+        "own_home_system_even_without_settlement",
+        "system_with_own_settlement"
+      ]
     }
   },
-  "supersedes": "designer-clarifications-005",
+  "supersedes": "designer-clarifications-006",
   "configuration_reference": "game-configuration.json",
   "confirmed_implementation_interpretations": {
     "C01": {

@@ -2133,7 +2133,7 @@
       "name": "Insurance",
       "kind": "tech",
       "cost": 3,
-      "text": "During ACTIONS, whenever you are skipped because none of your action tokens is on top of a stack, gain 1 Credit or 1 Ship in a system where you have a Settlement.",
+      "text": "During the ACTIONS phase, while you still have action tokens on the board, each time your turn is skipped because none of your action tokens are on top of a stack, gain 1 Credit or 1 Ship. Place a gained Ship anywhere you have a Settlement, or in your home system.",
       "image": "/art/tech/insurance.webp",
       "width": 240,
       "height": 388,
@@ -2141,7 +2141,8 @@
       "source": {
         "filename": "SpaceForce Cards v1.80.pdf",
         "page": 27
-      }
+      },
+      "rulesOverride": "Designer correction, 17 November 2026."
     },
     "tech.eminent-domain": {
       "id": "tech.eminent-domain",
@@ -2178,7 +2179,7 @@
       "name": "Sabotage",
       "kind": "tech",
       "cost": "X",
-      "text": "Choose an undiscounted value X and buy this Tech. Remove another player’s Tech worth up to X, returning its marker to Reserve. Cannot target Sabotage or be bought in the final round. Research Lab cannot reduce payment below the selected target’s full printed price.",
+      "text": "Choose a Credit value X and remove another player’s non-Sabotage Tech worth up to X. You must pay at least the target’s full printed price (cannot be discounted by Research lab). Return its ownership rocket to its owner’s Reserve. Sabotage cannot be bought in the last round.",
       "image": "/art/tech/sabotage.webp",
       "width": 240,
       "height": 388,

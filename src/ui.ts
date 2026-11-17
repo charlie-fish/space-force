@@ -198,8 +198,10 @@ export function mountApp(
     revision: number;
     base: Game;
     reserveAccepted: boolean;
+    preview?: Game;
   } | null = null;
   let rosterOpen = false;
+  let reserveWarningOpen = true;
   let placementTap: {
     system: string;
     phase: "homes" | "plan";
@@ -317,14 +319,46 @@ export function mountApp(
   function perform(
     command: Command,
     revision = game?.revision,
-    accepted?: { intent: boolean; reserve: boolean },
+    accepted?: { intent: boolean; reserve: boolean; preview?: Game },
     actor = game?.turn,
   ) {
     if (!game) return;
     const old = game;
     confirmation = null;
     try {
-      let next = applyCommand(game, actor!, command, revision);
+      if (
+        command.type === "completeReserve" &&
+        old.pending?.kind === "reserve" &&
+        !accepted?.reserve
+      ) {
+        const pending = old.pending,
+          available = Math.min(
+            player(old, pending.owner).reserve,
+            pending.remaining,
+          );
+        const applied =
+          pending.effect.kind === "reinforce"
+            ? sumOwners(
+                Object.values(
+                  command.ships ?? recoveryAllocations(old, pending),
+                ),
+              )
+            : available;
+        if (applied < pending.remaining) {
+          requestConfirmation(
+            [
+              `${pending.label} needs ${pending.remaining} more rockets; only ${applied} will be applied.`,
+              flexibleReminder(old, pending.owner),
+            ],
+            command,
+            "Reserve shortfall",
+            true,
+          );
+          return;
+        }
+      }
+      let next =
+        accepted?.preview ?? applyCommand(game, actor!, command, revision);
       if (command.type === "returnCredits") {
         game = next;
         error = "";
@@ -334,9 +368,22 @@ export function mountApp(
         render();
         return;
       }
-      const reserve = reserveNotice(next);
+      const recovery = next.pending?.kind === "reserve" ? next.pending : null;
+      const reserve =
+        reserveNotice(next) ??
+        (recovery
+          ? {
+              title: "Reserve shortfall",
+              messages: [
+                ...recovery.messages,
+                flexibleReminder(next, recovery.owner),
+              ],
+            }
+          : null);
       const predictable =
         reserve &&
+        command.type !== "completeReserve" &&
+        (!recovery || recovery.owner === old.turn) &&
         next.turn === old.turn &&
         !revealsHiddenInformation(old, next);
       const warnings = accepted?.intent ? [] : intentWarnings(old, command);
@@ -347,12 +394,17 @@ export function mountApp(
           command,
           predictable ? reserve.title : "Check this decision",
           Boolean(predictable),
+          next,
         );
         return;
       }
       if (predictable && accepted?.reserve)
-        next = applyCommand(next, next.turn, { type: "acknowledge" });
+        next = applyCommand(next, next.turn, {
+          type:
+            next.pending?.kind === "reserve" ? "finishReserve" : "acknowledge",
+        });
       game = next;
+      reserveWarningOpen = true;
       if (
         game.turn !== old.turn ||
         game.events.length !== old.events.length ||
@@ -383,7 +435,6 @@ export function mountApp(
           "action",
           "rapid",
           "mercenaries",
-          "afterOrder",
           "filibuster",
           "insurance",
           "eminent",
@@ -423,6 +474,7 @@ export function mountApp(
   }
   function start() {
     privatePeek = false;
+    reserveWarningOpen = true;
     game = createGame(count, seedFrom(mapCode || String(Date.now())), names, {
       techPreset,
       scenario,
@@ -443,6 +495,7 @@ export function mountApp(
       if (!raw) throw Error("No saved game is available.");
       const loaded = restoreGame(JSON.parse(raw));
       game = loaded;
+      reserveWarningOpen = true;
       view = loaded.pending
         ? "board"
         : loaded.phase === "tech"
@@ -520,8 +573,7 @@ export function mountApp(
       return "Eminent Domain: choose whether to SETTLE at home before scoring.";
     if (pending?.kind === "mercenaries")
       return "Mercenaries: convert up to three Credits into Ships.";
-    if (pending?.kind === "afterOrder")
-      return "Choose the order of your after-MOVE Techs.";
+
     if (pending?.kind === "action")
       return `${pending.source}: choose the ${ACTION_LABELS[pending.action]} effect in ${nameOf(system(g, pending.system))}, then commit.`;
     if (pending?.kind === "rapid")
@@ -580,7 +632,7 @@ export function mountApp(
     return `<aside class="guide" aria-label="Learn as you play"><div><span class="eyebrow">Learn as you play</span><p>${escape(g.pending ? instruction(g) : tips[g.phase])}</p></div>${button("Hide guide", "guide-off", "", false, "quiet")}</aside>`;
   }
   function landing() {
-    return `<main class="landing"><div class="landing-art"><img src="${ART.cover.image}" width="562" height="768" alt="Space Force cover: rocket fleets above a ringed planet"/><span class="cover-credit">A game by Charlie Fish</span></div><section class="landing-copy"><div class="eyebrow">Local pass-and-play · Prototype 0.16</div><h1>Claim your<br/><span>corner of space.</span></h1><p class="lead">Plan your moves. Explore new systems. Settle the galaxy.</p><div class="scope-note"><strong>This build: ${TECH_PRESETS[techPreset].label} · ${eventMode === "foresight-test" ? "Tech playtest Events" : "simpler Events"}.</strong><span>A complete local game for 2–7 players on one device. Event cards count rounds; their effects and auctions are disabled. Remote rooms and full Event effects follow later.</span></div><form id="setup-form"><fieldset><legend>How many players?</legend><div class="player-counts">${Array.from({ length: 6 }, (_, i) => button(String(i + 2), "count", `data-count="${i + 2}" aria-pressed="${count === i + 2}"`, false, count === i + 2 ? "selected" : "")).join("")}</div></fieldset><fieldset class="setup-options"><legend>Tech display</legend><label>Preset <select data-setting="tech-preset">${Object.entries(
+    return `<main class="landing"><div class="landing-art"><img src="${ART.cover.image}" width="562" height="768" alt="Space Force cover: rocket fleets above a ringed planet"/><span class="cover-credit">A game by Charlie Fish</span></div><section class="landing-copy"><div class="eyebrow">Local pass-and-play · Prototype 0.17</div><h1>Claim your<br/><span>corner of space.</span></h1><p class="lead">Plan your moves. Explore new systems. Settle the galaxy.</p><div class="scope-note"><strong>This build: ${TECH_PRESETS[techPreset].label} · ${eventMode === "foresight-test" ? "Tech playtest Events" : "simpler Events"}.</strong><span>A complete local game for 2–7 players on one device. Event cards count rounds; their effects and auctions are disabled. Remote rooms and full Event effects follow later.</span></div><form id="setup-form"><fieldset><legend>How many players?</legend><div class="player-counts">${Array.from({ length: 6 }, (_, i) => button(String(i + 2), "count", `data-count="${i + 2}" aria-pressed="${count === i + 2}"`, false, count === i + 2 ? "selected" : "")).join("")}</div></fieldset><fieldset class="setup-options"><legend>Tech display</legend><label>Preset <select data-setting="tech-preset">${Object.entries(
       TECH_PRESETS,
     )
       .map(
@@ -1263,10 +1315,10 @@ export function mountApp(
     if (!before.length && !after.length && !nested.size) return "";
     return `<aside class="tech-effect-preview" aria-label="Tech effects for this action"><strong>Tech effects</strong>${before.length ? `<p><strong>Before this action:</strong> ${names(before)}.</p>` : ""}${after.length ? `<p><strong>After this action:</strong> ${names(after)}.</p>` : ""}${nested.size ? `<p><strong>Through free actions:</strong> ${names(nested)}.</p>` : ""}<p>These effects still trigger if the main action is empty. Free actions use no additional token or action slot.</p></aside>`;
   }
-  function foresightControl(g: Game, reveal = g.pending?.kind !== "reserve") {
+  function foresightControl(g: Game) {
     if (g.phase === "finished" || !hasTech(g, g.turn, "foresight")) return "";
     return `<div class="foresight-inline" aria-label="Foresight"><strong>Foresight</strong>${button(privatePeek ? "Hide private peek" : "Peek at next two Events", privatePeek ? "hide-peek" : "show-peek", "", false, "secondary")}${
-      privatePeek && reveal
+      privatePeek
         ? `<div class="foresight-cards">${
             peekEvents(g, g.turn)
               .map(
@@ -1281,14 +1333,14 @@ export function mountApp(
   function flexibleControl(g: Game, owner = g.turn) {
     if (g.phase === "finished" || !hasTech(g, owner, "flexible-economy"))
       return "";
-    return `<div class="flexible-inline" aria-label="Flexible Economy">${button("Return 1 Credit to Reserve", "return-credit", `data-owner="${owner}"`, player(g, owner).credits === 0, "secondary")}<small>Flexible Economy · one Credit at a time</small></div>`;
+    return `<div class="flexible-inline" aria-label="Flexible economy"><strong>Flexible economy</strong>${button("Return 1 Credit to Reserve", "return-credit", `data-owner="${owner}"`, player(g, owner).credits === 0, "secondary")}</div>`;
   }
   function recoveryAllocations(g: Game, pending: ReserveRecovery) {
     const owner = player(g, pending.owner),
       n = Math.min(owner.reserve, pending.remaining);
     return draft.recoveryShips ?? { [owner.home!]: n };
   }
-  function reserveRecoveryModal(g: Game, pending: ReserveRecovery) {
+  function reserveEffectPanel(g: Game, pending: ReserveRecovery) {
     const owner = player(g, pending.owner),
       available = Math.min(owner.reserve, pending.remaining),
       effect = pending.effect;
@@ -1296,7 +1348,7 @@ export function mountApp(
       controls = "";
     if (effect.kind === "production") {
       const credits = draft.recoveryCredits ?? effect.credits;
-      controls = `<p>Allocate the ${pending.remaining} unfinished production. Only available Reserve is applied; later top-ups keep the remaining allocation.</p>${numberControl("Remaining Ships", "recovery-ships", pending.remaining - credits, pending.remaining)}${numberControl("Remaining Credits", "recovery-credits", credits, pending.remaining)}`;
+      controls = `<p>Allocate the ${pending.remaining} unfinished production. Only available Reserve is applied; accepting a shortfall leaves the rest uncompleted.</p>${numberControl("Remaining Ships", "recovery-ships", pending.remaining - credits, pending.remaining)}${numberControl("Remaining Credits", "recovery-credits", credits, pending.remaining)}`;
     } else if (effect.kind === "reinforce") {
       const allocations = recoveryAllocations(g, pending);
       quantity = sumOwners(Object.values(allocations));
@@ -1312,7 +1364,38 @@ export function mountApp(
         )
         .join("");
     }
-    return `<div class="modal-scrim"><section class="modal reserve-recovery" role="dialog" aria-modal="true" aria-label="Reserve recovery"><h2>${escape(pending.label)} · Reserve shortfall</h2>${badge(owner.style, owner.name)}${owner.id === g.turn ? foresightControl(g, true) : ""}<div class="resource-pills"><span><small>Reserve</small><strong>${owner.reserve}</strong></span><span><small>Credits</small><strong>${owner.credits}</strong></span></div>${flexibleControl(g, owner.id)}${error ? `<p class="error" role="alert">${escape(error)}</p>` : ""}<p><strong>${pending.total - pending.remaining} / ${pending.total}</strong> completed; <strong>${pending.remaining}</strong> still to complete. Earlier gains and commitments stay in place.</p>${pending.messages.map((message) => `<p>${escape(message)}</p>`).join("")}${controls}<div class="commit-row">${button(quantity >= pending.remaining ? "Complete effect" : `Apply ${quantity} Reserve`, "use-reserve", "", quantity === 0, "primary")}${button("Continue with current result", "finish-reserve", "", false, "secondary")}</div><p>Return Credits one at a time, then apply the available Reserve. Continue with the current result to leave the remainder uncompleted.</p></section></div>`;
+    return `<section class="console reserve-effect"><div class="eyebrow">Effect waiting</div><h2>${escape(pending.label)}</h2>${owner.id !== g.turn ? `${badge(owner.style, owner.name)}<div class="resource-pills"><span><small>Reserve</small><strong>${owner.reserve}</strong></span><span><small>Credits</small><strong>${owner.credits}</strong></span></div>${flexibleControl(g, owner.id)}` : ""}<p>${pending.remaining} rocket${pending.remaining === 1 ? "" : "s"} remain to complete this effect. Earlier gains and commitments stay in place.</p>${controls}${button("Apply effect", "complete-reserve", "", false, "primary")}</section>`;
+  }
+  function reserveEffectCommand(): Command {
+    return {
+      type: "completeReserve",
+      credits: draft.recoveryCredits,
+      ships:
+        game?.pending?.kind === "reserve" &&
+        game.pending.effect.kind === "reinforce"
+          ? recoveryAllocations(game, game.pending)
+          : undefined,
+    };
+  }
+  function flexibleReminder(g: Game, owner: number) {
+    return `${player(g, owner).name} could use Flexible economy in the Status Box to increase their Reserve before applying this effect.`;
+  }
+  function backToReserve() {
+    reserveWarningOpen = false;
+    render();
+    scrollToStatus();
+    (
+      root.querySelector<HTMLElement>(
+        '.reserve-effect [data-action="return-credit"]:not(:disabled)',
+      ) ??
+      root.querySelector<HTMLElement>(
+        '#status-box [data-action="return-credit"]:not(:disabled)',
+      ) ??
+      root.querySelector<HTMLElement>("#status-box")
+    )?.focus({ preventScroll: true });
+  }
+  function reserveRecoveryModal(g: Game, pending: ReserveRecovery) {
+    return `<div class="modal-scrim"><section class="modal reserve-recovery" role="dialog" aria-modal="true" aria-label="Reserve shortfall"><h2>Reserve shortfall</h2>${pending.messages.map((message) => `<p>${escape(message)}</p>`).join("")}<p>${escape(flexibleReminder(g, pending.owner))}</p><div class="commit-row">${button("Go back", "back-to-reserve", "", false, "secondary")}${button("Confirm outcome", "confirm-reserve", "", false, "primary")}</div></section></div>`;
   }
   function actionForm(g: Game, s: System) {
     const p = player(g);
@@ -1397,7 +1480,8 @@ export function mountApp(
     return "";
   }
   function inspector(g: Game) {
-    if (reserveNotice(g) || g.pending?.kind === "reserve") return "";
+    if (g.pending?.kind === "reserve") return reserveEffectPanel(g, g.pending);
+    if (reserveNotice(g)) return "";
     if (g.pending?.kind === "filibuster") {
       const choices = g.systems.flatMap((s) =>
         s.tokens.flatMap((owner, index) =>
@@ -1408,15 +1492,11 @@ export function mountApp(
     }
     if (g.pending?.kind === "insurance") {
       const p = player(g),
-        places = g.systems.filter((s) =>
-          s.planets.some((p) => p.owners[g.turn] > 0),
-        );
+        places = availableSystems(g);
       return `<section class="console"><div class="eyebrow">Insurance · skipped turn</div><h2>Gain one Credit or Ship</h2><p>No action token of yours was on top. Choose one reward from Reserve. ${p.reserve === 0 ? "Reserve is empty; Flexible Economy can return Credits before choosing, if you own it." : `${p.reserve} Reserve available.`}</p>${button("Take 1 Credit", "insurance-credit", "", false, "primary")}<div class="feature-options">${places.map((s) => button(`Take 1 Ship in ${escape(nameOf(s))}`, "insurance-ship", `data-system-id="${s.id}"`, false, "secondary")).join("")}</div></section>`;
     }
     if (g.pending?.kind === "eminent")
       return `<section class="console"><div class="eyebrow">Eminent Domain · before scoring</div><h2>One last SETTLE at home?</h2><p>Resolve a free SETTLE in ${escape(nameOf(system(g, player(g).home!)))} with its applicable Tech effects. No action token or unused slot is required.</p>${button("Use free SETTLE", "use-eminent", "", false, "primary")}${button("Skip and continue", "skip-eminent", "", false, "quiet")}</section>`;
-    if (g.pending?.kind === "afterOrder")
-      return `<section class="console"><div class="eyebrow">After MOVE INTO</div><h2>Choose which Tech resolves first</h2><p>Mercenaries and Rapid Advance share this timing. Your choice can affect which Ships are available for conversion.</p>${g.context!.afterHooks!.map((id) => button(`Resolve ${escape(CARD_MAP[`tech.${id}`].title)} first`, "order-after", `data-tech="${id}"`, false, "primary")).join("")}</section>`;
     if (g.pending?.kind === "mercenaries")
       return `<section class="console"><div class="eyebrow">After MOVE INTO · Mercenaries</div><h2>Hire Ships in ${escape(nameOf(system(g, g.pending.system)))}</h2><p>Convert up to three existing Credits into Ships. These Ships are added directly and do not suffer black-hole entry losses.</p>${numberControl("Credits to convert", "mercenaries", draft.techCount, Math.min(3, player(g).credits))}${button("Confirm conversion", "commit-mercenaries", "", false, "primary")}</section>`;
 
@@ -1667,14 +1747,11 @@ export function mountApp(
       const targetReason = !selectedTarget
         ? "Choose an opponent Tech"
         : Number(CARD_MAP[selectedTarget.tech].cost) > value
-          ? "Increase the undiscounted value"
+          ? "Increase the Credit value"
           : null;
       const reason =
-          targetReason ??
-          purchaseReason(g, id, g.turn, false, value, selectedTarget),
-        fullReason =
-          targetReason ??
-          purchaseReason(g, id, g.turn, true, value, selectedTarget);
+        targetReason ??
+        purchaseReason(g, id, g.turn, false, value, selectedTarget);
       const cost = purchaseCost(
         g,
         id,
@@ -1683,7 +1760,7 @@ export function mountApp(
         value,
         selectedTarget ? Number(CARD_MAP[selectedTarget.tech].cost) : 0,
       );
-      return `<div class="sabotage-controls"><h4>Choose the Tech to remove</h4><div class="sabotage-targets">${targets.map((t) => button(`${escape(player(g, t.player).name)} · ${escape(CARD_MAP[t.tech].title)} (${CARD_MAP[t.tech].cost})`, "sabotage-target", `data-owner="${t.player}" data-tech="${t.tech}" aria-pressed="${t === selectedTarget}"`, false, t === selectedTarget ? "selected" : "secondary")).join("") || "<p>No legal opponent Tech is available.</p>"}</div>${numberControl("Undiscounted value (X)", "sabotage-value", value, hasTech(g, g.turn, "research-lab") ? 81 : 40)}<p>Pay at least the selected Tech’s full printed value, including with Research Lab. Remove a Tech of printed value up to X. Its ownership rocket returns to its owner's Reserve. Sabotage cannot target Sabotage or be bought in the last round.</p>${button(reason ?? `Buy Sabotage for ${cost} Credits${cost < value ? " · Research Lab" : ""}`, "buy", `data-tech="${id}"`, Boolean(reason), "primary")}${hasTech(g, g.turn, "research-lab") && cost < value ? button(fullReason ?? `Pay full price · ${value} Credits`, "buy", `data-tech="${id}" data-full-price="true"`, Boolean(fullReason), "secondary") : ""}</div>`;
+      return `<div class="sabotage-controls"><h4>Choose the Tech to remove</h4><div class="sabotage-targets">${targets.map((t) => button(`${escape(player(g, t.player).name)} · ${escape(CARD_MAP[t.tech].title)} (${CARD_MAP[t.tech].cost})`, "sabotage-target", `data-owner="${t.player}" data-tech="${t.tech}" aria-pressed="${t === selectedTarget}"`, false, t === selectedTarget ? "selected" : "secondary")).join("") || "<p>No legal opponent Tech is available.</p>"}</div>${numberControl("Credit value (X)", "sabotage-value", value, 40)}${button(reason ?? `Buy Sabotage for ${cost} Credits`, "buy", `data-tech="${id}"`, Boolean(reason), "primary")}</div>`;
     }
     const card = CARD_MAP[id],
       reason = purchaseReason(g, id),
@@ -1727,7 +1804,7 @@ export function mountApp(
   function overlay() {
     if (confirmation)
       return `<div class="modal-scrim"><section class="modal" role="dialog" aria-modal="true" aria-label="${confirmation.reserveAccepted ? escape(confirmation.title) : "Confirm decision"}"><h2>${escape(confirmation.title)}</h2>${confirmation.reserveAccepted ? "<p>This is the expected outcome if you commit:</p>" : ""}${confirmation.messages.map((m) => `<p>${escape(m)}</p>`).join("")}<p>Is this what you intended?</p><div class="commit-row">${button("Go back", "cancel-confirmation", "", false, "secondary")}${button("Confirm and commit", "confirm-command", "", false, "primary")}</div></section></div>`;
-    if (game?.pending?.kind === "reserve")
+    if (game?.pending?.kind === "reserve" && reserveWarningOpen)
       return reserveRecoveryModal(game, game.pending);
     const reserve = game ? reserveNotice(game) : null;
     if (reserve)
@@ -1880,7 +1957,7 @@ export function mountApp(
       [
         JSON.stringify(
           {
-            application: "Space Force local prototype 0.16.0",
+            application: "Space Force local prototype 0.17.0",
             exportedAt: new Date().toISOString(),
             game,
           },
@@ -2023,6 +2100,7 @@ export function mountApp(
     command: Command,
     title = "Check this decision",
     reserveAccepted = false,
+    preview?: Game,
   ) {
     if (!game) return;
     overlayReturn = {
@@ -2045,6 +2123,7 @@ export function mountApp(
       revision: game.revision,
       base: game,
       reserveAccepted,
+      preview,
     };
     render();
     root.querySelector<HTMLElement>(".modal button:not(:disabled)")?.focus();
@@ -2143,6 +2222,7 @@ export function mountApp(
       perform(confirmed.command, confirmed.revision, {
         intent: true,
         reserve: confirmed.reserveAccepted,
+        preview: confirmed.preview,
       });
     } else if (action === "guide-off") {
       guide = false;
@@ -2180,16 +2260,13 @@ export function mountApp(
         undefined,
         Number(data.owner),
       );
-    else if (action === "use-reserve" && game?.pending?.kind === "reserve")
-      perform({
-        type: "useReserve",
-        credits: draft.recoveryCredits,
-        ships:
-          game.pending.effect.kind === "reinforce"
-            ? recoveryAllocations(game, game.pending)
-            : undefined,
+    else if (action === "back-to-reserve") backToReserve();
+    else if (action === "complete-reserve") perform(reserveEffectCommand());
+    else if (action === "confirm-reserve")
+      perform(reserveEffectCommand(), game?.revision, {
+        intent: true,
+        reserve: true,
       });
-    else if (action === "finish-reserve") perform({ type: "finishReserve" });
     else if (action === "to-status") scrollToStatus();
     else if (action === "zoom-in") zoomBy(1.25);
     else if (action === "zoom-out") zoomBy(0.8);
@@ -2253,8 +2330,6 @@ export function mountApp(
         perform({ type: "insurance", system: data.systemId });
       else if (action === "use-eminent" || action === "skip-eminent")
         perform({ type: "eminent", use: action === "use-eminent" });
-      else if (action === "order-after")
-        perform({ type: "orderAfter", tech: data.tech! });
       else if (action === "commit-mercenaries")
         perform({ type: "mercenaries", count: draft.techCount });
       else if (action === "plan-pass") perform({ type: "planPass" });
@@ -2552,6 +2627,7 @@ export function mountApp(
     if (event.key === "Escape" && modal) {
       event.preventDefault();
       if (showHelp || activeCard || confirmation) closeOverlay();
+      else if (game?.pending?.kind === "reserve") backToReserve();
       return;
     }
     if (event.key === "Tab" && modal) {
@@ -2925,6 +3001,7 @@ export function mountApp(
       previewCache = new WeakMap();
       featureCache = new WeakMap();
       game = value;
+      reserveWarningOpen = true;
       privatePeek = false;
       placementTap = null;
       draft = freshDraft();

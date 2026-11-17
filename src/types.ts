@@ -181,9 +181,9 @@ export interface Score {
   total: number;
 }
 export interface Game {
-  schema: 7;
-  engine: "0.16.0";
-  content: "confirmed-techs-reserve-recovery-4";
+  schema: 8;
+  engine: "0.17.0";
+  content: "ordered-techs-shortfall-review-5";
   config: GameConfig;
   seed: number;
   rng: number;
@@ -222,6 +222,7 @@ export interface Game {
   endgameQueue: number[];
   legacyRulesUntil: number;
   reserveRecoveryFrom: number;
+  confirmedTechRulesFrom: number;
 }
 export interface GameConfig {
   techPreset:
@@ -249,6 +250,11 @@ export interface ActionChoices {
   replacements?: Replacements;
 }
 export type Command =
+  | {
+      type: "completeReserve";
+      credits?: number;
+      ships?: Record<string, number>;
+    }
   | { type: "useReserve"; credits?: number; ships?: Record<string, number> }
   | { type: "finishReserve" }
   | { type: "home"; system: string }

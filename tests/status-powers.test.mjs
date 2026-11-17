@@ -172,53 +172,102 @@ test("Foresight and Flexible Economy stay above and below active Status supply a
   h.close();
 });
 
-test("Reserve recovery popup returns one Credit, completes only missing production and survives autosave", () => {
+test("predictable Flexible economy shortages offer Go back before commitment and keep Reserve controls in the Status Box", () => {
+  const h = harness();
+  let g = fixture();
+  tech(g, 0, "flexible-economy");
+  credits(g, 0, 4);
+  ships(g, g.systems[0], 0, g.players[0].reserve);
+  const id = g.systems[0].id,
+    before = g.systems[0].ships[0];
+  h.app.setGame(g);
+  h.click(tile(id));
+  h.click('[data-kind="produce"]');
+  h.click('[data-action="commit-action"]');
+  const modal = h.root.querySelector(".modal");
+  assert.match(
+    modal.textContent,
+    /could use Flexible economy.*before applying this effect/,
+  );
+  assert.equal(
+    modal.querySelector('[data-action="return-credit"],input'),
+    null,
+  );
+  assert.equal(h.app.getGame(), g);
+  h.click('[data-action="cancel-confirmation"]');
+  assert.equal(h.root.querySelector(".modal"), null);
+  assert.equal(h.app.getGame().players[0].used.length, 0);
+  const controls = h.root.querySelector("#status-box .flexible-inline");
+  assert.equal(
+    controls.querySelector("strong").textContent,
+    "Flexible economy",
+  );
+  assert.equal(controls.querySelector("small"), null);
+  h.click('#status-box [data-action="return-credit"]');
+  h.click('[data-action="commit-action"]');
+  g = h.app.getGame();
+  assert.equal(g.turn, 1);
+  assert.equal(system(g, id).ships[0], before + 1);
+  assert.equal(g.players[0].credits, 3);
+  h.close();
+});
+
+test("committed Reserve warnings offer Go back to the Status Box and preserve previous output through apply and autosave", () => {
   const h = harness();
   h.app.setGame(supplyShortfall());
-  let g = h.app.getGame(),
-    id = g.systems[0].id,
-    before = g.systems[0].ships[0];
-  const modal = () => h.root.querySelector(".reserve-recovery");
-  assert.ok(modal());
-  assert.ok(modal().contains(h.window.document.activeElement));
-  assert.ok(modal().querySelector('[data-action="use-reserve"]').disabled);
-  assert.doesNotMatch(
-    modal().textContent,
-    /Is this the outcome you intended|Go back/,
+  const old = h.app.getGame(),
+    id = old.systems[0].id,
+    before = old.systems[0].ships[0];
+  const modal = h.root.querySelector(".reserve-recovery");
+  assert.ok(modal.contains(h.window.document.activeElement));
+  assert.equal(
+    modal.querySelector('input,[data-action="return-credit"]'),
+    null,
   );
-  h.click('.reserve-recovery [data-action="return-credit"]');
-  assert.equal(h.app.getGame().players[0].reserve, 1);
-  assert.equal(h.app.getGame().players[0].credits, 3);
-  assert.equal(h.app.getGame().turn, 0);
-  assert.ok(modal().contains(h.window.document.activeElement));
-  h.click('.reserve-recovery [data-action="use-reserve"]');
-  g = h.app.getGame();
+  assert.match(modal.textContent, /Go back/);
+  h.click('[data-action="back-to-reserve"]');
+  assert.equal(h.app.getGame(), old);
+  assert.equal(h.root.querySelector(".modal"), null);
+  h.click('#status-box [data-action="return-credit"]');
+  h.click('[data-action="complete-reserve"]');
+  const g = h.app.getGame();
   assert.equal(g.pending, null);
   assert.equal(g.turn, 1);
   assert.equal(system(g, id).ships[0], before + 1);
   assert.equal(g.log.filter((l) => l.text.startsWith("Produced ")).length, 1);
-  assert.equal(modal(), null);
-  const saved = JSON.parse(
-    h.window.localStorage.getItem("space-force.local-family.v1"),
+  assert.equal(
+    JSON.parse(h.window.localStorage.getItem("space-force.local-family.v1"))
+      .revision,
+    g.revision,
   );
-  assert.equal(saved.revision, g.revision);
   h.close();
 });
 
-test("an empty-Credits recovery popup keeps focus inside and always offers continuing with the current result", () => {
+test("an empty-Credits shortfall can be accepted without adjustment controls or a soft lock", () => {
   const h = harness();
   h.app.setGame(supplyShortfall(0));
   const modal = h.root.querySelector(".reserve-recovery");
-  assert.ok(modal.querySelector('[data-action="return-credit"]').disabled);
+  assert.equal(
+    modal.querySelector('[data-action="return-credit"],input'),
+    null,
+  );
   assert.ok(modal.contains(h.window.document.activeElement));
-  h.key('.reserve-recovery [data-action="finish-reserve"]', "Escape");
-  assert.ok(h.root.querySelector(".reserve-recovery"));
-  h.click('.reserve-recovery [data-action="finish-reserve"]');
+  h.click('[data-action="back-to-reserve"]');
+  assert.ok(
+    h.root.querySelector('#status-box [data-action="return-credit"]').disabled,
+  );
+  h.click('[data-action="complete-reserve"]');
+  assert.match(
+    h.root.querySelector(".modal").textContent,
+    /could use Flexible economy/,
+  );
+  h.click('[data-action="confirm-command"]');
   assert.equal(h.app.getGame().turn, 1);
+  assert.equal(h.root.querySelector(".modal"), null);
   h.close();
 });
 
-test("a recipient's Explore recovery controls return that player's Credits without passing the active turn", () => {
+test("opponent Explore shortfalls return to recipient controls in the Status Box without advancing the acting turn", () => {
   const h = harness();
   let g = fixture(),
     id = g.systems[0].id,
@@ -236,19 +285,56 @@ test("a recipient's Explore recovery controls return that player's Credits witho
   g = step(g, { type: "explore", recipient: 1 });
   h.app.setGame(g);
   assert.equal(
-    h.root.querySelector('.reserve-recovery [data-action="return-credit"]')
-      .dataset.owner,
-    "1",
+    h.root.querySelector('.reserve-recovery [data-action="return-credit"]'),
+    null,
   );
+  h.click('[data-action="back-to-reserve"]');
+  const selector = '.reserve-effect [data-action="return-credit"]';
+  assert.equal(h.root.querySelector(selector).dataset.owner, "1");
   for (let i = 0; i < 2; i++) {
-    h.click('.reserve-recovery [data-action="return-credit"]');
+    h.click(selector);
     assert.equal(h.app.getGame().turn, 0);
-    h.click('.reserve-recovery [data-action="use-reserve"]');
   }
+  h.click('[data-action="complete-reserve"]');
   assert.equal(h.app.getGame().players[1].credits, 0);
   assert.equal(h.app.getGame().players[0].credits, 0);
   assert.equal(h.app.getGame().turn, 1);
   assert.equal(system(h.app.getGame(), id).ships[1], 2);
+  h.close();
+});
+
+test("Go back from a revealed Explore shortfall preserves the token, committed Settlement and initial Credit award", () => {
+  const h = harness();
+  let g = fixture(),
+    id = g.systems[0].id,
+    p = g.systems[0].planets[1];
+  tech(g, 0, "flexible-economy");
+  credits(g, 0, 3);
+  ships(g, g.systems[0], 0, g.players[0].reserve - 1);
+  p.explore = "credit3";
+  const initialShips = g.systems[0].ships[0];
+  h.app.setGame(g);
+  h.click(tile(id));
+  h.click('[data-kind="settle"]');
+  h.input(`[data-number="settlement"][data-planet="${p.id}"]`, "1");
+  h.click('[data-action="commit-action"]');
+  assert.equal(h.app.getGame().pending.kind, "reserve");
+  assert.equal(system(h.app.getGame(), id).planets[1].explore, null);
+  const committed = h.app.getGame();
+  h.click('[data-action="back-to-reserve"]');
+  assert.equal(h.app.getGame(), committed);
+  assert.equal(h.app.getGame().players[0].credits, 4);
+  h.click('#status-box [data-action="return-credit"]');
+  h.click('#status-box [data-action="return-credit"]');
+  h.click('[data-action="complete-reserve"]');
+  g = h.app.getGame();
+  assert.equal(g.context, null);
+  assert.equal(system(g, id).planets[1].owners[0], 1);
+  assert.equal(system(g, id).ships[0], initialShips - 1);
+  assert.equal(
+    g.log.filter((l) => l.text.startsWith("Explore token revealed: +3")).length,
+    1,
+  );
   h.close();
 });
 
@@ -295,6 +381,28 @@ test("Filibuster labels top, bottom and singleton tokens and Sabotage resets X o
   );
   const selected = h.root.querySelector(".sabotage-targets .selected");
   assert.equal(selected.dataset.tech, "tech.flexible-economy");
+  const sabotage = h.root.querySelector(".sabotage-controls");
+  assert.match(
+    sabotage.querySelector(".quantity-row").textContent,
+    /Credit value \(X\)/,
+  );
+  assert.equal(sabotage.querySelector("p"), null);
+  assert.match(
+    h.root.querySelector('[data-tech-id="tech.sabotage"] .tech-body > p')
+      .textContent,
+    /\(cannot be discounted by Research lab\)/,
+  );
+  h.input('[data-number="sabotage-value"]', "8");
+  assert.match(
+    h.root.querySelector('.sabotage-controls [data-action="buy"]').textContent,
+    /8 Credits/,
+  );
+  assert.equal(
+    h.root.querySelector(
+      '[data-action="buy"][data-tech="tech.sabotage"][data-full-price]',
+    ),
+    null,
+  );
   const css = readFileSync(
     new URL("../src/style.css", import.meta.url),
     "utf8",

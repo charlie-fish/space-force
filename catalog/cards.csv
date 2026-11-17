@@ -10,7 +10,7 @@ tech.artificial-warp,tech,Artificial Warp,Artificial Warp,3,10,15,on_acquisition
 tech.arcologies,tech,Arcologies,Arcologies,5,11,15,during_settle,true,R05: one shared extra space per planet; full at printed capacity and capacity plus one for PRODUCE and Soylent Green.,base-1.80,implemented_local_normal_turns
 tech.kessler-syndrome,tech,Kessler Syndrome,Kessler Syndrome,5,12,17,on_acquisition,true,,base-1.80,implemented_local_normal_turns
 tech.planet-nine,tech,Planet Nine,Planet nine,4,13,18,on_acquisition,true,,base-1.80,implemented_local_normal_turns
-tech.mercenaries,tech,Mercenaries,Mercenaries,9,14,17,after_move_into,true,,base-1.80,implemented_local_normal_turns
+tech.mercenaries,tech,Mercenaries,Mercenaries,9,14,17,after_move_into,true,Designer 2026-11-17: always resolves before Rapid Advance.,base-1.80,implemented_local_normal_turns
 tech.banking,tech,Banking,Banking,7,15,15,during_actions,true,,base-1.80,implemented_local_normal_turns
 tech.spice,tech,Spice,SPICE,12,16,19,after_produce,true,R01: bonus PRODUCE repeats other applicable Tech chains but does not trigger Spice again; finish the first chain before the bonus.,base-1.80,implemented_local_normal_turns
 tech.agility,tech,Agility,Agility,4,17,15,during_move_into,true,,base-1.80,implemented_local_normal_turns
@@ -23,10 +23,10 @@ tech.cloaking,tech,Cloaking,Cloaking,8,23,15,before_attack,true,,base-1.80,imple
 tech.strategic-stall,tech,Strategic Stall,Strategic stall,5,24,19,during_plan,true,,base-1.80,implemented_local_normal_turns
 tech.filibuster,tech,Filibuster,Filibuster,6,25,16,after_plan,true,,base-1.80,implemented_local_normal_turns
 tech.patrol,tech,Patrol,Patrol,6,26,18,ongoing_attack_restriction,true,,base-1.80,implemented_local_normal_turns
-tech.insurance,tech,Insurance,Insurance,3,27,17,skipped_actions_turn,true,,base-1.80,implemented_local_normal_turns
+tech.insurance,tech,Insurance,Insurance,3,27,17,skipped_actions_turn,true,"Designer 2026-11-17: only while own tokens remain; Ship at home even without a Settlement, or anywhere with an own Settlement.",base-1.80,implemented_local_normal_turns
 tech.eminent-domain,tech,Eminent Domain,Eminent Domain,3,28,16,before_endgame_scoring,true,,base-1.80,implemented_local_normal_turns
 tech.disruptor,tech,Disruptor,Disruptor,7,29,16,on_acquisition_next_round_restriction,true,,base-1.80,implemented_local_normal_turns
-tech.sabotage,tech,Sabotage,Sabotage,X,30,19,on_acquisition,true,"R07 and designer 2026-11-17: nominal destruction value is undiscounted, but actual payment must be at least the target printed value even with Research Lab; cannot target Sabotage.",base-1.80,implemented_local_normal_turns
+tech.sabotage,tech,Sabotage,Sabotage,X,30,19,on_acquisition,true,R07 and designer 2026-11-17: pay Credit value X without Research lab discount; legal opponent target up to X; cannot target Sabotage.,base-1.80,implemented_local_normal_turns
 tech.flexible-economy,tech,Flexible Economy,Flexible Economy,2,31,16,ongoing,true,,base-1.80,implemented_local_normal_turns
 tech.government-incentives,tech,Government Incentives,Government Incentives,7,32,17,before_settle,true,,base-1.80,implemented_local_normal_turns
 event.cyber-attack,event,Cyber Attack,Cyber Attack,,35,20,round_actions,false,,base-1.80,inventoried_not_implemented

@@ -8,6 +8,7 @@ export function harness(storage) {
     { url: "https://space-force.test/" },
   );
   const { window } = dom;
+  window.scrollTo = () => {};
   const root = window.document.querySelector("#app");
   const app = mountApp(root, storage ?? window.localStorage);
   const click = (selector) => {

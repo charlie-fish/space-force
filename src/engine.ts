@@ -104,9 +104,9 @@ export function createGame(
     "Choose a supported test setup.",
   );
   const g: Game = {
-    schema: 7,
-    engine: "0.16.0",
-    content: "confirmed-techs-reserve-recovery-4",
+    schema: 8,
+    engine: "0.17.0",
+    content: "ordered-techs-shortfall-review-5",
     config: { ...clone(config), events: config.events ?? "simpler" },
     seed: seed >>> 0,
     rng: seed >>> 0,
@@ -135,6 +135,7 @@ export function createGame(
     endgameQueue: [],
     legacyRulesUntil: 0,
     reserveRecoveryFrom: 0,
+    confirmedTechRulesFrom: 0,
   };
   g.players = Array.from({ length: count }, (_, id) => ({
     id,
@@ -441,10 +442,12 @@ export function purchaseCost(
       ? integer(sabotageValue, 81)
       : CARD_MAP[tech]?.cost;
   requireRule(typeof value === "number", "Unknown Tech value.");
+  if (tech === "tech.sabotage" && !historicalTechRules(g)) return value;
   const cost =
     hasTech(g, id, "research-lab") && !fullPrice
       ? Math.floor(value / 2)
       : value;
+  if (tech !== "tech.sabotage" || legacyRules(g)) return cost;
   const floor =
     minimum ??
     (tech === "tech.sabotage"
@@ -455,9 +458,7 @@ export function purchaseCost(
             .filter((n) => n <= value),
         )
       : 0);
-  return tech === "tech.sabotage" && !legacyRules(g)
-    ? Math.max(cost, floor)
-    : cost;
+  return Math.max(cost, floor);
 }
 export function sabotageTargets(g: Game, id = g.turn) {
   return g.players.flatMap((p) =>
@@ -513,7 +514,9 @@ export function afterActionHooks(
     action === "produce"
       ? ["population-explosion", ...(source === "tech.spice" ? [] : ["spice"])]
       : action === "move"
-        ? ["rapid-advance", "mercenaries"]
+        ? historicalTechRules(g)
+          ? ["rapid-advance", "mercenaries"]
+          : ["mercenaries", "rapid-advance"]
         : []
   ).filter((id) => hasTech(g, g.turn, id));
 }
@@ -555,7 +558,10 @@ function advanceActions(g: Game, after: number, remaining = g.players.length) {
       g.turn = id;
       return;
     }
-    if (hasTech(g, id, "insurance")) {
+    if (
+      hasTech(g, id, "insurance") &&
+      (historicalTechRules(g) || g.systems.some((s) => s.tokens.includes(id)))
+    ) {
       g.turn = id;
       g.pending = { kind: "insurance", after: id, remaining: remaining - step };
       log(
@@ -568,6 +574,7 @@ function advanceActions(g: Game, after: number, remaining = g.players.length) {
   throw Error("A token stack has no valid owner.");
 }
 const legacyRules = (g: Game) => g.revision < g.legacyRulesUntil;
+const historicalTechRules = (g: Game) => g.revision < g.confirmedTechRulesFrom;
 function pauseReserve(
   g: Game,
   owner: number,
@@ -600,7 +607,7 @@ function pauseReserve(
 }
 function useRecoveredReserve(
   g: Game,
-  command: Extract<Command, { type: "useReserve" }>,
+  command: Extract<Command, { type: "useReserve" | "completeReserve" }>,
 ) {
   requireRule(g.pending?.kind === "reserve", "No Reserve recovery is pending.");
   const pending = g.pending,
@@ -674,6 +681,48 @@ function useRecoveredReserve(
     g.pending = null;
     resumeContinuation(g, pending.after);
   }
+}
+
+function finishReserve(g: Game) {
+  requireRule(g.pending?.kind === "reserve", "No Reserve recovery is pending.");
+  const pending = g.pending;
+  g.pending = null;
+  log(
+    g,
+    `${pending.label}: continued with ${pending.total - pending.remaining}/${pending.total}; ${pending.remaining} left uncompleted.`,
+    pending.owner,
+  );
+  resumeContinuation(g, pending.after);
+}
+
+/** Apply new rulings to unresolved choices without changing completed historical commands. */
+export function applyConfirmedTechRules(g: Game) {
+  if (!g.confirmedTechRulesFrom || g.revision !== g.confirmedTechRulesFrom)
+    return;
+  const logStart = g.log.length;
+  if (
+    g.pending?.kind === "rapid" &&
+    g.context?.kind === "move" &&
+    g.context.afterHooks?.includes("mercenaries")
+  ) {
+    g.context.afterHooks = ["mercenaries", "rapid-advance"];
+    runAfterHooks(g);
+  }
+  if (g.pending?.kind === "afterOrder") {
+    g.context!.afterHooks = ["mercenaries", "rapid-advance"].filter((id) =>
+      g.context!.afterHooks!.includes(id),
+    );
+    g.context!.afterOrderChosen = true;
+    runAfterHooks(g);
+  }
+  if (
+    g.pending?.kind === "insurance" &&
+    !g.systems.some((s) => s.tokens.includes(g.turn))
+  ) {
+    const { after, remaining } = g.pending;
+    advanceActions(g, after, remaining);
+  }
+  for (let i = logStart; i < g.log.length; i++) g.log[i].revision = g.revision;
 }
 
 function reserveWarning(label: string, wanted: number, available: number) {
@@ -793,6 +842,7 @@ function runAfterHooks(g: Game) {
   const c = g.context!;
   if (
     c.kind === "move" &&
+    historicalTechRules(g) &&
     (c.afterHooks?.length ?? 0) > 1 &&
     !c.afterOrderChosen
   ) {
@@ -1900,21 +1950,33 @@ export function applyCommand(
   command = clone(command);
   const g = clone(state);
   const p = player(g, actor);
-  if (command.type === "useReserve") useRecoveredReserve(g, command);
-  else if (command.type === "finishReserve") {
+  if (command.type === "completeReserve") {
     requireRule(
       g.pending?.kind === "reserve",
       "No Reserve recovery is pending.",
     );
     const pending = g.pending;
-    g.pending = null;
-    log(
-      g,
-      `${pending.label}: continued with ${pending.total - pending.remaining}/${pending.total}; ${pending.remaining} left uncompleted.`,
-      pending.owner,
+    const amount = Math.min(
+      player(g, pending.owner).reserve,
+      pending.remaining,
     );
-    resumeContinuation(g, pending.after);
-  } else if (command.type === "returnCredits") {
+    if (pending.effect.kind === "reinforce")
+      for (const n of Object.values(command.ships ?? {})) integer(n, 40);
+    if (pending.effect.kind === "production")
+      integer(command.credits ?? pending.effect.credits, pending.remaining);
+    const selected =
+      pending.effect.kind === "reinforce"
+        ? sum(
+            Object.values(
+              command.ships ?? { [player(g, pending.owner).home!]: amount },
+            ),
+          )
+        : amount;
+    if (selected > 0) useRecoveredReserve(g, command);
+    if (g.pending === pending) finishReserve(g);
+  } else if (command.type === "useReserve") useRecoveredReserve(g, command);
+  else if (command.type === "finishReserve") finishReserve(g);
+  else if (command.type === "returnCredits") {
     requireRule(
       hasTech(g, actor, "flexible-economy"),
       "Flexible Economy is required to return Credits.",
@@ -2008,10 +2070,15 @@ export function applyCommand(
     );
     const after = g.pending.after,
       remaining = g.pending.remaining;
+    requireRule(
+      historicalTechRules(g) || g.systems.some((s) => s.tokens.includes(actor)),
+      "Insurance applies only while you still have action tokens on the board.",
+    );
     if (command.system)
       requireRule(
-        system(g, command.system).planets.some((p) => p.owners[actor] > 0),
-        "Insurance Ships need a system with one of your Settlements.",
+        (!historicalTechRules(g) && command.system === p.home) ||
+          system(g, command.system).planets.some((p) => p.owners[actor] > 0),
+        "Insurance Ships need your home system or a system with one of your Settlements.",
       );
     if (p.reserve > 0) {
       p.reserve--;
@@ -2464,6 +2531,7 @@ export function applyCommand(
   else throw new Error("Unknown game command.");
   g.commands.push({ actor, command: clone(command) });
   g.revision++;
+  applyConfirmedTechRules(g);
   if (g.phase !== "finished")
     g.decisions.push({
       player: command.type === "returnCredits" ? actor : g.turn,
@@ -2489,6 +2557,7 @@ export function replayGame(
     | "commands"
     | "legacyRulesUntil"
     | "reserveRecoveryFrom"
+    | "confirmedTechRulesFrom"
   >,
 ): Game {
   let game = createGame(
@@ -2505,6 +2574,10 @@ export function replayGame(
     record.reserveRecoveryFrom,
     record.commands.length,
   );
+  game.confirmedTechRulesFrom = integer(
+    record.confirmedTechRulesFrom,
+    record.commands.length,
+  );
   for (const { actor, command } of record.commands)
     game = applyCommand(game, actor, command);
   return game;
@@ -2512,9 +2585,9 @@ export function replayGame(
 
 export function assertInvariants(g: Game) {
   requireRule(
-    g.schema === 7 &&
-      g.engine === "0.16.0" &&
-      g.content === "confirmed-techs-reserve-recovery-4",
+    g.schema === 8 &&
+      g.engine === "0.17.0" &&
+      g.content === "ordered-techs-shortfall-review-5",
     "Unsupported saved-game version.",
   );
   requireRule(
@@ -2617,6 +2690,7 @@ export function assertInvariants(g: Game) {
   integer(g.revision, Number.MAX_SAFE_INTEGER);
   integer(g.legacyRulesUntil, Number.MAX_SAFE_INTEGER);
   integer(g.reserveRecoveryFrom, Number.MAX_SAFE_INTEGER);
+  integer(g.confirmedTechRulesFrom, Number.MAX_SAFE_INTEGER);
   if (g.pending?.kind === "reserve") {
     const recovery = g.pending;
     requireRule(

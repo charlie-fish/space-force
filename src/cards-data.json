@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "contentVersion": "base-1.80+designer-clarifications-003",
+  "contentVersion": "base-1.80+designer-clarifications-007",
   "sources": [
     "Space Force rules v1.80.pdf",
     "SpaceForce Cards v1.80.pdf",
@@ -38,7 +38,8 @@
         "rulebookPdfPage": 18
       },
       "ruleNotes": [
-        "R01: almanac overrides card; direct conversion of one Ship, not a SETTLE action and no SETTLE hooks."
+        "R01: almanac overrides card; direct conversion of one Ship, not a SETTLE action and no SETTLE hooks.",
+        "Designer 2026-11-17: resolve after Mercenaries when both apply; no order choice."
       ]
     },
     {
@@ -202,7 +203,10 @@
       "source": {
         "cardsPdfPage": 14,
         "rulebookPdfPage": 17
-      }
+      },
+      "ruleNotes": [
+        "Designer 2026-11-17: always resolve Mercenaries before Rapid Advance when both apply."
+      ]
     },
     {
       "id": "tech.banking",
@@ -408,16 +412,18 @@
       "title": "Insurance",
       "type": "tech",
       "cost": 3,
-      "text": "During the ACTIONS phase, each time your turn is skipped because none of your action tokens were on top of a stack, gain 1 Credit or 1 Ship. Place a gained Ship anywhere you have a Settlement.",
+      "text": "During the ACTIONS phase, while you still have action tokens on the board, each time your turn is skipped because none of your action tokens are on top of a stack, gain 1 Credit or 1 Ship. Place a gained Ship anywhere you have a Settlement, or in your home system.",
       "timing": "skipped_actions_turn",
       "restrictions": [
-        "A gained Ship must be placed in a system containing one of your Settlements. Forfeit skips do not trigger Insurance."
+        "Only while the owner still has an action token on the board.",
+        "A Ship may be placed in the home system even with no Settlement, or anywhere the owner has a Settlement."
       ],
       "simultaneousAllowed": true,
       "source": {
         "cardsPdfPage": 27,
         "rulebookPdfPage": 17
-      }
+      },
+      "rulesOverride": "Designer correction, 17 November 2026."
     },
     {
       "id": "tech.eminent-domain",
@@ -454,12 +460,12 @@
       "title": "Sabotage",
       "type": "tech",
       "cost": "X",
-      "text": "Choose a Credit value X and remove another player’s non-Sabotage Tech worth up to X. You must pay at least the target’s full printed price, including with Research Lab. Return its ownership rocket to its owner’s Reserve. Sabotage cannot be bought in the last round.",
+      "text": "Choose a Credit value X and remove another player’s non-Sabotage Tech worth up to X. You must pay at least the target’s full printed price (cannot be discounted by Research lab). Return its ownership rocket to its owner’s Reserve. Sabotage cannot be bought in the last round.",
       "timing": "on_acquisition",
       "restrictions": [
         "Cannot be bought in the last round.",
         "Cannot target Sabotage.",
-        "A legal opponent target is required. Payment cannot fall below that target’s full printed value, including with Research Lab.",
+        "A legal opponent target is required. Pay the chosen Credit value X; it must cover the target’s printed value and cannot be discounted by Research lab.",
         "Removing ownership does not undo previously placed pieces or conversions."
       ],
       "simultaneousAllowed": true,
@@ -468,9 +474,9 @@
         "rulebookPdfPage": 19
       },
       "ruleNotes": [
-        "R07: nominal value remains separate from actual payment; designer 2026-11-17 additionally requires payment at least the target’s printed value, including with Research Lab."
+        "R07 and designer 2026-11-17: the selected target must be worth at most Credit value X; actual payment is X and cannot be discounted by Research lab."
       ],
-      "rulesOverride": "Designer clarification, 17 November 2026: minimum actual payment is the selected target’s full printed value."
+      "rulesOverride": "Designer correction, 17 November 2026: Sabotage cannot be discounted by Research lab."
     },
     {
       "id": "tech.flexible-economy",

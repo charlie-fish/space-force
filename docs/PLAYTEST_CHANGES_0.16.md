@@ -1,5 +1,7 @@
 # Prototype 0.16 playtest guide
 
+Historical release: [0.17](PLAYTEST_CHANGES_0.17.md) supersedes its Reserve pop-up controls, Mercenaries/Rapid Advance ordering, Insurance eligibility/destinations and Sabotage discount behaviour. C01–C04 remain confirmed.
+
 17 November 2026. C01–C04 are **designer-confirmed**. This release updates the local 2–7 player normal-turn prototype; all thirty Techs remain available through ten-card displays.
 
 ## What changed

@@ -285,7 +285,7 @@ test("carried Ships survive an exploration/orientation save checkpoint and move 
   assert.equal(system(g, target.id).ships[1], 1);
 });
 
-test("Mercenaries and Rapid Advance can resolve in either order, including after a black hole removes every carrier", () => {
+test("Mercenaries always precedes Rapid Advance, including after black holes remove every incoming Ship", () => {
   const { g, from, target } = movement(2);
   tech(g, 0, "mercenaries");
   tech(g, 0, "rapid-advance");
@@ -296,27 +296,27 @@ test("Mercenaries and Rapid Advance can resolve in either order, including after
     system: target.id,
     sources: { [from.id]: 2 },
   });
-  assert.equal(moved.pending.kind, "afterOrder");
+  assert.equal(moved.pending.kind, "mercenaries");
   assert.equal(system(moved, target.id).ships[0], 0);
-  let first = step(moved, { type: "orderAfter", tech: "mercenaries" });
-  first = step(first, { type: "mercenaries", count: 3 });
-  assert.equal(system(first, target.id).ships[0], 3);
-  assert.equal(first.pending.kind, "rapid");
-  first = step(first, { type: "rapid", planet: target.planets[0].id });
-  assert.equal(system(first, target.id).ships[0], 2);
-  assert.equal(system(first, target.id).planets[0].owners[0], 1);
-  let second = step(moved, { type: "orderAfter", tech: "rapid-advance" });
-  assert.equal(second.pending.kind, "mercenaries");
-  second = step(second, { type: "mercenaries", count: 3 });
-  assert.equal(second.context, null);
-  assert.equal(system(second, target.id).ships[0], 3);
-  assert.equal(system(second, target.id).planets[0].owners[0], 0);
   assert.throws(
-    () =>
-      step(step(moved, { type: "orderAfter", tech: "mercenaries" }), {
-        type: "mercenaries",
-        count: 4,
-      }),
+    () => step(moved, { type: "orderAfter", tech: "rapid-advance" }),
+    /No after-MOVE ordering/,
+  );
+  assert.throws(
+    () => step(moved, { type: "rapid", planet: target.planets[0].id }),
+    /No Rapid/,
+  );
+  let hired = step(moved, { type: "mercenaries", count: 3 });
+  assert.equal(hired.pending.kind, "rapid");
+  assert.equal(system(hired, target.id).ships[0], 3);
+  hired = step(hired, { type: "rapid", planet: target.planets[0].id });
+  assert.equal(system(hired, target.id).ships[0], 2);
+  assert.equal(system(hired, target.id).planets[0].owners[0], 1);
+  const declined = step(moved, { type: "mercenaries", count: 0 });
+  assert.equal(declined.context, null);
+  assert.equal(system(declined, target.id).planets[0].owners[0], 0);
+  assert.throws(
+    () => step(moved, { type: "mercenaries", count: 4 }),
     /whole-number/,
   );
 });
@@ -465,13 +465,13 @@ test("Filibuster owners lift the exact selected own token in first-player order 
 function insuranceFixture() {
   const g = fixture();
   tech(g, 0, "insurance");
-  g.players[0].used = ["move", "settle", "produce", "attack"];
+  g.players[0].used = ["move", "settle", "produce"];
   g.systems.forEach((s) => (s.tokens = []));
-  g.systems[1].tokens = [1, 1];
+  g.systems[1].tokens = [0, 1, 1];
   g.turn = 1;
   return g;
 }
-test("Insurance awards each actual skipped turn, including exhausted owners, and stops when ACTIONS ends", () => {
+test("Insurance awards skipped turns only while the owner has tokens on the board", () => {
   let g = insuranceFixture(),
     id = g.systems[1].id;
   g = step(g, { type: "resolve", action: "move", system: id, invest: true });
@@ -482,11 +482,14 @@ test("Insurance awards each actual skipped turn, including exhausted owners, and
   assert.equal(g.players[0].credits, before + 1);
   assert.equal(g.turn, 1);
   g = step(g, { type: "resolve", action: "attack", system: id, invest: true });
+  assert.equal(g.turn, 0);
+  assert.equal(g.pending, null);
+  g = step(g, { type: "resolve", action: "attack", system: id, invest: true });
   assert.notEqual(g.phase, "actions");
   assert.equal(g.players[0].credits, before + 1);
 });
 
-test("Insurance Ships require a current Settlement and an empty Reserve can be replenished before choosing", () => {
+test("Insurance Ships may use an empty home or a current Settlement, with Flexible Economy available before choosing", () => {
   let g = insuranceFixture();
   tech(g, 0, "flexible-economy");
   const home = system(g, g.players[0].home),
@@ -501,15 +504,20 @@ test("Insurance Ships require a current Settlement and an empty Reserve can be r
     invest: true,
   });
   assert.equal(g.pending.kind, "insurance");
+  const invalid = g.systems.find(
+    (s) => s.id !== home.id && !s.planets.some((p) => p.owners[0]),
+  );
   assert.throws(
-    () => step(g, { type: "insurance", system: home.id }),
-    /Settlement/,
+    () => step(g, { type: "insurance", system: invalid.id }),
+    /home system or/,
   );
   const empty = step(g, { type: "insurance" });
   assert.equal(empty.pending.kind, "reserve");
   g = step(g, { type: "returnCredits", count: 2 });
   assert.equal(g.pending.kind, "insurance");
-  g = step(g, { type: "insurance" });
+  const initialShips = system(g, home.id).ships[0];
+  g = step(g, { type: "insurance", system: home.id });
+  assert.equal(system(g, home.id).ships[0], initialShips + 1);
   assert.equal(g.players[0].reserve, 1);
   assert.equal(g.turn, 1);
 });
@@ -703,7 +711,7 @@ test("genuine 0.14 nested-chain saves migrate at intermediate choices and retain
     });
     assert.equal(g.pending.kind, point.pending);
     assert.equal(g.phase, point.phase);
-    assert.equal(g.engine, "0.16.0");
+    assert.equal(g.engine, "0.17.0");
     assert.ok(g.context);
   }
   const done = restoreGame(oldChain);
@@ -737,7 +745,7 @@ test("every new decision checkpoint survives JSON autosave and continues identic
     sources: { [m.from.id]: 2 },
   });
   checkpoints.push(g);
-  g = step(g, { type: "orderAfter", tech: "mercenaries" });
+  g = step(g, { type: "mercenaries", count: 2 });
   checkpoints.push(g);
   g = setup();
   tech(g, 0, "eminent-domain");

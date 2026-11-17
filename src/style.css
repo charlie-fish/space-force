@@ -339,9 +339,9 @@ small {
 }
 .flexible-inline {
   display: flex;
-  flex-wrap: wrap;
+  flex-direction: column;
   gap: 8px;
-  align-items: center;
+  align-items: flex-start;
 }
 .foresight-inline > strong {
   margin-right: 10px;
@@ -355,9 +355,6 @@ small {
   color: #242034;
   background: #f7e5bf;
   border-color: #735b3f;
-}
-.reserve-recovery .resource-pills {
-  margin: 12px 0;
 }
 .sabotage-targets {
   max-height: 220px;
