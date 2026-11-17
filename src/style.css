@@ -2656,3 +2656,88 @@ svg.poker-chip {
   flex: none;
   pointer-events: none;
 }
+
+/* Event art stays lazy-loaded; decisions use the same compact controls as Techs. */
+.event-card {
+  min-width: 0;
+  width: 100%;
+  overflow-wrap: anywhere;
+  padding: 12px;
+  border: 1px solid #d2c5ad;
+  border-radius: 14px;
+  background: #fffaf0;
+  color: #30283a;
+}
+.event-card > button:first-child {
+  border: 0;
+  padding: 0;
+  background: transparent;
+}
+.event-card img,
+.active-event-art img {
+  width: min(100%, 240px);
+  height: auto;
+  border-radius: 10px;
+}
+.event-card h3 {
+  margin: 10px 0 6px;
+}
+.event-card p {
+  line-height: 1.45;
+}
+.active-event-art {
+  background: transparent;
+  border: 0;
+  padding: 0;
+}
+.active-event-summary {
+  padding: 12px 14px;
+  background: #f2e6ca;
+  border-left: 4px solid #8d561d;
+  border-radius: 6px;
+  color: #33293c;
+}
+.active-event-summary p {
+  margin: 5px 0 0;
+  line-height: 1.4;
+}
+.bid-status {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 18px;
+  padding-left: 20px;
+}
+.migration-grid {
+  display: grid;
+  gap: 12px;
+}
+.event-selection-history {
+  line-height: 1.7;
+}
+.batch-pool {
+  max-width: 42rem;
+}
+.event-choice .commit-row,
+.auction-console .event-pair {
+  margin-top: 18px;
+}
+
+.event-pair {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 240px));
+  gap: 16px;
+}
+.console select {
+  font: inherit;
+  font-size: max(10pt, 1rem);
+  min-height: 44px;
+  padding: 8px;
+  border-radius: 8px;
+  background: #fff9e9;
+  color: #242034;
+}
+@media (max-width: 560px) {
+  .event-pair {
+    grid-template-columns: minmax(0, 240px);
+  }
+}

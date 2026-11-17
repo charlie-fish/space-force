@@ -26,6 +26,7 @@ export interface Planet {
   y: number;
   explore: Explore | null;
   blocked: boolean;
+  exploreFaceUp?: boolean;
 }
 export interface System {
   id: string;
@@ -56,6 +57,8 @@ export interface Player {
   unplaced: number;
   stalledRound: number;
   freeInvestments: Action[];
+  blockedAction?: Action;
+  slotOwners?: Partial<Record<Action, number>>;
 }
 export interface MovePayload {
   sources: Record<string, number>;
@@ -77,6 +80,7 @@ export interface ActionContext {
   actor: number;
   system: string;
   kind: Action;
+  slot?: Action;
   bank: boolean;
   settlementQueue?: SettlementPlacement[];
   replacement?: Record<string, number>;
@@ -88,7 +92,7 @@ export interface ActionContext {
   bankDone?: boolean;
   afterOrderChosen?: boolean;
 }
-export type SettlementResume = "settle" | "genesis" | "rapid";
+export type SettlementResume = "settle" | "genesis" | "rapid" | "event";
 export type ReserveEffect =
   | { kind: "ships"; system: string }
   | { kind: "credits" }
@@ -107,6 +111,7 @@ export interface ReserveRecovery {
   messages: string[];
 }
 export type Continuation =
+  | { kind: "eventRewards" }
   | { kind: "productionDone" }
   | { kind: "actionDone"; actor: number }
   | { kind: "techDone" }
@@ -125,6 +130,10 @@ export type Continuation =
   | { kind: "settlementNext"; system: string; resume: SettlementResume };
 export type Pending =
   | ReserveRecovery
+  | { kind: "bid" }
+  | { kind: "eventSelect" }
+  | { kind: "eventChoice"; event: string }
+  | { kind: "scrambler" }
   | { kind: "filibuster"; remaining: number[] }
   | { kind: "insurance"; after: number; remaining: number }
   | { kind: "eminent" }
@@ -181,9 +190,9 @@ export interface Score {
   total: number;
 }
 export interface Game {
-  schema: 9;
-  engine: "0.19.0";
-  content: "active-player-reserve-checks-6";
+  schema: 10;
+  engine: "0.20.0";
+  content: "full-events-bidding-7";
   config: GameConfig;
   seed: number;
   rng: number;
@@ -198,6 +207,26 @@ export interface Game {
   events: string[];
   revealedEvents: string[];
   eventHistory: string[][];
+  roundLimit: number;
+  activeEvent: {
+    id: string;
+    owner: number;
+    round: number;
+    ally?: number;
+  } | null;
+  auction: {
+    bids: (number | null)[];
+    winner: number | null;
+    paid: number;
+  } | null;
+  eventSelections: {
+    round: number;
+    candidates: string[];
+    selected: string;
+    owner: number;
+    bids: number[];
+  }[];
+  eventFlow: { event: string; queue: number[]; rewards: EventReward[] } | null;
   market: string[];
   finalEconomy: boolean;
   pending: Pending | null;
@@ -237,9 +266,29 @@ export interface GameConfig {
     | "peaceful"
     | "random";
   scenario: "standard" | "five-tech-chain";
-  events?: "simpler" | "foresight-test";
+  events?: "simpler" | "foresight-test" | "full";
+  eventBatch?: "standard" | "batch-1" | "batch-2" | "batch-3";
+}
+export interface EventReward {
+  owner: number;
+  kind: "ships" | "credits";
+  amount: number;
+  system?: string;
+}
+export interface EventChoices {
+  system?: string;
+  planet?: string;
+  action?: Action;
+  player?: number;
+  amount?: number;
+  ships?: Record<string, number>;
+  settlements?: Record<string, number[]>;
+  planets?: string[];
+  tech?: string;
+  skip?: boolean;
 }
 export interface ActionChoices {
+  invest?: boolean;
   bank?: boolean;
   sources?: Record<string, number>;
   credits?: number;
@@ -251,6 +300,10 @@ export interface ActionChoices {
   replacements?: Replacements;
 }
 export type Command =
+  | { type: "bid"; amount: number }
+  | { type: "selectEvent"; event: string }
+  | ({ type: "eventChoice" } & EventChoices)
+  | { type: "scramble"; system?: string; skip?: boolean }
   | {
       type: "completeReserve";
       credits?: number;
@@ -273,6 +326,7 @@ export type Command =
       type: "resolve";
       system: string;
       action: Action;
+      slot?: Action;
       invest?: boolean;
     } & ActionChoices)
   | { type: "orient"; rotation: number }

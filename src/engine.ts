@@ -1,4 +1,21 @@
 import {
+  EVENT_BATCHES,
+  eventIs,
+  planReason,
+  forcedInvestment,
+  investmentAmount,
+  shipDamage,
+  attackTargetAllowed,
+} from "./events.js";
+export {
+  eventIs,
+  planReason,
+  forcedInvestment,
+  investmentAmount,
+  shipDamage,
+  attackTargetAllowed,
+} from "./events.js";
+import {
   ART,
   CARD_MAP,
   DIRECTIONS,
@@ -26,6 +43,7 @@ import type {
   SettlementPlacement,
   MovePayload,
   ReserveEffect,
+  EventChoices,
 } from "./types.js";
 import {
   findOpenSpace,
@@ -57,7 +75,7 @@ export const system = (g: Game, id: string): System => {
   return s;
 };
 export const hasTech = (g: Game, id: number, tech: string) =>
-  player(g, id).techs.includes(`tech.${tech}`);
+  !eventIs(g, "luddite-decree") && player(g, id).techs.includes(`tech.${tech}`);
 const sum = (numbers: number[]) => numbers.reduce((a, b) => a + b, 0);
 const log = (g: Game, text: string, id: number | null = g.turn) => {
   g.log.push({ revision: g.revision + 1, round: g.round, player: id, text });
@@ -100,13 +118,13 @@ export function createGame(
     Object.prototype.hasOwnProperty.call(TECH_PRESETS, config.techPreset) &&
       ["standard", "five-tech-chain"].includes(config.scenario) &&
       (config.events === undefined ||
-        ["simpler", "foresight-test"].includes(config.events)),
+        ["simpler", "foresight-test", "full"].includes(config.events)),
     "Choose a supported test setup.",
   );
   const g: Game = {
-    schema: 9,
-    engine: "0.19.0",
-    content: "active-player-reserve-checks-6",
+    schema: 10,
+    engine: "0.20.0",
+    content: "full-events-bidding-7",
     config: { ...clone(config), events: config.events ?? "simpler" },
     seed: seed >>> 0,
     rng: seed >>> 0,
@@ -121,6 +139,18 @@ export function createGame(
     events: [],
     revealedEvents: [],
     eventHistory: [],
+    roundLimit:
+      (config.eventBatch && config.eventBatch !== "standard"
+        ? 10
+        : count <= 3
+          ? 10
+          : 8) /
+        2 +
+      1,
+    activeEvent: null,
+    auction: null,
+    eventSelections: [],
+    eventFlow: null,
     market: TECH_PRESETS[config.techPreset].techs.slice(),
     finalEconomy: false,
     pending: null,
@@ -238,21 +268,36 @@ export function createGame(
     "blackHole",
     "blackHole",
   ] as Explore[]);
+  const batch =
+    config.eventBatch &&
+    config.eventBatch !== "standard" &&
+    Object.prototype.hasOwnProperty.call(EVENT_BATCHES, config.eventBatch)
+      ? EVENT_BATCHES[config.eventBatch as keyof typeof EVENT_BATCHES]
+      : null;
+  requireRule(
+    config.eventBatch === undefined ||
+      config.eventBatch === "standard" ||
+      batch,
+    "Choose a valid Event batch.",
+  );
+  requireRule(
+    !batch || config.events === "full",
+    "Event test batches require full Events.",
+  );
   g.events = shuffle(
     g,
-    CARDS.filter((c) => c.type === "event").map((c) => c.id),
-  ).slice(0, count <= 3 ? 10 : 8);
+    batch
+      ? batch.cards.map((id) => `event.${id}`)
+      : CARDS.filter((c) => c.type === "event").map((c) => c.id),
+  ).slice(0, batch ? 10 : count <= 3 ? 10 : 8);
   if (config.techPreset === "random")
     g.market = shuffle(
       g,
       IMPLEMENTED_TECHS.filter(
-        (id) => id !== "tech.foresight" || g.config.events === "foresight-test",
+        (id) => id !== "tech.foresight" || g.config.events !== "simpler",
       ),
     ).slice(0, 10);
-  if (
-    g.config.events !== "foresight-test" &&
-    g.market.includes("tech.foresight")
-  ) {
+  if (g.config.events === "simpler" && g.market.includes("tech.foresight")) {
     const legal = IMPLEMENTED_TECHS.filter(
       (id) =>
         !g.market.includes(id) &&
@@ -269,7 +314,7 @@ export function createGame(
   }
   log(
     g,
-    `Local ${TECH_PRESETS[config.techPreset].label} game created. ${g.config.events === "foresight-test" ? "Nonstandard Foresight Tech test: Events count rounds and permit owner peeks; effects and auctions are disabled." : "Simpler Events count rounds; their effects and auction are disabled."}${config.scenario === "five-tech-chain" ? " Designer test scenario: each player starts with the five R01 Techs; their ownership markers come from Reserve." : ""}`,
+    `Local ${TECH_PRESETS[config.techPreset].label} game created. ${g.config.events === "full" ? "Full Events and sealed bidding enabled." : g.config.events !== "simpler" ? "Nonstandard Foresight Tech test: Events count rounds and permit owner peeks; effects and auctions are disabled." : "Simpler Events count rounds; their effects and auction are disabled."}${config.scenario === "five-tech-chain" ? " Designer test scenario: each player starts with the five R01 Techs; their ownership markers come from Reserve." : ""}`,
     null,
   );
   assertInvariants(g);
@@ -302,10 +347,12 @@ export function canMove(
   to: System,
 ): boolean {
   if (from.id === to.id || !from.revealed) return false;
-  if (warp(from) && warp(to)) return true;
+  if (!eventIs(g, "gravitational-lensing") && warp(from) && warp(to))
+    return true;
   const e = edgeBetween(from, to);
-  if (e < 0) return false;
+  if (e < 0) return eventIs(g, "spacetime-rip", id);
   return (
+    eventIs(g, "gravitational-lensing") ||
     hasTech(g, id, "agility") ||
     (!edges(from).includes(e) && !edges(to).includes((e + 3) % 6))
   );
@@ -364,20 +411,26 @@ export function production(g: Game, s: System, id = g.turn): number {
   return sum(
     s.planets.map((p) =>
       !p.blocked && p.owners[id] > 0
-        ? sum(p.owners) >= p.capacity
-          ? 2
-          : 1
+        ? (sum(p.owners) >= p.capacity ? 2 : 1) *
+          (eventIs(g, "el-mayarah", id) &&
+          p.owners.some((n, other) => other !== id && n > 0)
+            ? 2
+            : 1)
         : 0,
     ),
   );
 }
 export function eligibleTokens(g: Game, id = g.turn): System[] {
-  return g.systems.filter((s) => s.tokens[s.tokens.length - 1] === id);
+  return player(g, id).used.length >= 4
+    ? []
+    : g.systems.filter(
+        (s) =>
+          s.tokens.length > 0 &&
+          (eventIs(g, "cyber-attack") || s.tokens[s.tokens.length - 1] === id),
+      );
 }
 export function canPlan(g: Game, s: System, id = g.turn): boolean {
-  return !g.disruptions.some(
-    (d) => d.round === g.round && d.system === s.id && d.owner !== id,
-  );
+  return !planReason(g, s, id);
 }
 export function purchaseReason(
   g: Game,
@@ -386,6 +439,7 @@ export function purchaseReason(
   fullPrice = false,
   value?: number,
   target?: { player: number; tech: string },
+  free = false,
 ): string | null {
   const p = player(g, id);
   const card = CARD_MAP[tech];
@@ -401,7 +455,7 @@ export function purchaseReason(
     )
   )
     return "Another player’s Patents prevents this purchase.";
-  if (tech === "tech.foresight" && g.config.events !== "foresight-test")
+  if (tech === "tech.foresight" && g.config.events === "simpler")
     return "Foresight is excluded with simpler Events.";
   if (tech === "tech.sabotage") {
     if (isFinalRound(g)) return "Sabotage cannot be bought in the last round.";
@@ -424,7 +478,7 @@ export function purchaseReason(
               .map((t) => Number(CARD_MAP[t.tech].cost)),
           )
       : 0;
-  const cost = purchaseCost(g, tech, id, fullPrice, value, minimum);
+  const cost = free ? 0 : purchaseCost(g, tech, id, fullPrice, value, minimum);
   if (p.credits < cost) return `You need ${cost} Credits.`;
   if (p.reserve + cost < 1)
     return "A Reserve rocket is needed to mark ownership.";
@@ -472,7 +526,7 @@ export function sabotageTargets(g: Game, id = g.turn) {
 }
 export function peekEvents(g: Game, id: number): string[] {
   requireRule(
-    hasTech(g, id, "foresight") && g.config.events === "foresight-test",
+    hasTech(g, id, "foresight") && g.config.events !== "simpler",
     "Only a Foresight owner may inspect the upcoming Events.",
   );
   return g.events.slice(0, 2);
@@ -503,8 +557,8 @@ export function attackCost(
           Math.ceil((ships + settlements) / 3),
           Math.ceil((ships + 2 * settlements) / 4),
         )
-      : Math.ceil(ships / 3) + Math.ceil(settlements / 2)
-    : Math.ceil(ships / 2) + settlements;
+      : Math.ceil(ships / shipDamage(g, true)) + Math.ceil(settlements / 2)
+    : Math.ceil(ships / shipDamage(g)) + settlements;
 }
 export function afterActionHooks(
   g: Game,
@@ -538,6 +592,12 @@ function finishPlanning(g: Game) {
   if (owners.length) {
     g.turn = owners[0];
     g.pending = { kind: "filibuster", remaining: owners.slice(1) };
+  } else finishPlanEffects(g);
+}
+function finishPlanEffects(g: Game) {
+  if (eventIs(g, "scrambler")) {
+    g.turn = g.activeEvent!.owner;
+    g.pending = { kind: "scrambler" };
   } else startActions(g);
 }
 function startActions(g: Game) {
@@ -560,6 +620,7 @@ function advanceActions(g: Game, after: number, remaining = g.players.length) {
       return;
     }
     if (
+      (player(g, id).used.length < 4 || historicalTechRules(g)) &&
       hasTech(g, id, "insurance") &&
       (historicalTechRules(g) || g.systems.some((s) => s.tokens.includes(id)))
     ) {
@@ -648,6 +709,17 @@ function useRecoveredReserve(
     amount > 0,
     "Return a Credit to Reserve, or continue with the current result.",
   );
+  if (effect.kind === "settlement") {
+    const s = system(g, effect.system),
+      planet = s.planets.find((p) => p.id === effect.planet)!;
+    if (g.phase === "event" && planet.explore) {
+      // An Event may have paused before placing a Settlement on a Prophecy token.
+      // Resume the placement machinery so its reward precedes the Settlement.
+      g.pending = null;
+      settlePlanet(g, s, planet, amount, "reserve", "event");
+      return;
+    }
+  }
   if (effect.kind === "production") {
     const credits = integer(command.credits ?? effect.credits, 40);
     requireRule(
@@ -797,10 +869,12 @@ function startAction(
 ) {
   // Keep interrupted actions as plain data so nested choices survive autosave.
   const parent = source ? (g.context ?? undefined) : undefined;
+  const slot = !source ? g.context?.slot : undefined;
   g.context = {
     actor: g.turn,
     system: active,
     kind,
+    ...(slot ? { slot } : {}),
     bank: Boolean(choices?.bank),
     ...(source ? { source } : {}),
     ...(parent ? { parent } : {}),
@@ -808,6 +882,11 @@ function startAction(
     beforeHooks: beforeActionHooks(g, kind),
     afterHooks: [],
   };
+  if (forcedInvestment(g, kind)) {
+    g.context.beforeHooks = [];
+    actionBody(g);
+    return;
+  }
   if (source)
     log(
       g,
@@ -903,7 +982,8 @@ function runAfterHooks(g: Game) {
     g.context = c.parent;
     if (g.context.stage === "before") runBeforeHooks(g);
     else runAfterHooks(g);
-  } else if (g.phase === "endgame") nextEndgame(g);
+  } else if (g.phase === "event") finishEvent(g);
+  else if (g.phase === "endgame") nextEndgame(g);
   else advanceActions(g, c.actor);
 }
 function finishAction(g: Game, messages: string[] = []) {
@@ -919,33 +999,17 @@ function finishAction(g: Game, messages: string[] = []) {
     hasTech(g, c.actor, "banking")
   ) {
     c.bankDone = true;
-    if (player(g).reserve > 0) {
-      player(g).reserve--;
-      player(g).invested++;
-      if (c.parent) player(g).freeInvestments.push(c.kind);
-      else player(g).investedActions.push(c.kind);
-      log(g, "Banking: invested one Reserve rocket.");
-    } else {
-      if (
-        pauseReserve(
-          g,
-          c.actor,
-          "Banking",
-          1,
-          1,
-          {
-            kind: "investment",
-            action: c.kind,
-            banking: true,
-            free: Boolean(c.parent),
-          },
-          { kind: "afterHooks" },
-          messages,
-        )
+    if (
+      investRocket(
+        g,
+        c.slot ?? c.kind,
+        true,
+        Boolean(c.source),
+        { kind: "afterHooks" },
+        messages,
       )
-        return;
-      messages.push(reserveWarning("Banking", 1, 0));
-    }
+    )
+      return;
   }
   if (messages.length)
     notice(g, "Reserve limit", messages, { kind: "afterHooks" });
@@ -955,6 +1019,21 @@ function resolveActionBody(g: Game, choices: ActionChoices) {
   const c = g.context!;
   c.stage = "body";
   g.pending = null;
+  if (forcedInvestment(g, c.kind)) {
+    requireRule(
+      choices.invest,
+      "The active Event requires this action to be Invested.",
+    );
+    c.afterHooks = [];
+    c.stage = "after";
+    if (
+      !investRocket(g, c.slot ?? c.kind, false, Boolean(c.source), {
+        kind: "afterHooks",
+      })
+    )
+      runAfterHooks(g);
+    return;
+  }
   const p = player(g),
     s = system(g, c.system);
   if (c.kind === "move")
@@ -1015,22 +1094,491 @@ function resolveActionBody(g: Game, choices: ActionChoices) {
     finishAction(g);
   }
 }
-function revealEvents(g: Game) {
-  g.finalEconomy = g.events.length === 0;
-  g.revealedEvents = g.finalEconomy ? [] : g.events.splice(0, 2);
-  if (g.revealedEvents.length) {
-    g.eventHistory.push(g.revealedEvents.slice());
+/** Invest at commitment time, so Economic Boom also covers Banking and expires after cash-in. */
+function investRocket(
+  g: Game,
+  action: Action,
+  banking: boolean,
+  free: boolean,
+  after: Continuation,
+  messages: string[] = [],
+) {
+  const p = player(g),
+    wanted = investmentAmount(g),
+    amount = Math.min(wanted, p.reserve);
+  const markers = free ? p.freeInvestments : p.investedActions;
+  if (free || !markers.includes(action)) markers.push(action);
+  p.reserve -= amount;
+  p.invested += amount;
+  log(
+    g,
+    `${banking ? "Banking: invested" : "Invested"} ${amount} Reserve rocket${amount === 1 ? "" : "s"} for ${action.toUpperCase()}${wanted === 2 ? " · Economic Boom" : ""}.`,
+  );
+  if (amount < wanted) {
+    if (
+      pauseReserve(
+        g,
+        p.id,
+        banking ? "Banking" : "Investment",
+        wanted,
+        wanted - amount,
+        { kind: "investment", action, banking: false, free },
+        after,
+        messages,
+      )
+    )
+      return true;
+    notice(
+      g,
+      amount ? "Reserve limit" : "Reserve empty",
+      [
+        ...messages,
+        reserveWarning(banking ? "Banking" : "Investment", wanted, amount),
+      ],
+      after,
+    );
+    return true;
+  }
+  return false;
+}
+
+function finishEvent(g: Game) {
+  g.pending = null;
+  g.context = null;
+  g.eventFlow = null;
+  g.phase = "tech";
+  g.turn = g.first;
+}
+function nextEventPlayer(g: Game) {
+  if (g.eventFlow?.queue.length) {
+    g.turn = g.eventFlow.queue.shift()!;
+    g.pending = { kind: "eventChoice", event: g.eventFlow.event };
+  } else finishEvent(g);
+}
+function grantEventRewards(g: Game) {
+  g.pending = null;
+  const flow = g.eventFlow!;
+  while (flow.rewards.length) {
+    const reward = flow.rewards.shift()!,
+      p = player(g, reward.owner),
+      amount = Math.min(p.reserve, reward.amount);
+    p.reserve -= amount;
+    if (reward.kind === "credits") p.credits += amount;
+    else system(g, reward.system!).ships[p.id] += amount;
+    const label = CARD_MAP[flow.event].title;
     log(
       g,
-      `Round tracker: ${g.events.length} Event cards remain. Effects and bids are disabled.`,
+      `${label}: gained ${amount} ${reward.kind === "credits" ? "Credits" : `Ships in ${nameOf(system(g, reward.system!))}`}.`,
+      p.id,
     );
+    if (amount < reward.amount && reserveChecksApply(g, p.id)) {
+      const after: Continuation = { kind: "eventRewards" };
+      if (
+        pauseReserve(
+          g,
+          p.id,
+          label,
+          reward.amount,
+          reward.amount - amount,
+          reward.kind === "credits"
+            ? { kind: "credits" }
+            : { kind: "ships", system: reward.system! },
+          after,
+        )
+      )
+        return;
+      notice(
+        g,
+        "Reserve limit",
+        [reserveWarning(label, reward.amount, amount)],
+        after,
+      );
+      return;
+    }
+  }
+  nextEventPlayer(g);
+}
+export function eventTechOptions(g: Game) {
+  return g.market.filter(
+    (id) =>
+      id !== "tech.sabotage" &&
+      Number(CARD_MAP[id].cost) <= 6 &&
+      !purchaseReason(g, id, g.turn, false, undefined, undefined, true),
+  );
+}
+export function prophecyOptions(g: Game) {
+  return g.systems
+    .filter((s) => s.revealed)
+    .flatMap((s) =>
+      s.planets
+        .filter((p) => !p.blocked && !p.explore && sum(p.owners) === 0)
+        .map((p) => ({ system: s.id, planet: p.id })),
+    );
+}
+function selectEvent(g: Game, event: string) {
+  requireRule(
+    g.pending?.kind === "eventSelect" &&
+      g.auction?.winner === g.turn &&
+      g.revealedEvents.includes(event),
+    "The auction winner must choose one of the two revealed Events.",
+  );
+  g.activeEvent = { id: event, owner: g.turn, round: g.round };
+  g.eventSelections.push({
+    round: g.round,
+    candidates: g.revealedEvents.slice(),
+    selected: event,
+    owner: g.turn,
+    bids: g.auction.bids as number[],
+  });
+  g.eventFlow = { event, queue: [], rewards: [] };
+  g.pending = null;
+  log(
+    g,
+    `Selected ${CARD_MAP[event].title}. Discarded ${CARD_MAP[g.revealedEvents.find((id) => id !== event)!].title}.`,
+  );
+  const key = event.slice(6),
+    order = g.players.map((_, i) => (g.first + i) % g.players.length);
+  if (key === "ragnarok" && g.events.length) {
+    g.roundLimit--;
+    log(
+      g,
+      "Ragnarök: repeat the Event step now. The game is one round shorter.",
+      null,
+    );
+    revealEvents(g);
+    return;
+  }
+  if (key === "communist-decree" || key === "turtling") {
+    for (const p of g.players) {
+      p.reserve += p.credits;
+      p.credits = 0;
+    }
+    log(g, `${CARD_MAP[event].title}: all Credits returned to Reserve.`, null);
+    if (key === "communist-decree") {
+      g.eventFlow.rewards = order.map((owner) => ({
+        owner,
+        kind: "credits",
+        amount: 3,
+      }));
+      grantEventRewards(g);
+      return;
+    }
+  }
+  if (["politics", "turtling", "famine"].includes(key)) {
+    g.eventFlow.queue = order;
+    nextEventPlayer(g);
+    return;
+  }
+  if (key === "technological-singularity") {
+    const extra = shuffle(
+      g,
+      IMPLEMENTED_TECHS.filter((id) => !g.market.includes(id)),
+    ).slice(0, 4);
+    g.market.push(...extra);
+    notice(
+      g,
+      CARD_MAP[event].title,
+      [
+        extra.length
+          ? `Added ${extra.map((id) => CARD_MAP[id].title).join(", ")} to the Tech display.`
+          : "All Techs are already in the display.",
+      ],
+      { kind: "eventRewards" },
+    );
+    return;
+  }
+  if (
+    [
+      "stealth-invasion",
+      "all-your-base",
+      "consolidation",
+      "multicultural-tension",
+      "vorsprung",
+      "migration",
+      "hive-mind",
+      "capital-injection",
+      "galactic-summit",
+      "prophecy",
+      "alliance",
+    ].includes(key)
+  ) {
+    g.pending = { kind: "eventChoice", event };
+    return;
+  }
+  notice(
+    g,
+    CARD_MAP[event].title,
+    [
+      key === "ragnarok"
+        ? "The Event deck is empty; Ragnarök has no effect."
+        : CARD_MAP[event].text,
+    ],
+    { kind: "eventRewards" },
+  );
+}
+function chooseEventEffect(g: Game, choice: EventChoices) {
+  requireRule(
+    g.phase === "event" && g.pending?.kind === "eventChoice" && g.eventFlow,
+    "No Event choice is pending.",
+  );
+  const event = g.pending.event,
+    key = event.slice(6),
+    p = player(g),
+    flow = g.eventFlow;
+  const label = CARD_MAP[event].title;
+  if (choice.skip && !["politics", "famine", "prophecy"].includes(key)) {
+    log(g, `${label}: declined the optional effect.`);
+    nextEventPlayer(g);
+    return;
+  }
+  if (key === "politics") {
+    requireRule(
+      ["move", "settle", "produce", "attack"].includes(choice.action!),
+      "Choose the action slot to block.",
+    );
+    p.blockedAction = choice.action;
+    log(
+      g,
+      `Politics: blocked ${choice.action!.toUpperCase()} for the upcoming round.`,
+    );
+    nextEventPlayer(g);
+    return;
+  }
+  if (key === "famine") {
+    const home = system(g, p.home!),
+      total = sum(home.planets.map((planet) => planet.owners[p.id])),
+      needed = Math.ceil(total / 2),
+      selected = choice.ships ?? {};
+    let count = 0;
+    for (const [id, n] of Object.entries(selected)) {
+      const planet = home.planets.find((planet) => planet.id === id);
+      requireRule(
+        planet && integer(n, 40) <= planet.owners[p.id],
+        "Select your own Settlements in your home system.",
+      );
+      planet.owners[p.id] -= n;
+      count += n;
+    }
+    requireRule(
+      count === needed,
+      `Return exactly ${needed} Settlements to Reserve.`,
+    );
+    p.reserve += count;
+    log(g, `Famine: returned ${count} home-system Settlements to Reserve.`);
+    nextEventPlayer(g);
+    return;
+  }
+  if (key === "stealth-invasion" || key === "turtling") {
+    const selected = choice.ships ?? {},
+      total = sum(Object.values(selected));
+    integer(total, 3);
+    for (const [id, n] of Object.entries(selected)) {
+      const s = system(g, id);
+      integer(n, 3);
+      requireRule(
+        !n || (s.revealed && (key !== "turtling" || id === p.home)),
+        "Choose legal face-up systems for these Ships.",
+      );
+      if (n)
+        flow.rewards.push({
+          owner: p.id,
+          kind: "ships",
+          amount: n,
+          system: id,
+        });
+    }
+  } else if (key === "capital-injection") {
+    flow.rewards.push({
+      owner: p.id,
+      kind: "credits",
+      amount: integer(choice.amount ?? 10, 10),
+    });
+  } else if (key === "hive-mind") {
+    for (const s of g.systems.filter((s) => s.revealed)) {
+      const amount = s.planets.filter(
+        (planet) =>
+          !planet.blocked &&
+          planet.owners[p.id] > 0 &&
+          planet.owners.some((n, id) => id !== p.id && n > 0),
+      ).length;
+      if (amount)
+        flow.rewards.push({ owner: p.id, kind: "ships", amount, system: s.id });
+    }
+  } else if (key === "all-your-base" || key === "consolidation") {
+    const s = system(g, choice.system!);
+    g.pending = null;
+    startAction(g, key === "consolidation" ? "settle" : "move", s.id, event);
+    return;
+  } else if (key === "vorsprung") {
+    requireRule(
+      choice.tech && eventTechOptions(g).includes(choice.tech),
+      "Choose an available Tech with Credit value up to 6; Sabotage cannot be claimed.",
+    );
+    g.pending = null;
+    buy(g, choice.tech, false, undefined, undefined, true);
+    return;
+  } else if (key === "multicultural-tension") {
+    const s = system(g, player(g, (p.id + 1) % g.players.length).home!),
+      planet = s.planets.find((planet) => planet.home)!;
+    if (settlementSpace(g, planet) > 0) {
+      if (p.reserve) {
+        g.pending = null;
+        settlePlanet(g, s, planet, 1, "reserve", "event");
+        return;
+      }
+      if (
+        pauseReserve(
+          g,
+          p.id,
+          label,
+          1,
+          1,
+          { kind: "settlement", system: s.id, planet: planet.id },
+          { kind: "eventRewards" },
+        )
+      )
+        return;
+      notice(g, "Reserve limit", [reserveWarning(label, 1, 0)], {
+        kind: "eventRewards",
+      });
+      return;
+    }
+    log(g, `${label}: no capacity remains on the home planet to your left.`);
+  } else if (key === "galactic-summit") {
+    const target = system(g, choice.system!);
+    requireRule(
+      !target.planets.some((planet) => planet.home),
+      "Choose a non-home system.",
+    );
+    for (const other of g.players) {
+      const total = sum(g.systems.map((s) => s.ships[other.id]));
+      for (const s of g.systems) s.ships[other.id] = 0;
+      target.ships[other.id] = total;
+    }
+    log(
+      g,
+      `${label}: relocated every Ship to ${nameOf(target)}. This is not a MOVE INTO action.`,
+    );
+  } else if (key === "migration") {
+    const target = system(g, choice.system!),
+      placements = choice.settlements ?? {};
+    requireRule(target.revealed, "Choose a face-up system.");
+    requireRule(
+      Object.keys(placements).every((id) =>
+        target.planets.some((planet) => planet.id === id),
+      ),
+      "Choose planets in this system only.",
+    );
+    const totals = g.players.map((other) =>
+      sum(target.planets.map((planet) => planet.owners[other.id])),
+    );
+    const actual = g.players.map(() => 0);
+    for (const planet of target.planets) {
+      const owners = placements[planet.id] ?? planet.owners;
+      requireRule(
+        owners.length === g.players.length,
+        "Preserve every player's Settlement ownership.",
+      );
+      owners.forEach((n, id) => {
+        integer(n, 40);
+        actual[id] += n;
+      });
+      const allowed =
+        planet.capacity +
+        (owners.some((n, id) => n > 0 && hasTech(g, id, "arcologies")) ? 1 : 0);
+      requireRule(
+        sum(owners) <= (planet.blocked ? 0 : allowed) ||
+          owners.every((n, id) => n === planet.owners[id]),
+        "These Settlements exceed planet capacity.",
+      );
+    }
+    requireRule(
+      totals.every((n, id) => n === actual[id]),
+      "Preserve each player's total Settlements in the selected system.",
+    );
+    for (const planet of target.planets)
+      planet.owners = (placements[planet.id] ?? planet.owners).slice();
+    log(
+      g,
+      `${label}: redistributed Settlements within ${nameOf(target)}; ownership totals are unchanged.`,
+    );
+  } else if (key === "prophecy") {
+    const selected = choice.planets ?? [];
+    requireRule(
+      selected.length <= Math.min(3, g.exploreBag.length) &&
+        new Set(selected).size === selected.length,
+      "Choose up to three available Explore tokens.",
+    );
+    const options = prophecyOptions(g),
+      systems = new Set<string>();
+    for (const id of selected) {
+      const option = options.find((o) => o.planet === id);
+      requireRule(
+        option && !systems.has(option.system),
+        "Choose empty planets, each in a different face-up system.",
+      );
+      systems.add(option.system);
+      system(g, option.system).planets.find(
+        (planet) => planet.id === id,
+      )!.explore = g.exploreBag.pop()!;
+    }
+    for (const s of g.systems)
+      for (const planet of s.planets)
+        if (planet.explore) planet.exploreFaceUp = true;
+    log(
+      g,
+      `${label}: added ${selected.length} Explore tokens and turned all board Explore tokens face-up. Apply a token only when its planet is settled.`,
+    );
+  } else if (key === "alliance") {
+    const other = integer(choice.player ?? -1, g.players.length - 1);
+    requireRule(other !== p.id, "Choose another player.");
+    g.activeEvent!.ally = other;
+    log(
+      g,
+      `${label}: ${player(g, other).name} cannot attack ${p.name} until this Event is discarded.`,
+    );
+  } else throw Error("Unknown Event choice.");
+  grantEventRewards(g);
+}
+
+function revealEvents(g: Game) {
+  if (g.activeEvent)
+    log(
+      g,
+      `Discarded previous Event: ${CARD_MAP[g.activeEvent.id].title}.`,
+      null,
+    );
+  g.activeEvent = null;
+  g.eventFlow = null;
+  for (const p of g.players) delete p.blockedAction;
+  g.finalEconomy = g.events.length === 0;
+  g.revealedEvents = g.finalEconomy ? [] : g.events.splice(0, 2);
+  g.phase = "event";
+  g.turn = g.first;
+  g.auction = null;
+  g.pending = null;
+  if (g.revealedEvents.length) {
+    g.eventHistory.push(g.revealedEvents.slice());
+    if (g.config.events === "full") {
+      g.auction = { bids: g.players.map(() => null), winner: null, paid: 0 };
+      g.pending = { kind: "bid" };
+      log(
+        g,
+        "Two Events revealed. Enter sealed bids in player order; only the winner pays. Zero bids are allowed.",
+        null,
+      );
+    } else
+      log(
+        g,
+        `Round tracker: ${g.events.length} Event cards remain. Effects and bids are disabled.`,
+        null,
+      );
   } else
     log(
       g,
       "The Event deck cannot draw another pair. Finish Tech purchases, then score.",
+      null,
     );
-  g.phase = "event";
-  g.turn = g.first;
 }
 function passFirst(g: Game) {
   const next = (g.first + 1) % g.players.length;
@@ -1041,7 +1589,7 @@ export function reinforceAllowance(g: Game, id = g.turn) {
   return hasTech(g, id, "assembly-line") ? 4 : 3;
 }
 export function isFinalRound(g: Game) {
-  return g.finalEconomy || g.round >= (g.players.length <= 3 ? 6 : 5);
+  return g.finalEconomy || g.round >= g.roundLimit;
 }
 export function reinforceCount(g: Game, id = g.turn) {
   return Math.min(player(g, id).reserve, reinforceAllowance(g, id));
@@ -1092,6 +1640,10 @@ function skipEmptyAllocation(g: Game) {
 }
 function finishTechTurn(g: Game) {
   g.pending = null;
+  if (g.phase === "event") {
+    finishEvent(g);
+    return;
+  }
   const next = (g.turn + 1) % g.players.length;
   if (next !== g.first) {
     g.turn = next;
@@ -1111,16 +1663,22 @@ function nextRound(g: Game) {
   g.turn = g.first;
   g.phase = "plan";
   for (const p of g.players) {
-    p.used = [];
+    p.used = p.blockedAction ? [p.blockedAction] : [];
+    p.slotOwners = p.blockedAction ? { [p.blockedAction]: p.id } : {};
     p.investedActions = [];
     p.freeInvestments = [];
-    p.unplaced = 4;
+    p.unplaced = p.blockedAction ? 3 : 4;
   }
   g.disruptions = g.disruptions.filter((d) => d.round >= g.round);
-  log(g, `Round ${g.round}: plan four action tokens each.`, null);
+  log(
+    g,
+    `Round ${g.round}: plan ${g.players.every((p) => p.blockedAction) ? "three" : "four"} action tokens each.`,
+    null,
+  );
 }
 function resumeContinuation(g: Game, after: Continuation) {
-  if (after.kind === "productionDone") finishAction(g);
+  if (after.kind === "eventRewards") grantEventRewards(g);
+  else if (after.kind === "productionDone") finishAction(g);
   else if (after.kind === "insuranceNext")
     advanceActions(g, after.after, after.remaining);
   else if (after.kind === "beforeHooks") runBeforeHooks(g);
@@ -1385,7 +1943,10 @@ function continueSettlement(g: Game, s: System, resume: SettlementResume) {
     runAfterHooks(g);
     return;
   }
-  if (resume === "genesis") {
+  if (resume === "event") {
+    finishEvent(g);
+    return;
+  } else if (resume === "genesis") {
     finishTechTurn(g);
     return;
   }
@@ -1554,11 +2115,15 @@ function place(
     return;
   }
   if (from === "reserve" && actual < Math.min(count, room)) {
+    const label =
+      resume === "event"
+        ? `${CARD_MAP[g.eventFlow!.event].title} Settlement`
+        : "Genesis Settlement";
     if (
       pauseReserve(
         g,
         g.turn,
-        "Genesis Settlement",
+        label,
         Math.min(count, room),
         Math.min(count, room) - actual,
         { kind: "settlement", system: s.id, planet: planet.id },
@@ -1569,7 +2134,7 @@ function place(
     notice(
       g,
       "Reserve limit",
-      [reserveWarning("Genesis Settlement", Math.min(count, room), available)],
+      [reserveWarning(label, Math.min(count, room), available)],
       { kind: "settlementNext", system: s.id, resume },
     );
     return;
@@ -1680,7 +2245,7 @@ function attack(g: Game, s: System, payload: AttackPayload) {
     const target = integer(Number(id), g.players.length - 1);
     const amount = integer(raw, 40);
     requireRule(
-      target !== g.turn || amount === 0,
+      !amount || attackTargetAllowed(g, g.turn, target, "ships"),
       "You cannot attack your own Ships.",
     );
     requireRule(amount <= s.ships[target], "Too many target Ships.");
@@ -1693,7 +2258,9 @@ function attack(g: Game, s: System, payload: AttackPayload) {
       const target = integer(Number(id), g.players.length - 1);
       const amount = integer(raw, 40);
       requireRule(
-        !amount || (target !== g.turn && planet.owners[g.turn] === 0),
+        !amount ||
+          (attackTargetAllowed(g, g.turn, target, "settlements") &&
+            planet.owners[g.turn] === 0),
         "You cannot attack Settlements on a planet you share.",
       );
       requireRule(
@@ -1796,6 +2363,7 @@ function buy(
   fullPrice = false,
   value?: number,
   sabotageTarget?: { player: number; tech: string },
+  free = false,
 ) {
   if (!tech) {
     log(g, "Passed the Tech purchase.");
@@ -1803,8 +2371,8 @@ function buy(
     return;
   }
   requireRule(
-    !purchaseReason(g, tech, g.turn, fullPrice, value, sabotageTarget),
-    purchaseReason(g, tech, g.turn, fullPrice, value, sabotageTarget) ??
+    !purchaseReason(g, tech, g.turn, fullPrice, value, sabotageTarget, free),
+    purchaseReason(g, tech, g.turn, fullPrice, value, sabotageTarget, free) ??
       "Cannot buy Tech.",
   );
   const p = player(g);
@@ -1819,14 +2387,18 @@ function buy(
         ),
       "Choose a legal opposing Tech within the undiscounted Sabotage value.",
     );
-  const cost = purchaseCost(
-    g,
-    tech,
-    g.turn,
-    fullPrice,
-    value,
-    tech === "tech.sabotage" ? Number(CARD_MAP[sabotageTarget!.tech].cost) : 0,
-  );
+  const cost = free
+    ? 0
+    : purchaseCost(
+        g,
+        tech,
+        g.turn,
+        fullPrice,
+        value,
+        tech === "tech.sabotage"
+          ? Number(CARD_MAP[sabotageTarget!.tech].cost)
+          : 0,
+      );
   p.credits -= cost;
   p.reserve += cost - 1;
   p.techs.push(tech);
@@ -1845,7 +2417,7 @@ function buy(
       g,
       "Disruptor has no effect in the last round; its ownership still scores 1 point.",
     );
-  const options = featureOptions(g, tech);
+  const options = eventIs(g, "luddite-decree") ? [] : featureOptions(g, tech);
   if (tech === "tech.genesis" && options.length)
     g.pending = { kind: "genesis" };
   else if (
@@ -1973,7 +2545,50 @@ export function applyCommand(
   command = clone(command);
   const g = clone(state);
   const p = player(g, actor);
-  if (command.type === "completeReserve") {
+  if (command.type === "bid") {
+    requireRule(
+      g.phase === "event" &&
+        g.pending?.kind === "bid" &&
+        g.auction &&
+        g.auction.bids[actor] === null,
+      "No sealed bid is due from this player.",
+    );
+    const amount = integer(command.amount, 40);
+    requireRule(amount <= p.credits, "A bid cannot exceed your Credits.");
+    g.auction.bids[actor] = amount;
+    log(g, "Sealed bid committed.");
+    if (g.auction.bids.every((n) => n !== null)) {
+      const order = g.players.map((_, i) => (g.first + i) % g.players.length);
+      const highest = Math.max(...(g.auction.bids as number[])),
+        winner = order.find((id) => g.auction!.bids[id] === highest)!;
+      g.auction.winner = winner;
+      g.auction.paid = highest;
+      player(g, winner).credits -= highest;
+      player(g, winner).reserve += highest;
+      log(
+        g,
+        `Bids revealed: ${order.map((id) => `${player(g, id).name} ${g.auction!.bids[id]}`).join(" · ")}. ${player(g, winner).name} wins and returns ${highest} Credits to Reserve.`,
+        null,
+      );
+      g.turn = winner;
+      g.pending = { kind: "eventSelect" };
+    } else g.turn = (actor + 1) % g.players.length;
+  } else if (command.type === "selectEvent") selectEvent(g, command.event);
+  else if (command.type === "eventChoice") chooseEventEffect(g, command);
+  else if (command.type === "scramble") {
+    requireRule(
+      g.pending?.kind === "scrambler" && eventIs(g, "scrambler", actor),
+      "No Scrambler decision is pending.",
+    );
+    if (!command.skip) {
+      const target = system(g, command.system!);
+      requireRule(target.tokens.length > 0, "Choose a nonempty stack.");
+      target.tokens.reverse();
+      log(g, `Scrambler: flipped the stack in ${nameOf(target)}.`);
+    } else log(g, "Scrambler: declined to flip a stack.");
+    g.pending = null;
+    startActions(g);
+  } else if (command.type === "completeReserve") {
     requireRule(
       g.pending?.kind === "reserve",
       "No Reserve recovery is pending.",
@@ -2006,7 +2621,10 @@ export function applyCommand(
     );
     const n = integer(command.count, 40);
     requireRule(
-      n > 0 && n <= p.credits,
+      n > 0 &&
+        n <=
+          p.credits -
+            (g.pending?.kind === "bid" ? (g.auction?.bids[actor] ?? 0) : 0),
       "Choose available Credits to return to Reserve.",
     );
     p.credits -= n;
@@ -2038,10 +2656,7 @@ export function applyCommand(
       "Place one token during PLAN.",
     );
     const s = system(g, command.system);
-    requireRule(
-      canPlan(g, s),
-      "Disruptor prevents your token placement here this round.",
-    );
+    requireRule(canPlan(g, s), planReason(g, s) ?? "Placement is blocked.");
     s.tokens.push(p.id);
     p.unplaced--;
     log(g, `Placed an action chip in ${nameOf(s)}.`);
@@ -2085,7 +2700,7 @@ export function applyCommand(
     if (remaining.length) {
       g.turn = remaining[0];
       g.pending = { kind: "filibuster", remaining: remaining.slice(1) };
-    } else startActions(g);
+    } else finishPlanEffects(g);
   } else if (command.type === "insurance") {
     requireRule(
       g.pending?.kind === "insurance",
@@ -2173,54 +2788,37 @@ export function applyCommand(
     );
     const s = system(g, command.system);
     requireRule(
-      s.tokens[s.tokens.length - 1] === actor,
+      eligibleTokens(g, actor).some((o) => o.id === s.id),
       "Only a stack with your chip on top can be resolved.",
+    );
+    const slot = command.slot ?? command.action;
+    requireRule(
+      command.action === slot || eventIs(g, "flexibility", actor),
+      "Only the Flexibility selector may use a different action from the chosen slot.",
+    );
+    requireRule(
+      command.invest || !forcedInvestment(g, command.action),
+      "The active Event requires this action to be Invested.",
     );
     requireRule(
       ["move", "settle", "produce", "attack"].includes(command.action) &&
-        !p.used.includes(command.action),
+        ["move", "settle", "produce", "attack"].includes(slot) &&
+        !p.used.includes(slot),
       "Choose an unused action slot.",
     );
-    s.tokens.pop();
-    p.used.push(command.action);
+    const tokenOwner = s.tokens.pop()!;
+    p.used.push(slot);
+    (p.slotOwners ??= {})[slot] = tokenOwner;
     g.context = {
       actor,
       system: s.id,
       kind: command.action,
+      slot,
       bank: Boolean(command.bank),
     };
     if (command.invest) {
-      const available = p.reserve;
-      p.investedActions.push(command.action);
-      if (p.reserve > 0) {
-        p.reserve--;
-        p.invested++;
-      }
-      log(g, `Invested the ${command.action} slot.`);
-      if (
-        available === 0 &&
-        pauseReserve(
-          g,
-          actor,
-          "Investment",
-          1,
-          1,
-          {
-            kind: "investment",
-            action: command.action,
-            banking: false,
-            free: false,
-          },
-          { kind: "actionDone", actor },
-        )
-      ) {
-        // The used slot stays committed while its missing rocket is recovered.
-      } else if (available === 0)
-        notice(g, "Reserve empty", [reserveWarning("Investment", 1, 0)], {
-          kind: "actionDone",
-          actor,
-        });
-      else advanceActions(g, actor);
+      if (!investRocket(g, slot, false, false, { kind: "actionDone", actor }))
+        advanceActions(g, actor);
     } else startAction(g, command.action, s.id, undefined, command);
   } else if (command.type === "act") {
     requireRule(
@@ -2300,7 +2898,7 @@ export function applyCommand(
     );
   } else if (command.type === "continueEvent") {
     requireRule(
-      g.phase === "event" && !g.pending,
+      g.phase === "event" && !g.pending && (!g.activeEvent || g.finalEconomy),
       "No Event step is awaiting acknowledgement.",
     );
     g.phase = "tech";
@@ -2622,9 +3220,9 @@ export function replayGame(
 
 export function assertInvariants(g: Game) {
   requireRule(
-    g.schema === 9 &&
-      g.engine === "0.19.0" &&
-      g.content === "active-player-reserve-checks-6",
+    g.schema === 10 &&
+      g.engine === "0.20.0" &&
+      g.content === "full-events-bidding-7",
     "Unsupported saved-game version.",
   );
   requireRule(
@@ -2654,18 +3252,25 @@ export function assertInvariants(g: Game) {
     g.config &&
       Object.prototype.hasOwnProperty.call(TECH_PRESETS, g.config.techPreset) &&
       ["standard", "five-tech-chain"].includes(g.config.scenario) &&
-      ["simpler", "foresight-test"].includes(g.config.events ?? ""),
+      ["simpler", "foresight-test", "full"].includes(g.config.events ?? "") &&
+      (g.config.eventBatch === undefined ||
+        g.config.eventBatch === "standard" ||
+        (g.config.events === "full" &&
+          Object.prototype.hasOwnProperty.call(
+            EVENT_BATCHES,
+            g.config.eventBatch,
+          ))),
     "Invalid game setup variables.",
   );
   requireRule(
-    g.market.length === 10 &&
-      new Set(g.market).size === 10 &&
+    g.market.length >= 10 &&
+      g.market.length <= 30 &&
+      new Set(g.market).size === g.market.length &&
       g.market.every((id) => IMPLEMENTED_TECHS.includes(id)),
     "Invalid Tech display.",
   );
   requireRule(
-    g.config.events === "foresight-test" ||
-      !g.market.includes("tech.foresight"),
+    g.config.events !== "simpler" || !g.market.includes("tech.foresight"),
     "Foresight is excluded with simpler Events.",
   );
   requireRule(
@@ -2718,12 +3323,99 @@ export function assertInvariants(g: Game) {
         context.actor === g.turn &&
         ["move", "settle", "produce", "attack"].includes(context.kind) &&
         (context.source === undefined ||
-          IMPLEMENTED_TECHS.includes(context.source)) &&
+          IMPLEMENTED_TECHS.includes(context.source) ||
+          ["event.all-your-base", "event.consolidation"].includes(
+            context.source,
+          )) &&
         g.systems.some((s) => s.id === context!.system),
       "Invalid action chain.",
     );
     context = context.parent ?? null;
   }
+  const eventCard = (id: string) => CARD_MAP[id]?.type === "event";
+  requireRule(
+    Array.isArray(g.events) &&
+      g.events.length % 2 === 0 &&
+      g.events.length <= 10 &&
+      g.events.every(eventCard) &&
+      new Set(g.events).size === g.events.length,
+    "Invalid Event draw pile.",
+  );
+  requireRule(
+    Number.isInteger(g.roundLimit) &&
+      g.roundLimit >= 1 &&
+      g.roundLimit <= 6 &&
+      Array.isArray(g.eventSelections),
+    "Invalid Event history or round limit.",
+  );
+  if (g.activeEvent)
+    requireRule(
+      g.config.events === "full" &&
+        eventCard(g.activeEvent.id) &&
+        Number.isInteger(g.activeEvent.owner) &&
+        g.players[g.activeEvent.owner] &&
+        (g.activeEvent.ally === undefined ||
+          (g.players[g.activeEvent.ally] &&
+            g.activeEvent.ally !== g.activeEvent.owner)),
+      "Invalid active Event.",
+    );
+  if (g.auction) {
+    const a = g.auction;
+    requireRule(
+      g.config.events === "full" &&
+        a.bids.length === g.players.length &&
+        a.bids.every(
+          (n) => n === null || (Number.isInteger(n) && n >= 0 && n <= 40),
+        ) &&
+        Number.isInteger(a.paid) &&
+        a.paid >= 0 &&
+        a.paid <= 40,
+      "Invalid sealed auction.",
+    );
+    if (a.winner !== null)
+      requireRule(
+        a.bids.every((n) => n !== null) &&
+          Number.isInteger(a.winner) &&
+          g.players[a.winner] &&
+          a.paid === a.bids[a.winner] &&
+          a.paid === Math.max(...(a.bids as number[])),
+        "Invalid auction winner.",
+      );
+  }
+  if (g.pending?.kind === "bid")
+    requireRule(
+      g.phase === "event" &&
+        g.auction?.winner === null &&
+        g.auction.bids[g.turn] === null &&
+        g.auction.bids.every(
+          (n, id) => n === null || n <= player(g, id).credits,
+        ),
+      "Invalid private bidding checkpoint.",
+    );
+  if (g.pending?.kind === "eventSelect")
+    requireRule(
+      g.phase === "event" &&
+        g.auction?.winner === g.turn &&
+        g.revealedEvents.length === 2,
+      "Invalid Event selection checkpoint.",
+    );
+  if (g.eventFlow)
+    requireRule(
+      g.phase === "event" &&
+        g.activeEvent?.id === g.eventFlow.event &&
+        g.eventFlow.queue.every((id) => Number.isInteger(id) && g.players[id]),
+      "Invalid Event effect continuation.",
+    );
+  if (g.pending?.kind === "eventChoice")
+    requireRule(
+      g.phase === "event" && g.eventFlow?.event === g.pending.event,
+      "Invalid Event decision checkpoint.",
+    );
+  if (g.pending?.kind === "scrambler")
+    requireRule(
+      g.phase === "plan" && eventIs(g, "scrambler", g.turn),
+      "Invalid Scrambler checkpoint.",
+    );
   integer(g.revision, Number.MAX_SAFE_INTEGER);
   integer(g.legacyRulesUntil, Number.MAX_SAFE_INTEGER);
   integer(g.reserveRecoveryFrom, Number.MAX_SAFE_INTEGER);
@@ -2804,8 +3496,7 @@ export function assertInvariants(g: Game) {
       "Invalid prototype Tech ownership.",
     );
     requireRule(
-      g.config.events === "foresight-test" ||
-        !p.techs.includes("tech.foresight"),
+      g.config.events !== "simpler" || !p.techs.includes("tech.foresight"),
       "Foresight ownership is excluded with simpler Events.",
     );
     integer(p.unplaced, 4);

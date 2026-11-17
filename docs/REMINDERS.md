@@ -6,15 +6,17 @@ Review priorities and next steps: [REVIEW_CHECKLIST.md](REVIEW_CHECKLIST.md).
 
 ## From the designer
 
-- [ ] Review exact interface bindings and provisional player styling during the prototype. P01–P05 and the pre-commit/no-reveal Undo rule are confirmed; these reviews do not block implementation.
+- [ ] Confirm the Earth First/Disruptor conflict ruling. Current provisional behaviour allows the compulsory first home placement, with later placements still blocked. See [0.20](PLAYTEST_CHANGES_0.20.md).
+
+- [ ] Review interface bindings and responsive readability during playtests. Current rocket appearances are approved. P01–P05 and the pre-commit/no-reveal Undo rule are confirmed; these reviews do not block implementation.
 
 - [ ] Share the **Tabletop Simulator Workshop URL** if convenient; the save ZIP has been received and parsed, so this is an optional additional reference.
-- [ ] Share the **rocket STL files**, with the colour mapping for the original designs if it is not clear from the filenames. Include a seventh design if available; the current seventh silhouette is provisional.
+- [x] **Rocket STL handoff closed (17 November 2026).** The designer approves the current rocket appearances; no STL files are required.
 
 ## Project work to retain
 
 - [x] Designer reports all 30 Techs seem to work as intended in local playtesting (17 November 2026). Keep v0.19 as the reviewed baseline; combined Event interactions and formal browser/device checks remain outstanding.
-- [ ] Recommended next coding milestone: all 30 Event effects and the auction in local normal-turn play; retain the simpler variant and test Tech/Event combinations.
+- [x] Implement all 30 Events and sealed bidding in local normal-turn play, retaining simpler Events and adding three disjoint ten-card test scenarios. See [the 0.20 guide](PLAYTEST_CHANGES_0.20.md).
 
 - [x] Build local Board/Techs/Event/Actions and Supply/Player Aid navigation with persistent Reserve/Credits, touch camera/view gestures, and desktop shortcuts.
 - [x] Implement all seven designer playtest batches, including Status history/S, compact legal-chip rings, explicit PLAN confirmation, Explore pauses/redistribution, Reserve warnings, allocation balancing and final-state views. See the [0.15 checklist](PLAYTEST_CHANGES_0.15.md).
@@ -25,7 +27,7 @@ Review priorities and next steps: [REVIEW_CHECKLIST.md](REVIEW_CHECKLIST.md).
 - [x] Apply the [0.17 corrections](PLAYTEST_CHANGES_0.17.md): fixed Mercenaries/Rapid Advance order, Insurance eligibility/home rewards, Flexible economy subheading and Go back warnings, and Sabotage wording/payment.
 - [x] C01–C04 confirmed by the designer; record them with R01–R08 in the rules catalogue.
 - [x] Implement home double-click/double-tap, inline Foresight/Flexible Economy, resumable Reserve-limited effects, Filibuster stack-position labels, Sabotage contrast/X reset/minimum payment and corrected Death Sun groups. See [the 0.16 guide](PLAYTEST_CHANGES_0.16.md).
-- [ ] Complete Event effects/auctions and remaining interactions; test their remote/simultaneous behaviour.
+- [ ] Designer-playtest the three Event batches and combined Tech/Event interactions. Later verify Events/bidding with remote clients and simultaneous mode.
 - [ ] Complete formal browser/phone and accessibility playtests. The designer has tested desktop/narrow-window layouts; a real Safari phone run remains outstanding. See [phone instructions](PHONE_TESTING.md) and [validation](PROTOTYPE.md#validation).
 - [ ] Implement the confirmed five-minute majority-removal core with reviewed phase handling, skipped turns, audit records, and automatic last-player victory.
 
@@ -36,8 +38,8 @@ Review priorities and next steps: [REVIEW_CHECKLIST.md](REVIEW_CHECKLIST.md).
 
 - [x] Prepare web assets and centre anchors from `13th hex.pdf`: **Asimov only for six players, Adams only for seven**. The supplied Asimov artwork replaces the old blank-hex task.
 - [ ] Archive the original `SPACE FORCE.png` binary and prepare an optimised web copy when it is available to the asset pipeline. Its supplied appearance is already recorded as the cover reference.
-- [x] Build seven provisional rocket silhouettes and matching chip faces/rim motifs, anchored to printed suns and matching receiving cutouts. Orange, a twin-pod silhouette, and a triangular rim pattern are provisional for player seven.
-- [ ] Validate silhouette/colour mapping and final chip/board proportions against the forthcoming STLs and device playtests.
+- [x] Build seven approved rocket silhouettes and matching chip faces/rim motifs, anchored to printed suns and matching receiving cutouts. Orange, a twin-pod silhouette and a triangular rim pattern are accepted for player seven.
+- [x] Designer approves current rocket silhouettes; close STL verification. Continue chip/board readability and proportions checks on real devices.
 
 - [x] Implement and test complete local normal-turn Family/simpler-Events games, including all ten Family Techs, scoring, draft Undo, autosave/resume and deterministic record export.
 - [x] Prepare 85 optimised self-hosted PDF assets, including both aid faces, Economy/Planet Nine tokens circular black-hole artwork and the original asteroid-belt/warp feature tokens. Archive of the original inline PNG remains outstanding.
@@ -63,4 +65,4 @@ Review priorities and next steps: [REVIEW_CHECKLIST.md](REVIEW_CHECKLIST.md).
 - [x] Hidden systems exclude unused home designs.
 - [x] R01–R08 resolved and the Prophecy/asteroid-warp edge cases recorded.
 
-The outstanding file handoffs do not block rules-engine development using provisional semantic pieces and the recorded rulings. Check and update this list during subsequent project iterations.
+The outstanding file handoffs do not block rules-engine development using the approved rocket artwork and recorded rulings. Check and update this list during subsequent project iterations.

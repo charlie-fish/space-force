@@ -6,14 +6,14 @@ Updated planning baseline: 15 November 2026. Confirmed items record the designer
 
 | ID | Item | Current position |
 | --- | --- | --- |
-| D01 | TTS save and assets | **Received and inspected:** ZIP containing TS_Save_1560.json and its preview. Deck/model images are external references; embedded Lua is table control. Workshop URL is optional; STL files remain outstanding. See [TTS_REVIEW.md](TTS_REVIEW.md). |
+| D01 | TTS save and assets | **Received and inspected:** ZIP containing TS_Save_1560.json and its preview. Deck/model images are external references; embedded Lua is table control. Workshop URL is optional; the rocket STL action is closed. See [TTS_REVIEW.md](TTS_REVIEW.md). |
 | D02 | First online play mode | **Confirmed:** normal turns first, then the selectable simultaneous-actions variant. Both support up to seven connected players. Recommend the variant at four or more seated players when available; host choice remains explicit. |
 | D03 | Rules baseline and errata | Written rules/cards v1.80 plus the designer's corrections and seven-player extension. **R01–R08 are resolved.** Rapid Advance follows the almanac rather than its card. The original hex versions are now confirmed current. |
-| D04 | Cover and player identity | **Confirmed:** use `SPACE FORCE.png` as the cover reference; give each colour its own rocket silhouette from rulebook p2; use poker-chip action tokens with matching silhouettes and distinct rim patterns. Await rocket STLs. |
+| D04 | Cover and player identity | **Confirmed:** use `SPACE FORCE.png` as the cover reference; give each colour its own rocket silhouette from rulebook p2; use poker-chip action tokens with matching silhouettes and distinct rim patterns. Current rocket appearances approved 17 November 2026; STLs no longer required. |
 | D05 | Boards and chip geometry | **Confirmed:** seven action boards, one per player; chips snap to system suns and board indentations, with matching chip/sun/cutout diameters. |
 | D06 | System assets | **Confirmed:** original twelve hexes are current. Supplied Asimov replaces the blank centre only at six players; Adams is the central seventh home only at seven players. Both are excluded from random pools. |
 | D07 | Maximum player count and supply | **Confirmed:** two to seven players; 40 rockets, four chips, and one action board per player. At seven: 280 rockets, 28 chips, seven boards, plus one shared two-sided aid. |
-| D08 | Seventh-player visual identity | **Provisional design choice:** orange (`#E87522`), a twin-pod rocket silhouette, and a triangular chip-rim pattern. Keep these distinct and replaceable pending design/STL review. |
+| D08 | Seventh-player visual identity | **Designer-approved current appearance:** orange (`#E58A43`), a twin-pod rocket silhouette, and a triangular chip-rim pattern. Keep these distinct and replaceable; STL review is closed. |
 | D09 | Lobby | **Confirmed:** join private rooms, browse/join public waiting games, and create public games. Use [LOBBY.md](LOBBY.md) for the proposed ready/host/cleanup policies. |
 | D10 | First-play teaching | **Required feature:** [TUTORIAL.md](TUTORIAL.md) incorporates the first-play teaching specification; issue #1 is superseded and closed at the designer's request. Implementation remains outstanding. |
 | D11 | Platform practices | **Proposed baseline:** [PLATFORM_REVIEW.md](PLATFORM_REVIEW.md) adds public-room, recovery, security, accessibility, loading, and operational checks. |
@@ -59,7 +59,7 @@ These are launch inputs, not reasons to stop the rules engine or board prototype
 - Active/confirmed newsletter subscribers exported by default, with suppression maintained separately.
 - Current/previous major browsers as the initial compatibility target; older requirements to be named.
 
-The seven-player limit, separate rocket silhouettes, chip face/rim identity, snapping geometry, seven action boards, exclusive Asimov/Adams centre rules, and normal-turn-first delivery order are confirmed requirements. Player seven's specific orange/twin-pod/triangular visual style is a provisional choice.
+The seven-player limit, separate rocket silhouettes, chip face/rim identity, snapping geometry, seven action boards, exclusive Asimov/Adams centre rules, and normal-turn-first delivery order are confirmed requirements. Player seven's implemented orange/twin-pod/triangular identity is accepted.
 
 ## Decision history
 
@@ -113,3 +113,9 @@ The 0.19 feedback places all hex artwork below every component and retains names
 The designer reports that all 30 Techs seem to be working as intended. The initial local Tech playtest is recorded as complete, with v0.19 as the baseline. This is a designer playtest report, not a claim that all Event combinations, remote hidden information or real-phone behaviour have been verified.
 
 The recommended next implementation is all 30 Event effects and the auction in local normal-turn play. Preserve the simpler Events option; full Events make Foresight usable in ordinary play. Real-phone testing can run alongside this work. Authoritative online rooms/recovery follow, then simultaneous/asynchronous modes, private administration and release work. Normal turns still precede the simultaneous variant. The user has asked for next steps; this entry records the recommendation and does not mark those future milestones as implemented or approved for public deployment. See [the current checklist](REVIEW_CHECKLIST.md).
+
+## Events and rocket approval · 17 November 2026
+
+The designer closed the action to provide rocket STLs, approving the current appearances. Version 0.20 implements all 30 Event effects, sealed bids and three selectable ten-card test batches; see [the guide](PLAYTEST_CHANGES_0.20.md). The prior recommendation above is now implemented locally and awaits designer Event playtesting.
+
+Confirmed Event rulings: **E01** Ammo Shortage + Death Sun allows two Ships OR two Settlements per sacrifice; **E02** resolve Filibuster before Scrambler; **E03** Hive Mind grants direct Ships without PRODUCE hooks. Preserve R02 expiry and R03 final-Economy timing. Ordinary full Events include Foresight.

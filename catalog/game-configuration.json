@@ -1,7 +1,7 @@
 {
-  "schema_version": 2,
+  "schema_version": 3,
   "configuration_id": "seven-player-extension-002",
-  "status": "specification_not_implemented",
+  "status": "implemented_local_normal_turns",
   "authority": "Designer request increasing the maximum to seven and specifying Asimov/Adams centre restrictions",
   "printed_rulebook_maximum_players": 6,
   "minimum_players": 2,
@@ -136,16 +136,17 @@
     "seventh_player": {
       "style_id": "player-style.seven",
       "colour_name": "Orange",
-      "colour_hex": "#E87522",
+      "colour_hex": "#E58A43",
       "rocket_shape_id": "rocket.twin-pod",
       "rocket_shape_description": "Two rocket bodies joined by a narrow bridge",
       "chip_rim_pattern_id": "rim.triangles",
-      "status": "provisional_design_choice_pending_art_or_STL_review",
+      "status": "designer_approved_current_appearance",
       "additional_components": {
         "rocket_tokens": 40,
         "action_tokens": 4,
         "action_boards": 1
-      }
+      },
+      "rocket_STL_required": false
     }
   },
   "lobby_configuration_reference": "lobby-configuration.json",

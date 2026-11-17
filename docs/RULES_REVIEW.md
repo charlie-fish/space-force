@@ -16,7 +16,7 @@ A rocket has a role determined by its location: Reserve, Credit, Ship in space, 
 
 Planets hold settlements from multiple players. Ships occupy systems. An action-token stack is ordered, and only its top token is normally available. Each player board has four distinct slots: MOVE INTO, SETTLE, PRODUCE, ATTACK.
 
-Preserve the six distinct rocket silhouettes shown on rulebook p2 and add a seventh distinct shape in a new colour. The provisional seventh-player style is orange with a twin-pod rocket silhouette and a triangular chip-rim pattern. Action tokens are poker chips carrying the player's colour and rocket silhouette, plus a different visible rim/side pattern for each player. Chips snap to the sun at each system's centre, including Asimov and Adams. Each chip is the same diameter as the sun and fits a semicircular receiving indentation on its owner's action board. Keep stack order and rim patterns visible. See [component design](COMPONENT_DESIGN.md).
+Preserve the six distinct rocket silhouettes shown on rulebook p2 and add a seventh distinct shape in a new colour. The accepted seventh-player style is orange with a twin-pod rocket silhouette and a triangular chip-rim pattern. Action tokens are poker chips carrying the player's colour and rocket silhouette, plus a different visible rim/side pattern for each player. Chips snap to the sun at each system's centre, including Asimov and Adams. Each chip is the same diameter as the sun and fits a semicircular receiving indentation on its owner's action board. Keep stack order and rim patterns visible. See [component design](COMPONENT_DESIGN.md).
 
 ## Setup: rulebook pp4–5 plus the seven-player extension
 
@@ -104,7 +104,7 @@ Online implementation needs separate selection, assignment, reveal, and resoluti
 
 ## Designer rulings — R01–R08 resolved
 
-Source: the designer's follow-up message on 13 November 2026, with subsequent confirmed edge cases recorded below. Keep these rulings versioned with the game content; a machine-readable reference is in [rules-clarifications.json](../catalog/rules-clarifications.json). The local engine implements the Family/simpler-Events subset; other card interactions remain specified for later implementation.
+Source: the designer's follow-up message on 13 November 2026, with subsequent confirmed edge cases recorded below. Keep these rulings versioned with the game content; a machine-readable reference is in [rules-clarifications.json](../catalog/rules-clarifications.json). The local engine implements all 30 Techs and all 30 Events with bidding; remote/simultaneous interactions remain later work.
 
 | ID | Confirmed ruling | Reference / implementation consequence |
 | --- | --- | --- |
@@ -137,7 +137,7 @@ Assume the player owns Population Explosion, Government Incentives, Frontier Pio
 - **Exploration commitment:** reveal and orient before Ship quantities; a revealed MOVE INTO requires positive entry through an original legal route. An empty action without a reveal remains permitted by R04.
 - **Black holes:** count destination holes only, one incoming Ship each if available. Le Guin starts with none.
 
-All eight original questions are answered, and the original hex versions are confirmed. Outstanding artwork/STL preparation and file handoffs are tracked in [REMINDERS.md](REMINDERS.md). Further rule interactions can be checked during playtests without reopening settled rulings.
+All eight original questions are answered, and the original hex versions are confirmed. Remaining artwork preparation and file handoffs (rocket STL action closed) are tracked in [REMINDERS.md](REMINDERS.md). Further rule interactions can be checked during playtests without reopening settled rulings.
 
 ## Additional confirmed Tech rulings (17 November 2026)
 
@@ -166,3 +166,13 @@ Death Sun replaces normal attack capacity with up to three opposing Ships OR two
 - Simultaneous token/slot secrecy, parameters chosen after reveal, a dependency declaration switching all participants to ordered resolution, stale submissions, disconnects, and the confirmed pre-commit/no-reveal Undo boundary.
 
 Include the reviewed idle-removal scenarios for every phase, majority thresholds, hidden choices, token-stack unblocking, preservation of the starting setup, and last-player completion. The local normal-turn engine and its rules/DOM/replay checks are implemented; see [current validation](PROTOTYPE.md#validation). Remote-only scenarios remain acceptance requirements for later milestones.
+
+## Confirmed Event interactions · 17 November 2026
+
+| ID | Designer ruling |
+| --- | --- |
+| E01 | With Ammo Shortage and Death Sun, each sacrificed Ship destroys up to **2 opposing Ships OR 2 Settlements**; mixed target types still need separate sacrifices. |
+| E02 | At the end of PLAN, resolve **Filibuster, then Scrambler**. |
+| E03 | **Hive Mind grants direct Ship rewards**, one per shared planet, without PRODUCE action hooks. |
+
+The rocket STL handoff is closed; the current seven rocket appearances are approved. [The 0.20 guide](PLAYTEST_CHANGES_0.20.md) records Event test batches and implementation conventions for review.

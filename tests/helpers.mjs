@@ -11,6 +11,9 @@ import {
   createGame,
   eligibleTokens,
   featureOptions,
+  eventTechOptions,
+  prophecyOptions,
+  forcedInvestment,
   freeSpace,
   legalOrientations,
   player,
@@ -104,10 +107,74 @@ function settleChoices(g, s, spread = false) {
 
 // A deterministic test driver, not a solo player shipped in the application.
 export function botCommand(g) {
-  if (g.phase === "event") return { type: "continueEvent" };
   if (g.phase === "pass") return { type: "nextRound" };
   const p = player(g),
     pending = g.pending;
+  if (pending?.kind === "bid")
+    return {
+      type: "bid",
+      amount: Math.min(p.credits, (g.seed + g.turn + g.round) % 5),
+    };
+  if (pending?.kind === "eventSelect")
+    return {
+      type: "selectEvent",
+      event: g.revealedEvents[(g.seed + g.round + g.eventHistory.length) % 2],
+    };
+  if (pending?.kind === "scrambler")
+    return {
+      type: "scramble",
+      system: g.systems.find((s) => s.tokens.length).id,
+    };
+  if (pending?.kind === "eventChoice") {
+    const key = pending.event.slice(6);
+    if (key === "politics") return { type: "eventChoice", action: "attack" };
+    if (key === "famine") {
+      const home = system(g, p.home),
+        ships = {};
+      let needed = Math.ceil(
+        home.planets.reduce((n, planet) => n + planet.owners[p.id], 0) / 2,
+      );
+      for (const planet of home.planets) {
+        const n = Math.min(needed, planet.owners[p.id]);
+        ships[planet.id] = n;
+        needed -= n;
+      }
+      return { type: "eventChoice", ships };
+    }
+    if (key === "vorsprung") {
+      const tech = eventTechOptions(g)[0];
+      return { type: "eventChoice", ...(tech ? { tech } : { skip: true }) };
+    }
+    if (key === "prophecy") {
+      const seen = new Set();
+      return {
+        type: "eventChoice",
+        planets: prophecyOptions(g)
+          .filter((o) => {
+            if (seen.has(o.system)) return false;
+            seen.add(o.system);
+            return true;
+          })
+          .slice(0, Math.min(3, g.exploreBag.length))
+          .map((o) => o.planet),
+      };
+    }
+    if (key === "galactic-summit") {
+      const target = g.systems.find((s) => !s.planets.some((p) => p.home));
+      return {
+        type: "eventChoice",
+        ...(target ? { system: target.id } : { skip: true }),
+      };
+    }
+    if (key === "alliance")
+      return { type: "eventChoice", player: (g.turn + 1) % g.players.length };
+    return {
+      type: "eventChoice",
+      system: p.home,
+      ships: { [p.home]: Math.min(3, p.reserve) },
+      amount: Math.min(10, p.reserve),
+    };
+  }
   if (pending?.kind === "filibuster") {
     const s = g.systems.find((s) => s.tokens.includes(g.turn));
     return s
@@ -130,7 +197,11 @@ export function botCommand(g) {
     return { type: "move", sources: pending.sources };
   if (pending?.kind === "action") {
     const active = system(g, pending.system);
-    const command = { type: "act", bank: true };
+    const command = {
+      type: "act",
+      bank: true,
+      ...(forcedInvestment(g, pending.action) ? { invest: true } : {}),
+    };
     if (pending.action === "settle")
       Object.assign(command, settleChoices(g, active));
     return command;
@@ -157,6 +228,7 @@ export function botCommand(g) {
     );
     return { type: "feature", ...options[0] };
   }
+  if (g.phase === "event") return { type: "continueEvent" };
   if (g.phase === "homes")
     return {
       type: "home",
@@ -167,7 +239,7 @@ export function botCommand(g) {
       ).id,
     };
   if (g.phase === "plan") {
-    if (p.techs.includes("tech.strategic-stall") && p.stalledRound !== g.round)
+    if (hasTech(g, p.id, "strategic-stall") && p.stalledRound !== g.round)
       return { type: "planPass" };
     // Stack half at home and half at the nearest expansion route.
     const home = system(g, p.home);
@@ -220,7 +292,7 @@ export function botCommand(g) {
           ...settleChoices(g, s, true),
         };
     }
-    if (!p.used.includes("produce")) {
+    if (!p.used.includes("produce") && !forcedInvestment(g, "produce")) {
       const s = options.find((s) => production(g, s) > 0);
       if (s)
         return { type: "resolve", action: "produce", system: s.id, bank: true };

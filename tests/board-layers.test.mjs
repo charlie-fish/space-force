@@ -229,6 +229,8 @@ test("a saved 0.18 black-hole Explore result adopts the new wording while preser
     }),
     saved = structuredClone(modern);
   saved.engine = "0.18.0";
+  saved.schema = 9;
+  saved.content = "active-player-reserve-checks-6";
   saved.pending.messages = saved.pending.messages.map((m) =>
     m.replace("A black hole is added", "A black hole remains"),
   );

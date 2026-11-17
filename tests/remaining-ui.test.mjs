@@ -176,18 +176,17 @@ test("reducing an uncommitted normal allocation clears Soylent replacements that
   h.close();
 });
 
-test("the last-ten display includes Foresight only in the labelled test setup and normal simpler Events replaces it", () => {
+test("full Events include Foresight normally; simpler Events still replace it", () => {
   const h = harness();
   assert.equal(
     h.root.querySelector('[data-setting="tech-preset"]').value,
     "remaining",
   );
   assert.equal(
-    h.root.querySelector('[data-check="foresight-test"]').checked,
-    true,
+    h.root.querySelector('[data-setting="event-mode"]').value,
+    "full",
   );
-  assert.match(h.root.textContent, /Foresight test \(nonstandard\)/);
-  check(h, "foresight-test", false);
+  h.input('[data-setting="event-mode"]', "simpler");
   h.root
     .querySelector("#setup-form")
     .dispatchEvent(
@@ -203,6 +202,7 @@ test("the last-ten display includes Foresight only in the labelled test setup an
       new testGame.window.Event("submit", { bubbles: true, cancelable: true }),
     );
   assert.deepEqual(testGame.app.getGame().market, REMAINING_TECHS);
+  assert.equal(testGame.app.getGame().config.events, "full");
   testGame.close();
 });
 

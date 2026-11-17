@@ -26,10 +26,17 @@ export function restoreGame(value: unknown): Game {
     reserveRecoveryFrom?: number;
     confirmedTechRulesFrom?: number;
   };
-  if (stored.engine === "0.18.0") {
-    const compatible = { ...(value as Game), engine: "0.19.0" as const };
-    assertInvariants(compatible);
-    return replayGame(compatible);
+  if (["0.18.0", "0.19.0"].includes(stored.engine)) {
+    if (
+      stored.schema !== 9 ||
+      stored.content !== "active-player-reserve-checks-6" ||
+      !Array.isArray(stored.commands) ||
+      stored.commands.length !== stored.revision ||
+      !stored.config ||
+      !Array.isArray(stored.players)
+    )
+      throw Error("Invalid legacy save.");
+    return replayGame(value as Game);
   }
   if (stored.engine === "0.14.0") {
     if (

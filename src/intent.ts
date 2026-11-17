@@ -22,7 +22,7 @@ export function intentWarnings(game: Game, command: Command): string[] {
           type: "resolve" as const,
           action: game.context.kind,
           system: game.context.system,
-          invest: false,
+          invest: Boolean(command.invest),
         }
       : command;
   command = effect;
@@ -116,13 +116,21 @@ export function reserveNotice(game: Game) {
 
 /** A draft may not preview an Explore reward or the face of a hidden system/card. */
 export function revealsHiddenInformation(before: Game, after: Game): boolean {
-  if (before.events.length !== after.events.length) return true;
+  if (
+    before.exploreBag.length !== after.exploreBag.length ||
+    before.events.length !== after.events.length ||
+    (before.pending?.kind === "bid" && after.pending?.kind !== "bid")
+  )
+    return true;
   return before.systems.some((old, i) => {
     const next = after.systems[i];
     return (
       (!old.revealed && next.revealed) ||
       old.planets.some(
-        (p, j) => p.explore !== null && next.planets[j]?.explore !== p.explore,
+        (p, j) =>
+          p.explore !== null &&
+          (next.planets[j]?.explore !== p.explore ||
+            (!p.exploreFaceUp && next.planets[j]?.exploreFaceUp)),
       )
     );
   });
