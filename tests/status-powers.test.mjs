@@ -379,7 +379,12 @@ test("Filibuster labels top, bottom and singleton tokens and Sabotage resets X o
     sabotage.querySelector(".quantity-row").textContent,
     /Credit value \(X\)/,
   );
-  assert.equal(sabotage.querySelector("p"), null);
+  const creditRow = sabotage
+    .querySelector('[data-number="sabotage-value"]')
+    .closest(".quantity-row");
+  assert.equal(creditRow.nextElementSibling.dataset.action, "buy");
+  assert.equal(creditRow.nextSibling, creditRow.nextElementSibling);
+
   assert.match(
     h.root.querySelector('[data-tech-id="tech.sabotage"] .tech-body > p')
       .textContent,
