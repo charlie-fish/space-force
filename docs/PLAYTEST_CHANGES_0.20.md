@@ -46,7 +46,7 @@ The designer confirmed E01–E03 during implementation:
 - End PLAN: **Filibuster before Scrambler**.
 - Hive Mind: **direct Ship rewards, no PRODUCE action hooks**.
 
-**Pending designer conflict ruling:** Earth First currently permits the compulsory first home token even if Disruptor targets that home; later placements there remain blocked. This provisional precedence avoids an impossible PLAN turn. The designer has been asked to confirm the intended precedence.
+**Historical 0.20 interpretation, superseded in [0.21](PLAYTEST_CHANGES_0.21.md):** the first-token-only exception below is no longer current. On 20 November the designer confirmed E04: with Earth First active, a Disruptor targeting an opponent home system has no blocking effect throughout the affected PLAN phase.
 
 Other implementation conventions for further review: Flexibility applies at each resolution using an unused receiving slot. Migration is a relocation, preserving ownership and not triggering SETTLE hooks or Explore tokens; unchanged existing Arcologies overflow may remain. Galactic Summit is a relocation, not MOVE INTO: it neither triggers movement Techs nor black-hole entry losses, and a hidden target stays hidden. Spacetime Rip allows non-neighbour systems as destinations; real shared asteroid edges still apply. These conventions do not replace confirmed R01–R08/C01–C04/E01–E03.
 

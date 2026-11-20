@@ -1,12 +1,12 @@
 # Reminders and asset handoffs
 
-Updated 17 November 2026. Keep this checklist current as files and checks arrive. These are persistent project reminders, not scheduled notifications.
+Updated 20 November 2026. Keep this checklist current as files and checks arrive. These are persistent project reminders, not scheduled notifications.
 
 Review priorities and next steps: [REVIEW_CHECKLIST.md](REVIEW_CHECKLIST.md).
 
 ## From the designer
 
-- [ ] Confirm the Earth First/Disruptor conflict ruling. Current provisional behaviour allows the compulsory first home placement, with later placements still blocked. See [0.20](PLAYTEST_CHANGES_0.20.md).
+- [x] E04 confirmed 20 November 2026: Earth First overrides Disruptor when it targets an opponent home system, for the affected PLAN phase. The Tech and placement chooser warn about the ineffective target. See [0.21](PLAYTEST_CHANGES_0.21.md).
 
 - [ ] Review interface bindings and responsive readability during playtests. Current rocket appearances are approved. P01–P05 and the pre-commit/no-reveal Undo rule are confirmed; these reviews do not block implementation.
 
@@ -14,6 +14,8 @@ Review priorities and next steps: [REVIEW_CHECKLIST.md](REVIEW_CHECKLIST.md).
 - [x] **Rocket STL handoff closed (17 November 2026).** The designer approves the current rocket appearances; no STL files are required.
 
 ## Project work to retain
+
+- [x] Apply [0.21](PLAYTEST_CHANGES_0.21.md): Event completion/selector summaries, sorted and committed Vorsprung claims, affordable Sabotage defaults, Turtling defaults, action-specific Event reminders and the five text updates.
 
 - [x] Designer reports all 30 Techs seem to work as intended in local playtesting (17 November 2026). Keep v0.19 as the reviewed baseline; combined Event interactions and formal browser/device checks remain outstanding.
 - [x] Implement all 30 Events and sealed bidding in local normal-turn play, retaining simpler Events and adding three disjoint ten-card test scenarios. See [the 0.20 guide](PLAYTEST_CHANGES_0.20.md).

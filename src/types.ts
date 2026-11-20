@@ -191,7 +191,7 @@ export interface Score {
 }
 export interface Game {
   schema: 10;
-  engine: "0.20.0";
+  engine: "0.21.0";
   content: "full-events-bidding-7";
   config: GameConfig;
   seed: number;

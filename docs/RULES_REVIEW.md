@@ -174,5 +174,6 @@ Include the reviewed idle-removal scenarios for every phase, majority thresholds
 | E01 | With Ammo Shortage and Death Sun, each sacrificed Ship destroys up to **2 opposing Ships OR 2 Settlements**; mixed target types still need separate sacrifices. |
 | E02 | At the end of PLAN, resolve **Filibuster, then Scrambler**. |
 | E03 | **Hive Mind grants direct Ship rewards**, one per shared planet, without PRODUCE action hooks. |
+| E04 | **Earth First overrides Disruptor targeting an opponent home system** for the affected PLAN phase; choosing that target has no blocking effect. The Tech phase must warn the buyer. Confirmed 20 November 2026. |
 
 The rocket STL handoff is closed; the current seven rocket appearances are approved. [The 0.20 guide](PLAYTEST_CHANGES_0.20.md) records Event test batches and implementation conventions for review.

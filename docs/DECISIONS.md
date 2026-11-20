@@ -119,3 +119,9 @@ The recommended next implementation is all 30 Event effects and the auction in l
 The designer closed the action to provide rocket STLs, approving the current appearances. Version 0.20 implements all 30 Event effects, sealed bids and three selectable ten-card test batches; see [the guide](PLAYTEST_CHANGES_0.20.md). The prior recommendation above is now implemented locally and awaits designer Event playtesting.
 
 Confirmed Event rulings: **E01** Ammo Shortage + Death Sun allows two Ships OR two Settlements per sacrifice; **E02** resolve Filibuster before Scrambler; **E03** Hive Mind grants direct Ships without PRODUCE hooks. Preserve R02 expiry and R03 final-Economy timing. Ordinary full Events include Foresight.
+
+## Event playtest corrections · 20 November 2026
+
+E04 is confirmed: with Earth First active, Disruptor targeting an opponent home system has no blocking effect during the affected PLAN phase. Its Tech/placement warnings explain this; the former provisional first-token-only exception is superseded.
+
+The designer requested completed one-off/ongoing-selector summaries, selection and explicit commitment for descending-cost Vorsprung options (including Tech-card double-click), an affordable highest-cost Sabotage default, Turtling's home-Ship default, El Mayarah/Economic Boom/Alliance/Black Cloud/Cyber Attack reminders and five text revisions. These are implemented in [0.21](PLAYTEST_CHANGES_0.21.md).

@@ -1,5 +1,6 @@
 import {
   EVENT_BATCHES,
+  earthFirstOverridesDisruptor,
   eventIs,
   planReason,
   forcedInvestment,
@@ -123,7 +124,7 @@ export function createGame(
   );
   const g: Game = {
     schema: 10,
-    engine: "0.20.0",
+    engine: "0.21.0",
     content: "full-events-bidding-7",
     config: { ...clone(config), events: config.events ?? "simpler" },
     seed: seed >>> 0,
@@ -2523,7 +2524,12 @@ function chooseFeature(
     });
     g.features.planet = true;
   }
-  log(g, `${CARD_MAP[tech].title}: placed its effect in ${nameOf(s)}.`);
+  log(
+    g,
+    tech === "tech.disruptor" && earthFirstOverridesDisruptor(g, g.turn, s.id)
+      ? `Earth First overrides Disruptor in ${nameOf(s)}. This opponent home system will not be blocked.`
+      : `${CARD_MAP[tech].title}: placed its effect in ${nameOf(s)}.`,
+  );
   finishTechTurn(g);
 }
 
@@ -3221,7 +3227,7 @@ export function replayGame(
 export function assertInvariants(g: Game) {
   requireRule(
     g.schema === 10 &&
-      g.engine === "0.20.0" &&
+      g.engine === "0.21.0" &&
       g.content === "full-events-bidding-7",
     "Unsupported saved-game version.",
   );

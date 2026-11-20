@@ -417,9 +417,10 @@ test("Sabotage controls charge chosen Credit value with Research Lab and enforce
   credits(g, 0, 10);
   h.app.setGame(g);
   h.click('[data-view="techs"]');
-  assert.ok(
+  assert.equal(
     h.root.querySelector('[data-action="buy"][data-tech="tech.sabotage"]')
       .disabled,
+    false,
   );
   h.click('[data-action="sabotage-target"][data-tech="tech.arcologies"]');
   assert.equal(

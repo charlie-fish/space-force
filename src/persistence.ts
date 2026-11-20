@@ -26,6 +26,11 @@ export function restoreGame(value: unknown): Game {
     reserveRecoveryFrom?: number;
     confirmedTechRulesFrom?: number;
   };
+  if (stored.engine === "0.20.0") {
+    const compatible = { ...(value as Game), engine: "0.21.0" as const };
+    assertInvariants(compatible);
+    return replayGame(compatible);
+  }
   if (["0.18.0", "0.19.0"].includes(stored.engine)) {
     if (
       stored.schema !== 9 ||

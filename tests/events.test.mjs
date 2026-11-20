@@ -564,7 +564,7 @@ test("active Events persist through the next Investments and are discarded exact
 
 test("0.19 records migrate without enabling Events or changing pieces and remain exactly replayable", () => {
   const g = restoreGame(oldSave);
-  assert.equal(g.engine, "0.20.0");
+  assert.equal(g.engine, "0.21.0");
   assert.equal(g.config.events, "foresight-test");
   assert.equal(g.activeEvent, null);
   for (const key of ["round", "phase", "turn", "systems"])
@@ -715,7 +715,7 @@ test("Event free actions run applicable nested Tech effects once and return to t
   );
 });
 
-test("provisional Earth First/Disruptor precedence permits the compulsory home token and blocks later home placements", () => {
+test("confirmed Earth First overrides Disruptor on an opponent home for the whole PLAN phase", () => {
   const g = setup(3, 7, config),
     home = system(g, g.players[0].home);
   g.activeEvent = { id: "event.earth-first", owner: 1, round: 1 };
@@ -723,6 +723,6 @@ test("provisional Earth First/Disruptor precedence permits the compulsory home t
   assert.equal(canPlan(g, home), true);
   assert.equal(g.systems.filter((s) => canPlan(g, s)).length, 1);
   const next = step(g, { type: "plan", system: home.id });
-  assert.equal(canPlan(next, system(next, home.id), 0), false);
+  assert.equal(canPlan(next, system(next, home.id), 0), true);
   assert.ok(next.systems.some((s) => canPlan(next, s, 0)));
 });

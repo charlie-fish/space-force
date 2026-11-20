@@ -49,6 +49,25 @@ export const EVENT_BATCHES = {
   },
 } as const;
 
+export const ONE_OFF_EVENTS = [
+  "all-your-base",
+  "capital-injection",
+  "communist-decree",
+  "consolidation",
+  "famine",
+  "galactic-summit",
+  "hive-mind",
+  "migration",
+  "multicultural-tension",
+  "politics",
+  "prophecy",
+  "ragnarok",
+  "stealth-invasion",
+  "technological-singularity",
+  "turtling",
+  "vorsprung",
+].map((id) => `event.${id}`);
+
 export const eventIs = (g: Game, event: string, owner?: number): boolean =>
   g.config.events === "full" &&
   g.activeEvent?.id === `event.${event}` &&
@@ -64,6 +83,16 @@ export const investmentAmount = (g: Game) =>
   eventIs(g, "economic-boom") ? 2 : 1;
 export const shipDamage = (g: Game, deathSun = false) =>
   (eventIs(g, "ammo-shortage") ? 1 : 2) + (deathSun ? 1 : 0);
+export function earthFirstOverridesDisruptor(
+  g: Game,
+  owner: number,
+  systemId: string,
+) {
+  return (
+    eventIs(g, "earth-first") &&
+    g.players.some((p) => p.id !== owner && p.home === systemId)
+  );
+}
 export function attackTargetAllowed(
   g: Game,
   attacker: number,
@@ -85,7 +114,7 @@ export function planReason(g: Game, s: System, id = g.turn): string | null {
     eventIs(g, "earth-first") &&
     !g.systems.some((s) => s.tokens.includes(id))
   ) {
-    // Provisional conflict rule: the compulsory first home token takes precedence.
+    // Earth First requires this home placement and overrides an opposing Disruptor.
     if (s.id !== g.players[id].home)
       return "Earth First: your first action token this PLAN phase must go in your home system.";
     return null;
@@ -93,7 +122,11 @@ export function planReason(g: Game, s: System, id = g.turn): string | null {
   if (
     !eventIs(g, "luddite-decree") &&
     g.disruptions.some(
-      (d) => d.round === g.round && d.system === s.id && d.owner !== id,
+      (d) =>
+        d.round === g.round &&
+        d.system === s.id &&
+        d.owner !== id &&
+        !earthFirstOverridesDisruptor(g, d.owner, s.id),
     )
   )
     return "Disruptor blocks your placement here this round.";

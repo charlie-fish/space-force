@@ -1,10 +1,10 @@
 # Designer review, reminders, and next steps
 
-Updated 17 November 2026 · Local prototype v0.20
+Updated 20 November 2026 · Local prototype v0.21
 
-The [local prototype](PROTOTYPE.md) implements normal turns, all 30 Techs, all 30 Events and sealed bidding for two to seven people sharing a device. The designer approved the current rocket appearances and closed the STL action. The initial local Tech playtest is complete. Review the three ten-card Event scenarios and combined interactions next; browser/phone and remote verification remain outstanding. R01–R08, C01–C04 and Event rulings E01–E03 are confirmed.
+The [local prototype](PROTOTYPE.md) implements normal turns, all 30 Techs, all 30 Events and sealed bidding for two to seven people sharing a device. The designer approved the current rocket appearances and closed the STL action. The initial local Tech playtest is complete. Review the three ten-card Event scenarios and combined interactions next; browser/phone and remote verification remain outstanding. R01–R08, C01–C04 and Event rulings E01–E04 are confirmed.
 
-Implemented feedback: [0.20 Events/bidding and batch guide](PLAYTEST_CHANGES_0.20.md), [prototype 0.19 board layers and controls](PLAYTEST_CHANGES_0.19.md), with [0.18](PLAYTEST_CHANGES_0.18.md), [0.17](PLAYTEST_CHANGES_0.17.md), [0.16](PLAYTEST_CHANGES_0.16.md), [0.15](PLAYTEST_CHANGES_0.15.md), [0.14](PLAYTEST_CHANGES_0.14.md), [0.13](PLAYTEST_CHANGES_0.13.md), [0.12](PLAYTEST_CHANGES_0.12.md), [0.11](PLAYTEST_CHANGES_0.11.md), [0.10](PLAYTEST_CHANGES_0.10.md) and [0.9](PLAYTEST_CHANGES_0.9.md) retained as history. The designer has tested desktop/narrow-window layouts; real-phone testing remains outstanding. See [phone instructions](PHONE_TESTING.md).
+Implemented feedback: [0.21 Event guidance and Tech choices](PLAYTEST_CHANGES_0.21.md), [0.20 Events/bidding and batch guide](PLAYTEST_CHANGES_0.20.md), [prototype 0.19 board layers and controls](PLAYTEST_CHANGES_0.19.md), with [0.18](PLAYTEST_CHANGES_0.18.md), [0.17](PLAYTEST_CHANGES_0.17.md), [0.16](PLAYTEST_CHANGES_0.16.md), [0.15](PLAYTEST_CHANGES_0.15.md), [0.14](PLAYTEST_CHANGES_0.14.md), [0.13](PLAYTEST_CHANGES_0.13.md), [0.12](PLAYTEST_CHANGES_0.12.md), [0.11](PLAYTEST_CHANGES_0.11.md), [0.10](PLAYTEST_CHANGES_0.10.md) and [0.9](PLAYTEST_CHANGES_0.9.md) retained as history. The designer has tested desktop/narrow-window layouts; real-phone testing remains outstanding. See [phone instructions](PHONE_TESTING.md).
 
 ## Check next
 
@@ -21,7 +21,7 @@ Implemented feedback: [0.20 Events/bidding and batch guide](PLAYTEST_CHANGES_0.2
 
 ## Outstanding from you
 
-- Confirm the Earth First/Disruptor conflict precedence. The provisional first-home exception is documented in [0.20](PLAYTEST_CHANGES_0.20.md).
+- Earth First/Disruptor precedence is confirmed as E04; no further ruling on that interaction is needed. Review the warnings and updated Tech controls in [0.21](PLAYTEST_CHANGES_0.21.md).
 
 - No rocket STLs are needed; this action is closed.
 - Optional Tabletop Simulator Workshop URL. The supplied TTS ZIP has already been received and inspected; there is no need to resend it.

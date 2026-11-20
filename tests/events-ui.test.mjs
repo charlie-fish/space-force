@@ -249,9 +249,13 @@ test("Famine requires the exact chosen half and Vorsprung leaves the ordinary Te
   assert.equal(h.app.getGame().turn, 1);
   g = effect("vorsprung");
   h.app.setGame(g);
-  const tech = h.root.querySelector('[data-action="claim-event-tech"]');
+  const tech = h.root.querySelector('[data-action="select-event-tech"]');
   assert.ok(tech);
-  h.click(`[data-action="claim-event-tech"][data-tech="${tech.dataset.tech}"]`);
+  h.click(
+    `[data-action="select-event-tech"][data-tech="${tech.dataset.tech}"]`,
+  );
+  assert.equal(h.app.getGame(), g);
+  h.click('[data-action="commit-vorsprung"]');
   assert.ok(h.app.getGame().players[0].techs.includes(tech.dataset.tech));
   h.close();
 });

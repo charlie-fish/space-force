@@ -2741,3 +2741,32 @@ svg.poker-chip {
     grid-template-columns: minmax(0, 240px);
   }
 }
+
+/* Event guidance stays beside the decision it changes. */
+.action-event-reminder,
+.console .earth-first-warning {
+  padding: 10px 12px;
+  background: #e1ebd8;
+  color: #243b28;
+  border-left: 3px solid #587b45;
+  border-radius: 5px;
+}
+.invest-choice {
+  flex-wrap: wrap;
+}
+.investment-event-reminder {
+  flex-basis: 100%;
+  margin-left: 28px;
+  color: #243b28;
+}
+.tech-card.vorsprung-choice {
+  cursor: pointer;
+  touch-action: manipulation;
+}
+.tech-card.event-tech-selected {
+  outline: 3px solid #c5d89c;
+  outline-offset: 2px;
+}
+.vorsprung-selection {
+  padding: 10px 0;
+}

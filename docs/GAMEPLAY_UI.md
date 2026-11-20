@@ -85,3 +85,11 @@ Verify all five views and Reserve/Credits access on phones and desktops. Exercis
 Structured defaults: [interaction-configuration.json](../catalog/interaction-configuration.json). Designer review: [REVIEW_CHECKLIST.md](REVIEW_CHECKLIST.md).
 
 The latest board renderer puts all hex-front/back artwork below all placed components, including shared-edge asteroid tokens in the five-player setup, while names remain on top. Players & supply defaults collapsed at every new required decision; view/draft/Credit edits preserve its current state. Show invested-slot counts next to used slots, with free-action investments separate. Click/tap the system being oriented to preview a clockwise 60-degree rotation; keep both buttons and explicit legal Commit. Drag/pinch/cancel gestures and synthetic clicks must not cause extra rotations. Black-hole Explore text is “A black hole is added to this system. Existing Ships are unharmed.”
+
+## Event and Tech decision guidance · 20 November 2026
+
+The Status Box marks the sixteen one-off Events listed in [0.21](PLAYTEST_CHANGES_0.21.md) as **Effect complete** after their full resolution. Ongoing Events retain their rules and selector's name. Action prompts explain El Mayarah's additional output, Economic Boom's two-rocket Investments, Alliance's named protection, Black Cloud's prohibited Ship targets and Cyber Attack's any-player top tokens.
+
+Vorsprung's Status choices sort by descending printed cost. A click selects a draft; the player must commit. Tech-view card clicks also select, while a double-click/double-tap selects and commits once. Keyboard users retain native card/commit buttons. Sabotage defaults to the highest affordable legal opponent Tech and its full value, preserving explicit changes. Turtling defaults to three home Ships, capped by Reserve, and allows lower/zero allocation.
+
+Earth First's confirmed precedence (E04) makes a Disruptor aimed at an opponent home ineffective for the affected PLAN phase; show a warning on the Tech during buying and in its target chooser. The invested-slot graphic shows two rockets during Economic Boom.

@@ -1,7 +1,7 @@
 {
-  "schema_version": 7,
-  "clarification_id": "designer-clarifications-010",
-  "date": "2026-11-17",
+  "schema_version": 8,
+  "clarification_id": "designer-clarifications-011",
+  "date": "2026-11-20",
   "authority": "Designer follow-up messages in the project conversation, including seven-player extension and playtest corrections",
   "printed_rules_version": "1.80",
   "status": "confirmed_all_techs_and_events_local_normal_turns",
@@ -128,6 +128,15 @@
       "event": "event.hive-mind",
       "direct_ships_per_shared_planet": 1,
       "produce_hooks_trigger": false
+    },
+    "E04": {
+      "status": "confirmed",
+      "confirmed_date": "2026-11-20",
+      "event": "event.earth-first",
+      "tech": "tech.disruptor",
+      "opponent_home_target_has_blocking_effect": false,
+      "duration": "affected_PLAN_phase",
+      "tech_phase_warning_required": true
     }
   },
   "confirmed_r01_example": {
@@ -322,13 +331,17 @@
     "player_summary_investment_count": "invested_action_slots_with_free_action_investments_shown_separately",
     "orientation_click_or_tap": "clockwise_60_degrees_on_the_system_being_oriented",
     "orientation_requires_explicit_commit": true,
-    "black_hole_explore_result": "A black hole is added to this system. Existing Ships are unharmed."
+    "black_hole_explore_result": "A black hole is added to this system. Existing Ships are unharmed.",
+    "event_one_off_summary": "event_name_and_Effect_complete_after_full_resolution",
+    "event_ongoing_summary": "event_text_and_selector_name",
+    "vorsprung_status_order": "cost_descending",
+    "vorsprung_requires_commit": true,
+    "vorsprung_tech_view_double_click": "select_and_commit_once",
+    "sabotage_default_target": "highest_affordable_legal_credit_value",
+    "turtling_default_ships": "min_3_available_reserve_at_home",
+    "economic_boom_investment_icons": 2
   },
   "provisional_event_interpretations": {
-    "earth_first_disruptor": {
-      "status": "awaiting_designer_ruling",
-      "current_implementation": "Earth First permits the first compulsory home token; Disruptor blocks later tokens there"
-    },
     "flexibility": "Each resolution may perform any action in an unused receiving slot",
     "migration": "Relocation preserves ownership totals; no SETTLE hooks or Explore rewards",
     "galactic_summit": "Relocation does not trigger MOVE hooks or black-hole entry losses; hidden targets remain hidden",
