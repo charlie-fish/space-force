@@ -1,6 +1,8 @@
 # Idle-player removal and continued play
 
-Version 0.7 · 15 November 2026 · Specification, not implemented
+Updated 16 November 2026 · Live online policy; specification, not implemented
+
+This confirmed five-minute policy covers **live online play**. Asynchronous play requires [its own policy](ASYNCHRONOUS_PLAY.md), with required-decision deadlines rather than treating ordinary offline waiting as inactivity. Do not apply this five-minute clock to asynchronous games.
 
 The previous specification covered temporary disconnects, reconnection, waiting-room host handover, and pause/save. It did not define a complete in-match removal-and-skip rule. The designer has now requested that progression rule and confirmed **five minutes** and **approval by a majority of the other active players**.
 

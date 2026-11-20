@@ -1,0 +1,22 @@
+{
+  "name": "space-force",
+  "version": "0.21.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vite --host 0.0.0.0 --port 5173",
+    "build": "tsc --noEmit && vite build && node scripts/check-build.mjs",
+    "preview": "vite preview --host 0.0.0.0 --port 4173",
+    "package": "npm run build && node scripts/make-portable.mjs",
+    "test": "tsc -p tsconfig.tests.json && node --test tests/*.test.mjs",
+    "check": "tsc --noEmit"
+  },
+  "engines": {
+    "node": ">=22.12"
+  },
+  "devDependencies": {
+    "jsdom": "^31.0.1",
+    "typescript": "^7.0.2",
+    "vite": "^8.3.8"
+  }
+}

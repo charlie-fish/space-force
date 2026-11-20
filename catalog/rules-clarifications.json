@@ -1,10 +1,10 @@
 {
-  "schema_version": 2,
-  "clarification_id": "designer-clarifications-003",
-  "date": "2026-11-13",
-  "authority": "Designer follow-up messages in the project conversation, including the seven-player extension",
+  "schema_version": 8,
+  "clarification_id": "designer-clarifications-011",
+  "date": "2026-11-20",
+  "authority": "Designer follow-up messages in the project conversation, including seven-player extension and playtest corrections",
   "printed_rules_version": "1.80",
-  "status": "confirmed_specification_not_implemented",
+  "status": "confirmed_all_techs_and_events_local_normal_turns",
   "delivery_order": [
     "normal_turns",
     "selectable_simultaneous_actions_variant"
@@ -28,7 +28,8 @@
     "special_centres_allowed_together": false,
     "adams_is_seventh_home_system": true,
     "player_aid_scope": "shared",
-    "player_aid_sides": 2
+    "player_aid_sides": 2,
+    "le_guin_default_black_holes": 0
   },
   "rulings": {
     "R01": {
@@ -91,12 +92,51 @@
     "R07": {
       "status": "resolved",
       "sabotage_destruction_value_with_research_lab": "undiscounted_value",
-      "sabotage_can_target_sabotage": false
+      "sabotage_can_target_sabotage": false,
+      "sabotage_minimum_actual_payment": "selected_target_full_printed_value_even_with_research_lab",
+      "payment_floor_confirmed_date": "2026-11-17",
+      "sabotage_can_be_discounted_by_research_lab": false,
+      "sabotage_actual_payment": "chosen_credit_value_X_at_least_selected_target_printed_value"
     },
     "R08": {
       "status": "resolved",
       "variant_excluded_preset_card_replacement": "random_legal_tech_of_printed_value_2_or_3",
       "policy_reference": "tech-presets.json#/variant_replacement_policy"
+    },
+    "E01": {
+      "status": "confirmed",
+      "confirmed_date": "2026-11-17",
+      "cards": [
+        "event.ammo-shortage",
+        "tech.death-sun"
+      ],
+      "ships_per_sacrifice": 2,
+      "settlements_per_sacrifice": 2,
+      "one_sacrifice_may_mix_target_types": false
+    },
+    "E02": {
+      "status": "confirmed",
+      "confirmed_date": "2026-11-17",
+      "end_plan_order": [
+        "tech.filibuster",
+        "event.scrambler"
+      ]
+    },
+    "E03": {
+      "status": "confirmed",
+      "confirmed_date": "2026-11-17",
+      "event": "event.hive-mind",
+      "direct_ships_per_shared_planet": 1,
+      "produce_hooks_trigger": false
+    },
+    "E04": {
+      "status": "confirmed",
+      "confirmed_date": "2026-11-20",
+      "event": "event.earth-first",
+      "tech": "tech.disruptor",
+      "opponent_home_target_has_blocking_effect": false,
+      "duration": "affected_PLAN_phase",
+      "tech_phase_warning_required": true
     }
   },
   "confirmed_r01_example": {
@@ -133,8 +173,178 @@
     "asteroid_connectivity": {
       "include_warp_links_in_board_connectivity_check": true,
       "edge_isolation_allowed_if_warps_keep_board_connected": true
+    },
+    "committed_settlements_displaced_by_explore": {
+      "source": "Designer playtest feedback, 2026-11-16",
+      "opponent_reward_first": true,
+      "place_acting_players_committed_settlements_that_still_fit": true,
+      "displaced_amount_requires_new_decision": true,
+      "displaced_amount_options": [
+        "keep_as_ships",
+        "allocate_to_another_eligible_planet_in_system"
+      ],
+      "other_committed_placements_may_be_reduced": false,
+      "supply_limits_still_apply": true
+    },
+    "black_hole_movement": {
+      "loss_only_on_entry": true,
+      "loss_on_departure": false,
+      "incoming_ships_destroyed_per_destination_black_hole": 1,
+      "loss_capped_by_incoming_ships": true,
+      "destroyed_ships_become_owner_credits": true
+    },
+    "unexplored_move_commitment": {
+      "reveal_before_choosing_ship_quantities": true,
+      "orientation_before_ship_quantities": true,
+      "at_least_one_ship_must_enter_after_reveal": true,
+      "original_entry_route_must_remain_legal": true,
+      "empty_unrevealing_action_still_allowed_under_R04": true
+    },
+    "final_round_disruptor": {
+      "source": "Designer playtest feedback, 2026-11-16",
+      "has_placement_effect": false,
+      "requires_placement_decision": false,
+      "ownership_still_scores": true,
+      "explain_on_card": true
+    },
+    "death_sun_attack": {
+      "source": "Designer follow-up, 2026-11-17",
+      "ships_per_sacrifice": 3,
+      "settlements_per_sacrifice": 2,
+      "mix_target_types_within_single_sacrifice": false,
+      "minimum_sacrifices": "ceil(opponent_ships/3) + ceil(opponent_settlements/2)"
+    },
+    "flexible_economy_reserve_recovery": {
+      "source": "Designer follow-up, 2026-11-17",
+      "inline_status_control": "below_owners_reserve_and_credits_during_their_turn",
+      "return_credits_one_at_a_time": true,
+      "allow_recovery_of_unfinished_reserve_limited_effects": true,
+      "keep_completed_gains_and_commitments": true,
+      "repeat_initial_rewards_or_action_hooks": false,
+      "opponent_explore_gift_uses_recipients_own_resources": true,
+      "continue_without_full_completion_allowed": true,
+      "status_subheading": "Flexible economy",
+      "interrupt_contains_reserve_adjustment_controls": false,
+      "interrupt_reminds_owner_to_use_status_control": true,
+      "interrupt_offers_go_back": true,
+      "go_back_may_undo_committed_reveals": false,
+      "accepted_shortfall_leaves_unfunded_remainder_uncompleted": true,
+      "opponent_explore_gift_allows_reserve_recovery_interrupt": false,
+      "reserve_checks_only_for_active_player": true
+    },
+    "foresight_control": {
+      "source": "Designer follow-up, 2026-11-17",
+      "inline_status_control": "above_owners_reserve_and_credits_during_their_turn",
+      "peek_next_events": 2,
+      "separate_tech_powers_menu": false,
+      "publicly_log_peeked_names": false,
+      "subheading_position": "above_peek_button_matching_flexible_economy"
+    },
+    "mercenaries_rapid_advance_order": {
+      "source": "Designer correction, 2026-11-17",
+      "order": [
+        "tech.mercenaries",
+        "tech.rapid-advance"
+      ],
+      "player_may_choose_order": false,
+      "applies_to_free_actions": true
+    },
+    "insurance": {
+      "source": "Designer correction, 2026-11-17",
+      "phase": "actions",
+      "requires_own_action_token_remaining_on_board": true,
+      "trigger": "turn_skipped_because_no_own_token_on_top",
+      "reward_from_reserve": "one_credit_or_ship",
+      "ship_destinations": [
+        "own_home_system_even_without_settlement",
+        "system_with_own_settlement"
+      ]
+    },
+    "non_active_reserve_shortages": {
+      "source": "Designer correction, 2026-11-17",
+      "interrupt_active_player": false,
+      "offer_recipient_reserve_refill": false,
+      "apply_only_available_reserve": true,
+      "gift_fails_automatically_when_reserve_empty": true,
+      "log_failed_gift": true,
+      "continue_acting_players_committed_effect": true
+    },
+    "reserve_dialog_behaviour": {
+      "source": "Designer conditional request and implementation inspection, 2026-11-17",
+      "combine_only_if_functionally_identical": true,
+      "all_three_functionally_identical": false,
+      "retained_names": [
+        "Reserve limit",
+        "Reserve empty",
+        "Reserve shortfall"
+      ],
+      "limit_and_empty": "confirm_reduced_or_zero_result",
+      "shortfall": "also_allows_flexible_economy_owner_to_return_to_status_box_and_resume_unfinished_effect"
     }
   },
-  "supersedes": "designer-clarifications-002",
-  "configuration_reference": "game-configuration.json"
+  "supersedes": "designer-clarifications-008",
+  "configuration_reference": "game-configuration.json",
+  "confirmed_implementation_interpretations": {
+    "C01": {
+      "status": "confirmed",
+      "confirmed_date": "2026-11-17",
+      "tech": "tech.gravity-drive",
+      "passengers_share_carrier_origin_and_legal_route": true,
+      "transport_before_destination_losses": true,
+      "carrier_loss_causes_extra_passenger_loss": false,
+      "incoming_losses_per_destination_hole": 1,
+      "losses_capped_by_all_incoming_carriers_and_passengers": true,
+      "casualty_ownership_chosen_by": "moving_player"
+    },
+    "C02": {
+      "status": "confirmed",
+      "confirmed_date": "2026-11-17",
+      "tech": "tech.eminent-domain",
+      "owner_order": "current_player_order_starting_first_player",
+      "before_scoring": true,
+      "banking_applies_outside_actions": false,
+      "applicable_R01_hooks_apply": true
+    },
+    "C03": {
+      "status": "confirmed",
+      "confirmed_date": "2026-11-17",
+      "tech": "tech.soylent-green",
+      "recheck_fullness_before_each_placement_and_after_explore": true,
+      "exclude_blocked_destroyed_planets": true,
+      "fullness": "settlements_at_least_printed_capacity"
+    },
+    "C04": {
+      "status": "confirmed",
+      "confirmed_date": "2026-11-17",
+      "tech": "tech.sabotage",
+      "legal_opponent_non_sabotage_target_required": true,
+      "targetless_zero_cost_ownership_allowed": false,
+      "remove_ongoing_ownership_effects": true,
+      "undo_earlier_placements_conversions_or_arcologies_overflow": false
+    }
+  },
+  "presentation": {
+    "source": "Designer playtest feedback, 2026-11-17",
+    "system_hex_artwork_layer": "below_all_placed_components",
+    "system_name_layer": "above_other_board_graphics",
+    "player_summary_default": "collapsed_on_each_required_decision",
+    "player_summary_investment_count": "invested_action_slots_with_free_action_investments_shown_separately",
+    "orientation_click_or_tap": "clockwise_60_degrees_on_the_system_being_oriented",
+    "orientation_requires_explicit_commit": true,
+    "black_hole_explore_result": "A black hole is added to this system. Existing Ships are unharmed.",
+    "event_one_off_summary": "event_name_and_Effect_complete_after_full_resolution",
+    "event_ongoing_summary": "event_text_and_selector_name",
+    "vorsprung_status_order": "cost_descending",
+    "vorsprung_requires_commit": true,
+    "vorsprung_tech_view_double_click": "select_and_commit_once",
+    "sabotage_default_target": "highest_affordable_legal_credit_value",
+    "turtling_default_ships": "min_3_available_reserve_at_home",
+    "economic_boom_investment_icons": 2
+  },
+  "provisional_event_interpretations": {
+    "flexibility": "Each resolution may perform any action in an unused receiving slot",
+    "migration": "Relocation preserves ownership totals; no SETTLE hooks or Explore rewards",
+    "galactic_summit": "Relocation does not trigger MOVE hooks or black-hole entry losses; hidden targets remain hidden",
+    "spacetime_rip": "Non-neighbour systems become adjacent; real shared asteroid edges still apply"
+  }
 }

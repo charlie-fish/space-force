@@ -9,7 +9,7 @@ system.heinlein,Heinlein,pdf.cardboard,4,left,false,2;2;2;1;1;1,0,1,left vertica
 system.harrison,Harrison,pdf.cardboard,4,right,false,2;2;2;2,0,0,left vertical edge,visually_transcribed_pending_second_check,4,hidden_non_home_pool,designer_confirmed_latest,2;3;4;5;6;7,false
 system.jemisin,Jemisin,pdf.cardboard,5,left,false,3;2;2;1,0,0,left vertical edge,visually_transcribed_pending_second_check,4,hidden_non_home_pool,designer_confirmed_latest,2;3;4;5;6;7,false
 system.willis,Willis,pdf.cardboard,5,right,false,3;3;1;1,0,0,left vertical edge,visually_transcribed_pending_second_check,4,hidden_non_home_pool,designer_confirmed_latest,2;3;4;5;6;7,false
-system.le-guin,Le Guin,pdf.cardboard,6,left,false,2;2;1;1;1,0,0,left vertical edge,visually_transcribed_pending_second_check,5,hidden_non_home_pool,designer_confirmed_latest,2;3;4;5;6;7,false
-system.lem,Lem,pdf.cardboard,6,right,false,2;2;1;1;1,1,1,right vertical edge,visually_transcribed_pending_second_check,5,hidden_non_home_pool,designer_confirmed_latest,2;3;4;5;6;7,false
+system.le-guin,Le Guin,pdf.cardboard,6,left,false,2;2;1;1,0,0,left vertical edge,visually_checked_against_source,4,hidden_non_home_pool,designer_confirmed_latest,2;3;4;5;6;7,false
+system.lem,Lem,pdf.cardboard,6,right,false,2;2;1;1;1,1,1,left and right vertical edges,visually_checked_against_source,5,hidden_non_home_pool,designer_confirmed_latest,2;3;4;5;6;7,false
 system.adams,Adams,pdf.centre-hexes,1,left,true,6;2;2;2;2,1,0,,visually_transcribed_pending_second_check,5,seven_player_centre_home_only,designer_supplied_current,7,true
 system.asimov,Asimov,pdf.centre-hexes,1,right,false,,0,0,,visually_transcribed_pending_second_check,0,six_player_centre_only,designer_supplied_current,6,true

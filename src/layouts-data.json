@@ -1,0 +1,391 @@
+{
+  "schemaVersion": 1,
+  "source": "Space Force rules v1.80.pdf, page 4; corroborated by SpaceForce Player aid v1.50.pdf, page 3",
+  "coordinateSystem": "pointy-top axial q,r with screen y increasing downwards",
+  "displayTransform": "The source diagrams use flat-top hexes. These coordinates preserve their axial grid and rotate the entire displayed map 30 degrees counterclockwise into pointy-top orientation. There is no reflection. The origin is arbitrary for two-to-four-player layouts and the central hidden/system cell for five-to-seven-player layouts.",
+  "centerFormula": {
+    "x": "sqrt(3) * radius * (q + r / 2)",
+    "y": "1.5 * radius * r"
+  },
+  "neighborDirections": [
+    [
+      1,
+      0
+    ],
+    [
+      0,
+      1
+    ],
+    [
+      -1,
+      1
+    ],
+    [
+      -1,
+      0
+    ],
+    [
+      0,
+      -1
+    ],
+    [
+      1,
+      -1
+    ]
+  ],
+  "edgeDirectionConvention": "Edge 0 faces east; edges 1 through 5 continue clockwise in 60-degree increments. A neighbor shares the opposite edge (edge+3)%6.",
+  "setupAsteroidConvention": "The five-player extra asteroid token lies on the shared edge between original home cells (0,-1) and (1,-1): edge 0 on (0,-1), equivalently edge 3 on (1,-1). The equivalent source-diagram edge is between its top home and upper-right home.",
+  "centreConvention": "Six/seven-player layouts use the same six hidden ring cells and six original outer homes. Asimov is the face-up non-home center at six; Adams is the face-up seventh home at seven. Neither special tile enters the random pools.",
+  "layouts": [
+    {
+      "players": 2,
+      "cells": [
+        {
+          "q": 0,
+          "r": 0,
+          "role": "home"
+        },
+        {
+          "q": 1,
+          "r": 1,
+          "role": "home"
+        },
+        {
+          "q": 1,
+          "r": 0,
+          "role": "hidden"
+        },
+        {
+          "q": 0,
+          "r": 1,
+          "role": "hidden"
+        }
+      ],
+      "setupAsteroid": null,
+      "centreSystemId": null,
+      "centreIsHome": false,
+      "expectedSystemCount": 4,
+      "expectedHomeCount": 2,
+      "sourcePdfPage": 4,
+      "sourceDiagramPlayers": 2
+    },
+    {
+      "players": 3,
+      "cells": [
+        {
+          "q": 0,
+          "r": 0,
+          "role": "home"
+        },
+        {
+          "q": 0,
+          "r": 2,
+          "role": "home"
+        },
+        {
+          "q": 2,
+          "r": 0,
+          "role": "home"
+        },
+        {
+          "q": 0,
+          "r": 1,
+          "role": "hidden"
+        },
+        {
+          "q": 1,
+          "r": 0,
+          "role": "hidden"
+        },
+        {
+          "q": 1,
+          "r": 1,
+          "role": "hidden"
+        }
+      ],
+      "setupAsteroid": null,
+      "centreSystemId": null,
+      "centreIsHome": false,
+      "expectedSystemCount": 6,
+      "expectedHomeCount": 3,
+      "sourcePdfPage": 4,
+      "sourceDiagramPlayers": 3
+    },
+    {
+      "players": 4,
+      "cells": [
+        {
+          "q": 0,
+          "r": 0,
+          "role": "home"
+        },
+        {
+          "q": 0,
+          "r": 2,
+          "role": "home"
+        },
+        {
+          "q": 2,
+          "r": -1,
+          "role": "home"
+        },
+        {
+          "q": 2,
+          "r": 1,
+          "role": "home"
+        },
+        {
+          "q": 0,
+          "r": 1,
+          "role": "hidden"
+        },
+        {
+          "q": 1,
+          "r": 0,
+          "role": "hidden"
+        },
+        {
+          "q": 1,
+          "r": 1,
+          "role": "hidden"
+        },
+        {
+          "q": 2,
+          "r": 0,
+          "role": "hidden"
+        }
+      ],
+      "setupAsteroid": null,
+      "centreSystemId": null,
+      "centreIsHome": false,
+      "expectedSystemCount": 8,
+      "expectedHomeCount": 4,
+      "sourcePdfPage": 4,
+      "sourceDiagramPlayers": 4
+    },
+    {
+      "players": 5,
+      "cells": [
+        {
+          "q": -2,
+          "r": 1,
+          "role": "home"
+        },
+        {
+          "q": 0,
+          "r": -1,
+          "role": "home"
+        },
+        {
+          "q": 1,
+          "r": -1,
+          "role": "home"
+        },
+        {
+          "q": -1,
+          "r": 2,
+          "role": "home"
+        },
+        {
+          "q": 1,
+          "r": 1,
+          "role": "home"
+        },
+        {
+          "q": -1,
+          "r": 0,
+          "role": "hidden"
+        },
+        {
+          "q": -1,
+          "r": 1,
+          "role": "hidden"
+        },
+        {
+          "q": 0,
+          "r": 0,
+          "role": "hidden"
+        },
+        {
+          "q": 0,
+          "r": 1,
+          "role": "hidden"
+        },
+        {
+          "q": 1,
+          "r": 0,
+          "role": "hidden"
+        }
+      ],
+      "setupAsteroid": {
+        "q": 0,
+        "r": -1,
+        "edge": 0
+      },
+      "centreSystemId": null,
+      "centreIsHome": false,
+      "expectedSystemCount": 10,
+      "expectedHomeCount": 5,
+      "sourcePdfPage": 4,
+      "sourceDiagramPlayers": 5
+    },
+    {
+      "players": 6,
+      "cells": [
+        {
+          "q": 2,
+          "r": -1,
+          "role": "home"
+        },
+        {
+          "q": 1,
+          "r": -2,
+          "role": "home"
+        },
+        {
+          "q": -1,
+          "r": -1,
+          "role": "home"
+        },
+        {
+          "q": -2,
+          "r": 1,
+          "role": "home"
+        },
+        {
+          "q": -1,
+          "r": 2,
+          "role": "home"
+        },
+        {
+          "q": 1,
+          "r": 1,
+          "role": "home"
+        },
+        {
+          "q": 1,
+          "r": 0,
+          "role": "hidden"
+        },
+        {
+          "q": 0,
+          "r": 1,
+          "role": "hidden"
+        },
+        {
+          "q": -1,
+          "r": 1,
+          "role": "hidden"
+        },
+        {
+          "q": -1,
+          "r": 0,
+          "role": "hidden"
+        },
+        {
+          "q": 0,
+          "r": -1,
+          "role": "hidden"
+        },
+        {
+          "q": 1,
+          "r": -1,
+          "role": "hidden"
+        },
+        {
+          "q": 0,
+          "r": 0,
+          "role": "centre",
+          "systemId": "system.asimov",
+          "home": false
+        }
+      ],
+      "setupAsteroid": null,
+      "centreSystemId": "system.asimov",
+      "centreIsHome": false,
+      "expectedSystemCount": 13,
+      "expectedHomeCount": 6,
+      "sourcePdfPage": 4,
+      "sourceDiagramPlayers": 6
+    },
+    {
+      "players": 7,
+      "cells": [
+        {
+          "q": 2,
+          "r": -1,
+          "role": "home"
+        },
+        {
+          "q": 1,
+          "r": -2,
+          "role": "home"
+        },
+        {
+          "q": -1,
+          "r": -1,
+          "role": "home"
+        },
+        {
+          "q": -2,
+          "r": 1,
+          "role": "home"
+        },
+        {
+          "q": -1,
+          "r": 2,
+          "role": "home"
+        },
+        {
+          "q": 1,
+          "r": 1,
+          "role": "home"
+        },
+        {
+          "q": 1,
+          "r": 0,
+          "role": "hidden"
+        },
+        {
+          "q": 0,
+          "r": 1,
+          "role": "hidden"
+        },
+        {
+          "q": -1,
+          "r": 1,
+          "role": "hidden"
+        },
+        {
+          "q": -1,
+          "r": 0,
+          "role": "hidden"
+        },
+        {
+          "q": 0,
+          "r": -1,
+          "role": "hidden"
+        },
+        {
+          "q": 1,
+          "r": -1,
+          "role": "hidden"
+        },
+        {
+          "q": 0,
+          "r": 0,
+          "role": "centre",
+          "systemId": "system.adams",
+          "home": true
+        }
+      ],
+      "setupAsteroid": null,
+      "centreSystemId": "system.adams",
+      "centreIsHome": true,
+      "expectedSystemCount": 13,
+      "expectedHomeCount": 7,
+      "sourcePdfPage": 4,
+      "sourceDiagramPlayers": 6
+    }
+  ]
+}

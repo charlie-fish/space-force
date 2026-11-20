@@ -14,7 +14,7 @@ Inventory updated on 15 November 2026. Page references below are **one-based PDF
 | SPACE FORCE.png | — | Front-cover graphic supplied in chat; visual reference for branding, colours, and illustrated style. The original binary has not been archived in this checkout. |
 | [Rules video](https://www.youtube.com/watch?v=b5LjEQc_m4Y) | — | Supplementary explanation. Automated access was throttled during discovery; its contents have not been verified. The rulebook itself warns the video may predate refinements. |
 | Re__Space_Force_TTS_changes.zip | — | Received: save JSON and 256×256 preview, with linked artwork/models and embedded table-control Lua. See [TTS_REVIEW.md](TTS_REVIEW.md). |
-| Rocket STL files | — | Awaiting the designer's files; use to verify the six original shapes, with a seventh distinct shape now also required. |
+| Rocket STL files | Not required | Handoff closed 17 November 2026: designer approves the current seven SVG rocket appearances. |
 
 The [source register](../catalog/sources.csv) records sizes and SHA-256 checksums for the PDFs so later replacements can be recognised precisely. Checksums identify files; they do not make the catalogue an approved production ruleset.
 
@@ -46,7 +46,7 @@ Card IDs, printed titles, canonical titles, costs, timing, and rulebook referenc
 
 Banks, Attwood, Butler, Bujold, Clarke, and Simak are the six original home designs. The six other original tiles are non-home systems. **Designer correction: unused home designs are excluded from the hidden pool.** Choose hidden tiles only from the six original non-home designs. The special centre tiles below are excluded from all random pools.
 
-[systems.csv](../catalog/systems.csv) includes all **fourteen supplied designs**. **The designer has confirmed that the original twelve system hexes are the correct latest versions.** That version check is complete. Their visually transcribed capacities/features and the new hexes still need routine geometry/transcription verification when converted into engine data; tile coordinates, planet anchors, edge indices, and rotations remain to be encoded.
+[systems.csv](../catalog/systems.csv) includes all **fourteen supplied designs**. **The designer has confirmed that the original twelve system hexes are the correct latest versions.** That version check is complete. Tile layouts, planet/sun anchors, edge indices and rotations are now encoded in the [prototype data](PROTOTYPE.md#architecture-and-assets), extracted from PDF bounding boxes and checked against the source. Review their appearance during device playtests. Le Guin has four planets (2/2/1/1), and Lem has both left and right asteroid belts; these correct earlier catalogue transcriptions.
 
 ## Additional centre hexes: 13th hex.pdf
 
@@ -75,15 +75,19 @@ There are seven individual action boards and **one shared two-sided player aid**
 
 The extra copies reuse existing art. They are quantities in content data, not three new designs. The large additional black-hole feature is separate from the two round black-hole Explore tokens.
 
+## Implemented prototype assets
+
+The [art manifest](../src/art-data.json) maps stable component IDs to 85 optimised self-hosted WebP assets, dimensions, source pages and normalised anchors. The [extraction script](../scripts/prepare-assets.py) regenerates these from the supplied PDFs. Both aid faces are included once. The manifest also contains all 142 printed settlement-circle centres, the first-player token with Economy-stage rectangles, the Planet Nine token with its single settlement anchor, the circular black-hole Explore image, and the additional asteroid-belt/warp tokens from cardboard page 7. The belt image is vertical (64×322); rotate it by the chosen edge angle. The warp is landscape (240×182), with a semantic open-space anchor calculated at render time. Printed elongated-hole image layers are excluded from Clarke/Lem/Adams exports so the interface can place this same circular art for every hole type. Only artwork changes; semantic hole counts stay authoritative. Le Guin has no default hole. The matching cover illustration is extracted from rulebook page 1; the separately supplied PNG original remains to be archived. Full card artwork/reference data is available, while only the ten Family Tech effects are playable in this build.
+
 ## Artwork pipeline
 
 Retain original PDFs and future source art in a controlled asset archive. Record provenance and a source checksum. Extract individual pieces with stable IDs; optimise web copies separately. Use an asset manifest to map a piece ID to its current artwork, attribution, dimensions, and fallback image. Keep planet capacities, edge barriers, and hit areas in semantic game data rather than trying to read them from the images at runtime.
 
 Cards must have readable semantic text in the interface. Images can show the original design, but must not be the only representation of rules, costs, or available actions. New images should be replaceable without editing the engine or changing saved-game IDs. Responsive image sizes and lazy loading will keep the PDFs' print resolution out of the initial download.
 
-The supplied front cover gives a visual direction of dark violet space, muted orange, sage green, cream, retro lettering, and textured illustration. Keep it as a replaceable cover asset; create optimised web copies when its source binary is archived. Player pieces use the six original silhouettes from rulebook page 2 plus a new seventh silhouette, checked against the forthcoming STLs where available.
+The supplied front cover gives a visual direction of dark violet space, muted orange, sage green, cream, retro lettering, and textured illustration. Keep it as a replaceable cover asset; create optimised web copies when its source binary is archived. Player pieces use the six original silhouettes from rulebook page 2 plus a new seventh silhouette, approved in their current SVG form by the designer.
 
-The supplied sheets do not provide a standalone complete web asset set for all rocket/action pieces or all component backs. Provisional SVG rockets must provide seven different silhouettes; a single recoloured rocket would not satisfy the accessibility requirement. Player seven provisionally uses orange, a twin-pod silhouette, and a triangular chip-rim pattern. Poker-chip faces and visible rim patterns must remain distinct in greyscale and when stacked. Neutral backs are suitable provisional assets. Preserve the compatible branding in the player aid as well.
+The supplied sheets do not provide a standalone complete web asset set for all rocket/action pieces or all component backs. The accepted SVG rockets provide seven different silhouettes; a single recoloured rocket would not satisfy the accessibility requirement. Player seven uses orange, a twin-pod silhouette, and a triangular chip-rim pattern. Poker-chip faces and visible rim patterns must remain distinct in greyscale and when stacked. Neutral backs are suitable provisional assets. Preserve the compatible branding in the player aid as well.
 
 The cover is available as a visual reference in the conversation, but has no local original-file checksum yet. Do not fabricate file metadata or claim the PNG is committed. The source register records that distinction.
 
@@ -93,4 +97,4 @@ The ZIP has been received and inspected. It supplies `TS_Save_1560.json` and `TS
 
 TTS saves contain setup information and references rather than embedding all image/model files. Exporting the accompanying assets avoids broken or inaccessible links. Running the mod in the Steam application is separate from inspecting and converting its files. See the official [importing guidance](https://kb.tabletopsimulator.com/custom-content/importing-mods/) and [save-file format](https://kb.tabletopsimulator.com/custom-content/save-file-format/).
 
-The handoff reminder covers rocket STL files and records the completed hex-version check and supplied centre tiles: see [REMINDERS.md](REMINDERS.md).
+The handoff reminder records the closed rocket STL action, completed hex-version check and supplied centre tiles: see [REMINDERS.md](REMINDERS.md).

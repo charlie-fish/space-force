@@ -31,7 +31,7 @@ Structured inventory: [tts-inventory.json](../catalog/tts-inventory.json).
 
 Use the saved transforms, snap points, deck mappings, and image/model references to prepare component assets and check geometry. Cross-check card text and tile contents against the confirmed PDFs and designer rulings before treating a linked image as current. In particular, the original system hexes are confirmed current by the designer, and Asimov/Adams come from the separately supplied `13th hex.pdf`.
 
-The browser implementation still needs seven players, the exclusive six/seven-player centre tiles, and distinct rocket silhouettes with chip-rim patterns. The TTS save's shared rocket mesh does not fulfil the distinct-shape requirement. Keep the STL handoff reminder and preserve the six page-two silhouettes plus the provisional seventh until final designs are available.
+The local browser implementation now has seven players, the exclusive six/seven-player centre tiles, and distinct SVG rockets/chip rims. The TTS save's shared mesh was not used as the seven distinct shapes. The designer approved the current rockets on 17 November 2026 and closed the STL handoff.
 
 Inventory linked sources, retrieve only relevant approved component assets during asset preparation, record checksums/provenance, and create optimised web versions. Table scenery, music, and table-control scripts are not needed for the core HTML/SVG game. Review any third-party reuse separately from the designer's game artwork.
 

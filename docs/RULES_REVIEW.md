@@ -2,7 +2,7 @@
 
 Reviewed against `Space Force rules v1.80.pdf` and `SpaceForce Cards v1.80.pdf`, with the player aid and cardboard artwork as supporting references. Page numbers below refer to the PDF, counted from one.
 
-Updated with the designer's clarifications on 13 November 2026. R01–R08 below are resolved. Where specified, these rulings take precedence over conflicting printed wording.
+Updated with the designer's clarifications through 16 November 2026. R01–R08 below are resolved. Where specified, these rulings take precedence over conflicting printed wording.
 
 Current scope also includes the designer's seven-player extension and `13th hex.pdf`. The printed rulebook describes up to six players; the extension below is the designer's project instruction, not a claim about the printed edition.
 
@@ -16,7 +16,7 @@ A rocket has a role determined by its location: Reserve, Credit, Ship in space, 
 
 Planets hold settlements from multiple players. Ships occupy systems. An action-token stack is ordered, and only its top token is normally available. Each player board has four distinct slots: MOVE INTO, SETTLE, PRODUCE, ATTACK.
 
-Preserve the six distinct rocket silhouettes shown on rulebook p2 and add a seventh distinct shape in a new colour. The provisional seventh-player style is orange with a twin-pod rocket silhouette and a triangular chip-rim pattern. Action tokens are poker chips carrying the player's colour and rocket silhouette, plus a different visible rim/side pattern for each player. Chips snap to the sun at each system's centre, including Asimov and Adams. Each chip is the same diameter as the sun and fits a semicircular receiving indentation on its owner's action board. Keep stack order and rim patterns visible. See [component design](COMPONENT_DESIGN.md).
+Preserve the six distinct rocket silhouettes shown on rulebook p2 and add a seventh distinct shape in a new colour. The accepted seventh-player style is orange with a twin-pod rocket silhouette and a triangular chip-rim pattern. Action tokens are poker chips carrying the player's colour and rocket silhouette, plus a different visible rim/side pattern for each player. Chips snap to the sun at each system's centre, including Asimov and Adams. Each chip is the same diameter as the sun and fits a semicircular receiving indentation on its owner's action board. Keep stack order and rim patterns visible. See [component design](COMPONENT_DESIGN.md).
 
 ## Setup: rulebook pp4–5 plus the seven-player extension
 
@@ -40,7 +40,7 @@ For two to six players, select the required home tiles randomly from the six ori
 
 Display ten Techs for the game, either selected randomly or using a named preset. Keep the remainder available server-side for Technological Singularity. Prepare the shuffled Event draw pile and Explore supply. Record setup choices and randomness privately for reproducibility.
 
-The physical rule for choosing the first player can be represented by a lobby choice, with random selection as a proposed convenience. Record the resulting seat order. Home orientations and exact tile/planet anchors still need to be encoded and checked against the diagrams/TTS.
+The physical rule for choosing the first player can be represented by a lobby choice, with random selection as a proposed convenience. Record the resulting seat order. The local prototype encodes source layouts, home orientations and measured tile/planet anchors; device appearance remains a playtest item. Le Guin has four planets of capacity 2/2/1/1 and no black hole by default.
 
 ## Round flow: rulebook pp6–13
 
@@ -48,11 +48,13 @@ The physical rule for choosing the first player can be represented by a lobby ch
 
 **ACTIONS.** In order, resolve one eligible top token. Skip a player with no available top token; otherwise they cannot pass. Remove that token, choose an unused action-board slot, and perform that action in the token's system or Invest the action with a rocket from Reserve. Each slot can normally be used once per round. The resolution sequence must account for Insurance and for Cyber Attack's use of other players' tokens.
 
-**MOVE INTO.** Bring any chosen own Ships from one or more adjacent systems into the active system. Adjacency normally means a shared edge; warp systems are mutually adjacent. Asteroid barriers block movement unless an effect overrides them. Reveal and orient a newly entered tile, keeping the entry legal and avoiding a disconnected board; put one hidden Explore token on each capacity-two planet there. **Asteroid belts may cut off edge connections if warp connections still keep the board connected.** Include warp links in the connectivity check for tile orientation and belt placement. For each black hole in the destination, destroy one incoming Ship, returned as its owner's Credit. That loss occurs as part of MOVE INTO, not automatically whenever a Ship is added by a different effect (p9).
+**MOVE INTO.** Bring any chosen own Ships from one or more adjacent systems into the active system. Adjacency normally means a shared edge; warp systems are mutually adjacent. Asteroid barriers block movement unless an effect overrides them. For an unexplored system, commit its reveal and orient it before choosing Ship quantities, keeping a legal entry and avoiding a disconnected board; at least one Ship must then enter through an original legal route. Put one hidden Explore token on each capacity-two planet there. **Asteroid belts may cut off edge connections if warp connections still keep the board connected.** Include warp links in the connectivity check for tile orientation and belt placement. For each black hole in the destination, destroy one incoming Ship if available, returned as its owner's Credit. Departure black holes cause no loss; multiple destination holes each destroy one, capped by incoming Ships. That loss occurs as part of MOVE INTO, not automatically whenever a Ship is added by a different effect (p9).
 
 **SETTLE.** Convert chosen Ships in the active system into Settlements within planet capacity. **Arcologies allows its owner to place a Settlement in one extra space above printed capacity; this is a single extra space per planet, shared across all Arcologies owners, not an extra space per owner.** A planet is full for PRODUCE and Soylent Green at either its printed capacity or one Settlement above it. Take and resolve a planet's Explore token before settling it. Token rewards come from the relevant player's Reserve. A revealed Explore black hole remains in the system. Settlements cannot normally move, and players cannot normally destroy their own Settlements (pp9–10).
 
 Prophecy can place an “add an opponent Settlement” Explore token on a capacity-one planet. When a player later attempts to settle it, they choose an opponent for the token's Settlement first. If that reward can be placed, it fills the planet, leaving no normal space for the acting player. They can settle it themselves only if Arcologies or Soylent Green applies; Soylent Green still requires all planets in the active system to be full. The Explore recipient is an opponent, not the acting player.
+
+For a committed multi-Settlement allocation, an opponent's Explore reward can displace one of the acting player's planned Settlements. Place the acting player's committed Settlements that still fit, then prompt for only the displaced amount: keep those rockets as Ships or allocate them to another eligible planet in the same system. For example, two committed Settlements on an empty size-two planet become one own and one opponent Settlement, with one own rocket left to reassign. All other committed/queued placements remain fixed; this prompt cannot reduce them. Non-choice Explore outcomes require Ok before continuation, and Reserve-limited outcomes warn the active player before advancing.
 
 **PRODUCE.** Each planet containing the acting player's Settlement produces one Ship or Credit; a fully settled planet produces an additional one. Fullness counts everyone's Settlements. The player allocates the results between Credits and Ships, subject to Reserve supply; Ships go in the active system (pp10–11).
 
@@ -102,7 +104,7 @@ Online implementation needs separate selection, assignment, reveal, and resoluti
 
 ## Designer rulings — R01–R08 resolved
 
-Source: the designer's follow-up message on 13 November 2026. Keep these rulings versioned with the game content; a machine-readable reference is in [rules-clarifications.json](../catalog/rules-clarifications.json). It is a specification, not an implemented engine.
+Source: the designer's follow-up message on 13 November 2026, with subsequent confirmed edge cases recorded below. Keep these rulings versioned with the game content; a machine-readable reference is in [rules-clarifications.json](../catalog/rules-clarifications.json). The local engine implements all 30 Techs and all 30 Events with bidding; remote/simultaneous interactions remain later work.
 
 | ID | Confirmed ruling | Reference / implementation consequence |
 | --- | --- | --- |
@@ -112,12 +114,12 @@ Source: the designer's follow-up message on 13 November 2026. Keep these rulings
 | R04 | A player may choose an otherwise empty action solely to trigger its before/after Tech effects. | pp8–11. Do not require a nonzero main effect as a prerequisite for these triggers. |
 | R05 | Arcologies provides one shared extra space per planet. A planet with its printed capacity or capacity plus one Settlements is full for PRODUCE and Soylent Green. | pp15,19. Multiple Arcologies owners do not create further spaces. Apply Explore rewards before the acting player's settlement. |
 | R06 | Only token/slot choices are secret. After reveal, players act simultaneously, or any player may declare a dependency and activate ordered resolution for all players. | p14. Action parameters are chosen during resolution; use the four-action priority and player order when disambiguating. |
-| R07 | With Research Lab, Sabotage's destruction value is its undiscounted value. Sabotage cannot target Sabotage. | pp18–19. Keep nominal value separate from Credits actually paid. |
+| R07 | With Research Lab, Sabotage's destruction value is its undiscounted value. Sabotage cannot target Sabotage. The designer additionally confirmed on 17 November 2026 that actual payment cannot be below the target's printed price; the subsequent wording confirms Sabotage cannot be discounted by Research lab. | pp18–19 plus designer follow-up. Keep nominal value separate from Credits actually paid; enforce the target-price floor. |
 | R08 | Replace each excluded preset Tech with a random legal Tech of value 2 or 3. | pp12,14,24. Preserve a ten-card, distinct, legal preset display and record replacements. |
 
 ### Confirmed R01 example
 
-Assume the player owns Population Explosion, Government Incentives, Frontier Pioneer, Rapid Advance, and Spice, and chooses to use the applicable effects:
+Assume the player owns Population Explosion, Government Incentives, Frontier Pioneer, Rapid Advance, and Spice, and resolves the applicable effects:
 
 1. Resolve the standard PRODUCE.
 2. Population Explosion grants a free SETTLE. Its before-effects include Frontier Pioneer adding one Ship and Government Incentives granting a free MOVE INTO.
@@ -131,8 +133,17 @@ Assume the player owns Population Explosion, Government Incentives, Frontier Pio
 - **Prophecy on a capacity-one planet:** resolve an opponent-Settlement token before the acting player's settlement. With the reward placed, the acting player needs an applicable Arcologies extra space or a legal Soylent Green replacement to settle there themselves.
 - **Asteroid isolation with warps:** removing edge paths is permitted when warp links keep the board connected. Connectivity validation must use both kinds of link.
 - **Setup pool correction:** hidden tiles come only from non-home designs; unused home designs are excluded.
+- **Committed Settlement displacement:** reassign only the amount displaced by an opponent's Explore reward, keeping it as Ships or placing it on another eligible planet; other committed placements stay fixed.
+- **Exploration commitment:** reveal and orient before Ship quantities; a revealed MOVE INTO requires positive entry through an original legal route. An empty action without a reveal remains permitted by R04.
+- **Black holes:** count destination holes only, one incoming Ship each if available. Le Guin starts with none.
 
-All eight original questions are answered, and the original hex versions are confirmed. Outstanding artwork/STL preparation and file handoffs are tracked in [REMINDERS.md](REMINDERS.md). Further rule interactions can be checked during playtests without reopening settled rulings.
+All eight original questions are answered, and the original hex versions are confirmed. Remaining artwork preparation and file handoffs (rocket STL action closed) are tracked in [REMINDERS.md](REMINDERS.md). Further rule interactions can be checked during playtests without reopening settled rulings.
+
+## Additional confirmed Tech rulings (17 November 2026)
+
+C01–C04 are confirmed: Gravity Drive origins/routes and chosen casualty ownership; Eminent Domain in player order with Banking only during ACTIONS; Soylent fullness rechecked after placements/Explore, ignoring blocked planets; and mandatory legal Sabotage targets without reversing earlier effects. The [0.16 guide](PLAYTEST_CHANGES_0.16.md#confirmed-interpretations) and [structured catalogue](../catalog/rules-clarifications.json) record the details.
+
+Death Sun replaces normal attack capacity with up to three opposing Ships OR two Settlements per sacrifice; a single sacrifice cannot mix these types. Cost is `ceil(Ships/3) + ceil(Settlements/2)`. Sabotage pays chosen Credit value X, at least the selected target’s printed price, without a Research lab discount. Flexible Economy can return Credits one at a time to complete an unfinished Reserve-limited effect without repeating its completed gains or action hooks. Mercenaries always precedes Rapid Advance. Insurance only qualifies while own tokens remain on the board; its Ship can go at home even without a Settlement, or anywhere with an own Settlement. These designer rulings override conflicting printed wording.
 
 ## Verification cases to preserve
 
@@ -144,6 +155,7 @@ All eight original questions are answered, and the original hex versions are con
 - Correct entry orientations, warp adjacency, barrier connectivity including warp routes, and black-hole loss.
 - The five-player setup consumes the one additional asteroid token, so Kessler Syndrome cannot place that same token while it remains on the board.
 - Mixed-player planet fullness, one shared Arcologies extra space, fullness at capacity and capacity plus one, production allocation, limited Reserve supply, and settling shared planets.
+- Committed SETTLE allocations interrupted by an opponent's Explore Settlement, preserving every other allocation and reassigning only the displaced amount; acknowledgements and Reserve warnings must survive reload.
 - Prophecy's opponent-Settlement token on a capacity-one planet, including no normal space for the acting player and the Arcologies/Soylent Green cases.
 - The full R01 five-Tech example, including no SETTLE hooks from Rapid Advance and no Spice recursion; empty actions must still activate applicable Techs.
 - Ordinary combat, insurance Credits, shared-planet protection, and the interactions of Patrol, Death Sun, Ammo Shortage, Black Cloud, and Alliance.
@@ -153,4 +165,15 @@ All eight original questions are answered, and the original hex versions are con
 - Event selection/expiry boundaries, Politics through PLAN cleanup, Ragnarök, last-round Sabotage prohibition, endgame settlement, and shared wins.
 - Simultaneous token/slot secrecy, parameters chosen after reveal, a dependency declaration switching all participants to ordered resolution, stale submissions, disconnects, and the confirmed pre-commit/no-reveal Undo boundary.
 
-Include the reviewed idle-removal scenarios for every phase, majority thresholds, hidden choices, token-stack unblocking, preservation of the starting setup, and last-player completion. No rules-engine tests have been run at this planning stage; the engine does not yet exist.
+Include the reviewed idle-removal scenarios for every phase, majority thresholds, hidden choices, token-stack unblocking, preservation of the starting setup, and last-player completion. The local normal-turn engine and its rules/DOM/replay checks are implemented; see [current validation](PROTOTYPE.md#validation). Remote-only scenarios remain acceptance requirements for later milestones.
+
+## Confirmed Event interactions · 17 November 2026
+
+| ID | Designer ruling |
+| --- | --- |
+| E01 | With Ammo Shortage and Death Sun, each sacrificed Ship destroys up to **2 opposing Ships OR 2 Settlements**; mixed target types still need separate sacrifices. |
+| E02 | At the end of PLAN, resolve **Filibuster, then Scrambler**. |
+| E03 | **Hive Mind grants direct Ship rewards**, one per shared planet, without PRODUCE action hooks. |
+| E04 | **Earth First overrides Disruptor targeting an opponent home system** for the affected PLAN phase; choosing that target has no blocking effect. The Tech phase must warn the buyer. Confirmed 20 November 2026. |
+
+The rocket STL handoff is closed; the current seven rocket appearances are approved. [The 0.20 guide](PLAYTEST_CHANGES_0.20.md) records Event test batches and implementation conventions for review.
