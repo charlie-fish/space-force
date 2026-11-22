@@ -190,9 +190,9 @@ export interface Score {
   total: number;
 }
 export interface Game {
-  schema: 10;
-  engine: "0.21.0";
-  content: "full-events-bidding-7";
+  schema: 11;
+  engine: "0.22.0";
+  content: "event-decks-board-targets-8";
   config: GameConfig;
   seed: number;
   rng: number;
@@ -207,6 +207,7 @@ export interface Game {
   events: string[];
   revealedEvents: string[];
   eventHistory: string[][];
+  initialEventCards: 8 | 10;
   roundLimit: number;
   activeEvent: {
     id: string;

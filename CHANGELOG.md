@@ -1,9 +1,19 @@
 # Change log
 
-## Unreleased
+## 0.22.0 — 2026-11-22
 
-- Record the designer’s report that all 30 Techs seem to work as intended in local playtesting; keep v0.19 as the reviewed baseline.
-- Update the recommended next steps: full local Event effects/auction and parallel phone testing, then online rooms/recovery, additional modes, private administration and release work. No application behaviour or release version changes.
+- Draw eight Events for every new 4–7-player game, including test batches, giving five normal rounds; retain ten cards/six rounds for 2–3 players. Preserve original decks and results when continuing older saves.
+- Select systems, planets and feature edges directly on the Board; double-click/double-tap confirms the current draft through the existing controls and warnings. Preserve explicit buttons and avoid duplicate commitments during touch/camera gestures.
+- List full face-up Explore effects after Prophecy without revealing later hidden tokens. Show original settlement totals for every player throughout Migration, alongside current draft totals.
+- Record initial Event deck size in schema 11/engine 0.22.0; extend deterministic replay, final-round, interaction and privacy regression coverage. See the [0.22 playtest guide](docs/PLAYTEST_CHANGES_0.22.md).
+
+## 0.21.0 — 2026-11-20
+
+- Add completed/ongoing Event summaries, sorted and committed Vorsprung choices, affordable Sabotage defaults, Turtling defaults and action-specific Event reminders. Confirm Earth First precedence over Disruptor. See [0.21](docs/PLAYTEST_CHANGES_0.21.md).
+
+## 0.20.0 — 2026-11-17
+
+- Implement all 30 Events, sealed bidding and three selectable ten-card test pools for local normal-turn play, with save/replay coverage. Close the rocket STL handoff after designer approval. See [0.20](docs/PLAYTEST_CHANGES_0.20.md).
 
 ## 0.19.0 — 2026-11-17
 

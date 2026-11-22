@@ -26,8 +26,20 @@ export function restoreGame(value: unknown): Game {
     reserveRecoveryFrom?: number;
     confirmedTechRulesFrom?: number;
   };
-  if (stored.engine === "0.20.0") {
-    const compatible = { ...(value as Game), engine: "0.21.0" as const };
+  if (["0.20.0", "0.21.0"].includes(stored.engine)) {
+    if (stored.schema !== 10 || stored.content !== "full-events-bidding-7")
+      throw Error("Invalid legacy save.");
+    const compatible: Game = {
+      ...(value as Game),
+      schema: 11,
+      engine: "0.22.0",
+      content: "event-decks-board-targets-8",
+      initialEventCards:
+        stored.players.length <= 3 ||
+        (stored.config?.eventBatch && stored.config.eventBatch !== "standard")
+          ? 10
+          : 8,
+    };
     assertInvariants(compatible);
     return replayGame(compatible);
   }

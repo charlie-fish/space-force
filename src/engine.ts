@@ -111,6 +111,24 @@ export function createGame(
   names: string[] = [],
   config: GameConfig = { techPreset: "family", scenario: "standard" },
 ): Game {
+  return initializeGame(count, seed, names, config);
+}
+function initializeGame(
+  count: number,
+  seed: number,
+  names: string[],
+  config: GameConfig,
+  historicalEventCount?: 8 | 10,
+): Game {
+  const eventCount = historicalEventCount ?? (count <= 3 ? 10 : 8);
+  requireRule(
+    eventCount === (count <= 3 ? 10 : 8) ||
+      (count >= 4 &&
+        eventCount === 10 &&
+        config.eventBatch &&
+        config.eventBatch !== "standard"),
+    "Invalid historical Event deck size.",
+  );
   requireRule(
     Number.isInteger(count) && count >= 2 && count <= 7,
     "Space Force supports two to seven players.",
@@ -123,9 +141,9 @@ export function createGame(
     "Choose a supported test setup.",
   );
   const g: Game = {
-    schema: 10,
-    engine: "0.21.0",
-    content: "full-events-bidding-7",
+    schema: 11,
+    engine: "0.22.0",
+    content: "event-decks-board-targets-8",
     config: { ...clone(config), events: config.events ?? "simpler" },
     seed: seed >>> 0,
     rng: seed >>> 0,
@@ -140,14 +158,8 @@ export function createGame(
     events: [],
     revealedEvents: [],
     eventHistory: [],
-    roundLimit:
-      (config.eventBatch && config.eventBatch !== "standard"
-        ? 10
-        : count <= 3
-          ? 10
-          : 8) /
-        2 +
-      1,
+    initialEventCards: eventCount,
+    roundLimit: eventCount / 2 + 1,
     activeEvent: null,
     auction: null,
     eventSelections: [],
@@ -290,7 +302,7 @@ export function createGame(
     batch
       ? batch.cards.map((id) => `event.${id}`)
       : CARDS.filter((c) => c.type === "event").map((c) => c.id),
-  ).slice(0, batch ? 10 : count <= 3 ? 10 : 8);
+  ).slice(0, eventCount);
   if (config.techPreset === "random")
     g.market = shuffle(
       g,
@@ -3195,13 +3207,15 @@ export function replayGame(
     | "reserveRecoveryFrom"
     | "confirmedTechRulesFrom"
     | "activeReserveChecksFrom"
-  >,
+  > &
+    Partial<Pick<Game, "initialEventCards">>,
 ): Game {
-  let game = createGame(
+  let game = initializeGame(
     record.players.length,
     record.seed,
     record.players.map((p) => p.name),
     record.config,
+    record.initialEventCards,
   );
   game.legacyRulesUntil = integer(
     record.legacyRulesUntil,
@@ -3226,9 +3240,9 @@ export function replayGame(
 
 export function assertInvariants(g: Game) {
   requireRule(
-    g.schema === 10 &&
-      g.engine === "0.21.0" &&
-      g.content === "full-events-bidding-7",
+    g.schema === 11 &&
+      g.engine === "0.22.0" &&
+      g.content === "event-decks-board-targets-8",
     "Unsupported saved-game version.",
   );
   requireRule(
@@ -3340,9 +3354,17 @@ export function assertInvariants(g: Game) {
   }
   const eventCard = (id: string) => CARD_MAP[id]?.type === "event";
   requireRule(
+    [8, 10].includes(g.initialEventCards) &&
+      (g.players.length <= 3
+        ? g.initialEventCards === 10
+        : g.initialEventCards === 8 ||
+          (g.config.eventBatch && g.config.eventBatch !== "standard")),
+    "Invalid initial Event count.",
+  );
+  requireRule(
     Array.isArray(g.events) &&
       g.events.length % 2 === 0 &&
-      g.events.length <= 10 &&
+      g.events.length <= g.initialEventCards &&
       g.events.every(eventCard) &&
       new Set(g.events).size === g.events.length,
     "Invalid Event draw pile.",
@@ -3350,7 +3372,7 @@ export function assertInvariants(g: Game) {
   requireRule(
     Number.isInteger(g.roundLimit) &&
       g.roundLimit >= 1 &&
-      g.roundLimit <= 6 &&
+      g.roundLimit <= g.initialEventCards / 2 + 1 &&
       Array.isArray(g.eventSelections),
     "Invalid Event history or round limit.",
   );

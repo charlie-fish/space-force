@@ -1,6 +1,6 @@
 {
-  "schema_version": 3,
-  "configuration_id": "seven-player-extension-002",
+  "schema_version": 4,
+  "configuration_id": "seven-player-extension-003",
   "status": "implemented_local_normal_turns",
   "authority": "Designer request increasing the maximum to seven and specifying Asimov/Adams centre restrictions",
   "printed_rulebook_maximum_players": 6,
@@ -160,5 +160,21 @@
   },
   "undo_policy_reference": "undo-policy.json",
   "tutorial_configuration_reference": "tutorial-configuration.json",
-  "supersedes": "seven-player-extension-001"
+  "supersedes": "seven-player-extension-002",
+  "event_deck_policy": {
+    "source": "Designer correction 2026-11-22, E05",
+    "applies_to_all_new_games_and_test_batches": true,
+    "two_or_three_players": {
+      "cards": 10,
+      "normal_rounds": 6
+    },
+    "four_to_seven_players": {
+      "cards": 8,
+      "normal_rounds": 5
+    },
+    "test_batch_pool_size": 10,
+    "draw_without_replacement": true,
+    "ragnarok_can_shorten_game": true,
+    "legacy_ten_card_test_saves": "preserve_original_deck_and_schedule"
+  }
 }

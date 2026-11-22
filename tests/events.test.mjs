@@ -92,12 +92,15 @@ test("three fixed ten-Event batches partition all 30 cards, with seeded decks at
       const c = { ...config, eventBatch: batch },
         a = setup(count, 91, c),
         b = setup(count, 91, c);
-      assert.equal(a.events.length, 10);
-      assert.equal(a.roundLimit, 6);
+      assert.equal(a.events.length, count <= 3 ? 10 : 8);
+      assert.equal(a.roundLimit, count <= 3 ? 6 : 5);
       assert.deepEqual(a.events, b.events);
-      assert.deepEqual(
-        new Set(a.events),
-        new Set(EVENT_BATCHES[batch].cards.map((id) => `event.${id}`)),
+      assert.ok(
+        a.events.every((id) =>
+          EVENT_BATCHES[batch].cards
+            .map((card) => `event.${card}`)
+            .includes(id),
+        ),
       );
     }
   assert.equal(setup(5, 4, config).events.length, 8);
@@ -564,7 +567,7 @@ test("active Events persist through the next Investments and are discarded exact
 
 test("0.19 records migrate without enabling Events or changing pieces and remain exactly replayable", () => {
   const g = restoreGame(oldSave);
-  assert.equal(g.engine, "0.21.0");
+  assert.equal(g.engine, "0.22.0");
   assert.equal(g.config.events, "foresight-test");
   assert.equal(g.activeEvent, null);
   for (const key of ["round", "phase", "turn", "systems"])

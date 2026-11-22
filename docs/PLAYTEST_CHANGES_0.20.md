@@ -13,7 +13,7 @@ All 30 Event effects and sealed bidding are now implemented for local normal-tur
 5. Resolve immediate choices in the Status Box. Continuous Event text stays visible there and in Event (E). A round effect lasts through the selecting Economy, the next PLAN/ACTIONS, and the following Investments; it expires exactly at **Discard the previous Event**.
 6. Replay the **same map code, player count and settings**, selecting the previously discarded card from each pair. Only one of each pair is selected, so two complementary runs are needed to exercise all ten effects. The Event view records selected/discarded cards and bids and lists the batch pool. Ragnarök adds an auction immediately and shortens the action-round count; the deck's pairs remain fixed.
 
-Each designer test batch uses **exactly ten Events at every player count**. Standard random games follow the rulebook: ten for two/three players, eight for four to seven. Simpler Events still ignore card text and skip bidding; the labelled legacy Foresight test remains available for older Tech tests.
+**Updated in [0.22](PLAYTEST_CHANGES_0.22.md):** every new setup, including test batches, draws ten Events for two/three players or eight for four to seven. A test batch is still a pool of ten; with four or more players, change the map code to sample the two omitted cards. Existing ten-card saves retain their original schedule. Simpler Events still ignore card text and skip bidding; the labelled legacy Foresight test remains available for older Tech tests.
 
 ## The three scenarios
 

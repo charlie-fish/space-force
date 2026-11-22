@@ -11,7 +11,7 @@ test("real 0.8 saves migrate through setup, drafts, hidden reveals and the Event
       revision: checkpoint.commands,
     };
     const restored = restoreGame(old);
-    assert.equal(restored.engine, "0.21.0");
+    assert.equal(restored.engine, "0.22.0");
     assert.equal(restored.phase, checkpoint.phase);
     assert.equal(restored.pending?.kind ?? null, checkpoint.pending);
     assert.equal(restored.players.length, 3);

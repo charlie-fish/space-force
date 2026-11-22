@@ -4,6 +4,8 @@
 
 The three ten-card Event batches remain available. This update applies the designer's Event playtest feedback and confirms Earth First's precedence over Disruptor. [The 0.20 guide](PLAYTEST_CHANGES_0.20.md) lists the batches and explains complementary repeat runs.
 
+**Current deck policy:** [0.22](PLAYTEST_CHANGES_0.22.md) draws eight cards from each ten-card pool for four to seven players; two/three still draw ten.
+
 ## Changes to check
 
 - **Earth First / Disruptor (E04 confirmed):** during the Tech phase, Disruptor warns that selecting an opponent's home system has no blocking effect under Earth First. This applies throughout the affected PLAN phase. Disruptor can still block other systems, including its owner's home for opponents. The placement chooser repeats the warning and identifies an ineffective selected target. Its ownership still scores normally.

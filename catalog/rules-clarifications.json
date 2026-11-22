@@ -1,7 +1,7 @@
 {
-  "schema_version": 8,
-  "clarification_id": "designer-clarifications-011",
-  "date": "2026-11-20",
+  "schema_version": 9,
+  "clarification_id": "designer-clarifications-012",
+  "date": "2026-11-22",
   "authority": "Designer follow-up messages in the project conversation, including seven-player extension and playtest corrections",
   "printed_rules_version": "1.80",
   "status": "confirmed_all_techs_and_events_local_normal_turns",
@@ -137,6 +137,31 @@
       "opponent_home_target_has_blocking_effect": false,
       "duration": "affected_PLAN_phase",
       "tech_phase_warning_required": true
+    },
+    "E05": {
+      "status": "confirmed",
+      "confirmed_date": "2026-11-22",
+      "source": "Designer player-count correction",
+      "event_cards_by_player_count": {
+        "2": 10,
+        "3": 10,
+        "4": 8,
+        "5": 8,
+        "6": 8,
+        "7": 8
+      },
+      "normal_rounds_by_player_count": {
+        "2": 6,
+        "3": 6,
+        "4": 5,
+        "5": 5,
+        "6": 5,
+        "7": 5
+      },
+      "applies_to_all_new_test_batches": true,
+      "test_batch_pool_size": 10,
+      "ragnarok_can_shorten_game": true,
+      "older_saves": "preserve_original_deck_and_schedule"
     }
   },
   "confirmed_r01_example": {
@@ -282,7 +307,7 @@
       "shortfall": "also_allows_flexible_economy_owner_to_return_to_status_box_and_resume_unfinished_effect"
     }
   },
-  "supersedes": "designer-clarifications-008",
+  "supersedes": "designer-clarifications-011",
   "configuration_reference": "game-configuration.json",
   "confirmed_implementation_interpretations": {
     "C01": {
@@ -324,7 +349,7 @@
     }
   },
   "presentation": {
-    "source": "Designer playtest feedback, 2026-11-17",
+    "source": "Designer playtest feedback through 2026-11-22",
     "system_hex_artwork_layer": "below_all_placed_components",
     "system_name_layer": "above_other_board_graphics",
     "player_summary_default": "collapsed_on_each_required_decision",
@@ -339,7 +364,11 @@
     "vorsprung_tech_view_double_click": "select_and_commit_once",
     "sabotage_default_target": "highest_affordable_legal_credit_value",
     "turtling_default_ships": "min_3_available_reserve_at_home",
-    "economic_boom_investment_icons": 2
+    "economic_boom_investment_icons": 2,
+    "board_target_single_click": "select_corresponding_status_control",
+    "board_target_double_click_or_tap": "use_current_confirmation_button_for_whole_draft",
+    "prophecy_explore_reminders": "full_effect_only_for_each_face_up_token",
+    "migration_reminder": "each_player_original_and_currently_assigned_settlements_in_selected_system"
   },
   "provisional_event_interpretations": {
     "flexibility": "Each resolution may perform any action in an unused receiving slot",

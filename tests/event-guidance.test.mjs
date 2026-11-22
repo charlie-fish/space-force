@@ -538,7 +538,7 @@ test("Alliance, Black Cloud and Cyber Attack explain restrictions before an empt
 
 test("a genuine 0.20 pending Vorsprung claim migrates with its choices intact and remains replayable", () => {
   const g = restoreGame(legacy);
-  assert.equal(g.engine, "0.21.0");
+  assert.equal(g.engine, "0.22.0");
   assert.equal(g.pending.event, "event.vorsprung");
   assert.deepEqual(g.players, legacy.players);
   assert.deepEqual(g.systems, legacy.systems);

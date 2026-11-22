@@ -215,7 +215,7 @@ test("Since your last turn starts at the previous decision, including consecutiv
 
 test("completed genuine 0.9 game migrates to the same scores and winners with the new pauses inserted", () => {
   const g = restoreGame(oldGame);
-  assert.equal(g.engine, "0.21.0");
+  assert.equal(g.engine, "0.22.0");
   assert.equal(g.phase, "finished");
   assert.deepEqual(g.scores, oldGame.expected.scores);
   assert.deepEqual(g.winners, oldGame.expected.winners);

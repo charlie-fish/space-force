@@ -2770,3 +2770,52 @@ svg.poker-chip {
 .vorsprung-selection {
   padding: 10px 0;
 }
+
+.board-system-choice.selected {
+  border-left: 3px solid #587b45;
+  padding-left: 9px;
+  background: #e1ebd8;
+}
+.revealed-explore-reminder {
+  color: #302939;
+  padding: 8px 0;
+}
+.revealed-explore-reminder ul,
+.migration-totals ul {
+  list-style: none;
+  padding: 0;
+  margin: 8px 0;
+}
+.revealed-explore-reminder li,
+.migration-totals li {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 8px 0;
+}
+.revealed-explore-reminder .planet-preview {
+  width: 42px;
+  height: 42px;
+  flex-shrink: 0;
+}
+.migration-totals {
+  padding: 10px 12px;
+  border: 1px solid #b2bda0;
+  border-radius: 7px;
+  background: #e1ebd8;
+  color: #243b28;
+}
+.migration-totals h3 {
+  margin: 0 0 6px;
+}
+.migration-totals li {
+  justify-content: space-between;
+  flex-wrap: wrap;
+}
+.legacy-event-setup {
+  padding: 10px;
+  border: 1px solid #735b3f;
+  border-radius: 7px;
+  background: #f7e5bf;
+  color: #242034;
+}

@@ -1,5 +1,5 @@
 {
-  "schema_version": 7,
+  "schema_version": 8,
   "status": "local_prototype_implemented_remote_controls_pending",
   "view_ids": [
     "board",
@@ -120,7 +120,13 @@
       "default": "collapsed_on_render"
     },
     "actions_phase_label": "Actions",
-    "players_and_supply_order": "current_first_player_then_existing_player_order"
+    "players_and_supply_order": "current_first_player_then_existing_player_order",
+    "face_up_explore_effect_reminders": true,
+    "hidden_explore_effect_reminders": false,
+    "migration_counts": [
+      "each_player_original_in_selected_system",
+      "each_player_currently_assigned_in_draft"
+    ]
   },
   "plan_placement": {
     "desktop": "translucent_cursor_hover_then_click_to_select_preview",
@@ -192,7 +198,20 @@
       "nested_controls": false
     },
     "unchanged_targets_and_previews_cached": true,
-    "cache_invalidated_on_replaced_position": true
+    "cache_invalidated_on_replaced_position": true,
+    "board_single_click_or_tap": "select_corresponding_status_control",
+    "board_double_click_or_tap": "confirm_whole_current_draft_with_existing_warnings",
+    "applies_to_event_system_and_planet_choices": true,
+    "invalid_or_disabled_target_can_commit": false,
+    "cancel_double_gesture_on": [
+      "view_change",
+      "other_control",
+      "draft_quantity_edit",
+      "new_decision",
+      "pan",
+      "pinch",
+      "pointercancel"
+    ]
   },
   "action_controls": {
     "invest_checkbox_position": "immediately_above_commit",

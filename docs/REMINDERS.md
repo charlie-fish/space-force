@@ -1,10 +1,12 @@
 # Reminders and asset handoffs
 
-Updated 20 November 2026. Keep this checklist current as files and checks arrive. These are persistent project reminders, not scheduled notifications.
+Updated 22 November 2026. Keep this checklist current as files and checks arrive. These are persistent project reminders, not scheduled notifications.
 
 Review priorities and next steps: [REVIEW_CHECKLIST.md](REVIEW_CHECKLIST.md).
 
 ## From the designer
+
+- [x] Apply [0.22](PLAYTEST_CHANGES_0.22.md): eight Events/five normal rounds for all new 4–7-player games, board target selection/double-confirm, face-up Explore reminders and original Migration settlement totals. Existing ten-card test saves retain their original schedule.
 
 - [x] E04 confirmed 20 November 2026: Earth First overrides Disruptor when it targets an opponent home system, for the affected PLAN phase. The Tech and placement chooser warn about the ineffective target. See [0.21](PLAYTEST_CHANGES_0.21.md).
 
