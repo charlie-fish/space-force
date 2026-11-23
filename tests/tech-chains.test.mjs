@@ -515,7 +515,7 @@ test("a Government free MOVE may reveal/orient a system and then return to the c
 
 test("genuine 0.11 records retain max-Credit defaults and final scores during migration", () => {
   const restored = restoreGame(oldCompleted);
-  assert.equal(restored.engine, "1.0.0");
+  assert.equal(restored.engine, "1.1.0");
   assert.deepEqual(restored.scores, oldCompleted.scores);
   assert.deepEqual(restored.config, {
     techPreset: "family",

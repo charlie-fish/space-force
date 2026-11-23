@@ -49,7 +49,7 @@ test("the last Economy and final results occur in round five for 4–7 players a
 
 test("an actual 0.21 ten-card four-player save preserves its original deck, six-round schedule and final scores", () => {
   let g = restoreGame(old.game);
-  assert.equal(g.engine, "1.0.0");
+  assert.equal(g.engine, "1.1.0");
   assert.equal(g.initialEventCards, 10);
   assert.equal(g.roundLimit, 6);
   for (const key of [
@@ -83,19 +83,17 @@ test("an actual 0.21 ten-card four-player save preserves its original deck, six-
   assert.equal(fresh.roundLimit, 5);
 });
 
-test("setup and Event view describe the player-count limit while retaining ten-card test pools", () => {
+test("random Event setup deals eight cards for seven players and the Event view shows that limit", () => {
   const h = harness();
   h.click('[data-action="count"][data-count="7"]');
-  assert.match(
-    h.root.querySelector('[data-setting="event-batch"]').textContent,
-    /8 drawn from 10/,
-  );
+  assert.equal(h.root.querySelector('[data-setting="event-batch"]'), null);
   h.root
     .querySelector("#setup-form")
     .dispatchEvent(
       new h.window.Event("submit", { bubbles: true, cancelable: true }),
     );
   assert.equal(h.app.getGame().events.length, 8);
+  assert.equal(h.app.getGame().config.eventBatch, "standard");
   h.click('[data-view="event"]');
   assert.match(h.root.textContent, /8 initially/);
   h.close();

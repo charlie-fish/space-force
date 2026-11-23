@@ -71,6 +71,27 @@ export const player = (g: Game, id = g.turn): Player => {
   requireRule(p, "Unknown player.");
   return p;
 };
+export const activePlayerIds = (g: Game): number[] =>
+  g.players.filter((p) => !p.forfeited).map((p) => p.id);
+function nextActive(g: Game, after: number): number {
+  for (let offset = 1; offset <= g.players.length; offset++) {
+    const id = (after + offset) % g.players.length;
+    if (!player(g, id).forfeited) return id;
+  }
+  throw Error("No active players remain.");
+}
+function wrapsPhase(g: Game, after: number, next: number): boolean {
+  const anchor =
+    g.forfeitCycle?.round === g.round && g.forfeitCycle.phase === g.phase
+      ? g.forfeitCycle.first
+      : g.first;
+  for (let offset = 1; offset <= g.players.length; offset++) {
+    const id = (after + offset) % g.players.length;
+    if (id === anchor) return true;
+    if (id === next) return false;
+  }
+  return true;
+}
 export const system = (g: Game, id: string): System => {
   const s = g.systems.find((s) => s.id === id);
   requireRule(s, "Unknown system.");
@@ -614,7 +635,7 @@ function finishPlanning(g: Game) {
   const owners = Array.from(
     { length: g.players.length },
     (_, i) => (g.first + i) % g.players.length,
-  ).filter((id) => hasTech(g, id, "filibuster"));
+  ).filter((id) => !player(g, id).forfeited && hasTech(g, id, "filibuster"));
   if (owners.length) {
     g.turn = owners[0];
     g.pending = { kind: "filibuster", remaining: owners.slice(1) };
@@ -641,6 +662,7 @@ function advanceActions(g: Game, after: number, remaining = g.players.length) {
   }
   for (let step = 1; step <= remaining; step++) {
     const id = (after + step) % g.players.length;
+    if (player(g, id).forfeited) continue;
     if (eligibleTokens(g, id).length) {
       g.turn = id;
       return;
@@ -1607,7 +1629,7 @@ function revealEvents(g: Game) {
     );
 }
 function passFirst(g: Game) {
-  const next = (g.first + 1) % g.players.length;
+  const next = nextActive(g, g.first);
   log(g, `Passed first player to ${player(g, next).name}.`, null);
   nextRound(g);
 }
@@ -1621,8 +1643,8 @@ export function reinforceCount(g: Game, id = g.turn) {
   return Math.min(player(g, id).reserve, reinforceAllowance(g, id));
 }
 function advanceAllocation(g: Game) {
-  const next = (g.turn + 1) % g.players.length;
-  if (next === g.first) {
+  const next = nextActive(g, g.turn);
+  if (wrapsPhase(g, g.turn, next)) {
     if (g.phase === "investments") revealEvents(g);
     else passFirst(g);
   } else {
@@ -1656,8 +1678,8 @@ function skipEmptyAllocation(g: Game) {
   }
   for (let i = 0; i < g.players.length; i++) {
     if (player(g).invested > 0) return;
-    const next = (g.turn + 1) % g.players.length;
-    if (next === g.first) {
+    const next = nextActive(g, g.turn);
+    if (wrapsPhase(g, g.turn, next)) {
       revealEvents(g);
       return;
     }
@@ -1670,8 +1692,8 @@ function finishTechTurn(g: Game) {
     finishEvent(g);
     return;
   }
-  const next = (g.turn + 1) % g.players.length;
-  if (next !== g.first) {
+  const next = nextActive(g, g.turn);
+  if (!wrapsPhase(g, g.turn, next)) {
     g.turn = next;
     return;
   }
@@ -1685,10 +1707,15 @@ function finishTechTurn(g: Game) {
 }
 function nextRound(g: Game) {
   g.round++;
-  g.first = (g.first + 1) % g.players.length;
+  g.first = nextActive(g, g.first);
+  delete g.forfeitCycle;
   g.turn = g.first;
   g.phase = "plan";
   for (const p of g.players) {
+    if (p.forfeited) {
+      p.unplaced = 0;
+      continue;
+    }
     p.used = p.blockedAction ? [p.blockedAction] : [];
     p.slotOwners = p.blockedAction ? { [p.blockedAction]: p.id } : {};
     p.investedActions = [];
@@ -1749,7 +1776,9 @@ function startEndgame(g: Game) {
   g.endgameQueue = Array.from(
     { length: g.players.length },
     (_, i) => (g.first + i) % g.players.length,
-  ).filter((id) => hasTech(g, id, "eminent-domain"));
+  ).filter(
+    (id) => !player(g, id).forfeited && hasTech(g, id, "eminent-domain"),
+  );
   nextEndgame(g);
 }
 function nextEndgame(g: Game) {
@@ -1773,8 +1802,9 @@ function finishGame(g: Game) {
   g.pending = null;
   g.context = null;
   g.scores = scoreGame(g);
-  const top = Math.max(...g.scores.map((s) => s.total));
-  const tied = g.scores.filter((s) => s.total === top);
+  const eligible = g.scores.filter((s) => !player(g, s.player).forfeited);
+  const top = Math.max(...eligible.map((s) => s.total));
+  const tied = eligible.filter((s) => s.total === top);
   const credits = Math.max(...tied.map((s) => s.credits));
   g.winners = tied.filter((s) => s.credits === credits).map((s) => s.player);
   log(
@@ -2565,6 +2595,105 @@ function chooseFeature(
   finishTechTurn(g);
 }
 
+function settleBids(g: Game, after: number) {
+  const auction = g.auction!;
+  const order = g.players
+    .map((_, i) => (g.first + i) % g.players.length)
+    .filter((id) => !player(g, id).forfeited);
+  if (order.every((id) => auction.bids[id] !== null)) {
+    const highest = Math.max(...order.map((id) => auction.bids[id]!));
+    const winner = order.find((id) => auction.bids[id] === highest)!;
+    auction.winner = winner;
+    auction.paid = highest;
+    player(g, winner).credits -= highest;
+    player(g, winner).reserve += highest;
+    log(
+      g,
+      `Bids revealed: ${order.map((id) => `${player(g, id).name} ${auction.bids[id]}`).join(" · ")}. ${player(g, winner).name} wins and returns ${highest} Credits to Reserve.`,
+      null,
+    );
+    g.turn = winner;
+    g.pending = { kind: "eventSelect" };
+  } else {
+    for (let step = 1; step <= g.players.length; step++) {
+      const id = (after + step) % g.players.length;
+      if (!player(g, id).forfeited && auction.bids[id] === null) {
+        g.turn = id;
+        return;
+      }
+    }
+  }
+}
+
+function forfeitPlayer(g: Game, id: number) {
+  integer(id, g.players.length - 1);
+  const removed = player(g, id);
+  requireRule(!removed.forfeited, "This player has already been removed.");
+  if (g.first === id) {
+    if (
+      !g.forfeitCycle ||
+      g.forfeitCycle.round !== g.round ||
+      g.forfeitCycle.phase !== g.phase
+    )
+      g.forfeitCycle = { round: g.round, phase: g.phase, first: g.first };
+    removed.forfeited = true;
+    g.first = nextActive(g, id);
+  } else removed.forfeited = true;
+  removed.unplaced = 0;
+  for (const s of g.systems)
+    s.tokens = s.tokens.filter((owner) => owner !== id);
+  g.endgameQueue = g.endgameQueue.filter((owner) => owner !== id);
+  if (g.pending?.kind === "filibuster")
+    g.pending.remaining = g.pending.remaining.filter((owner) => owner !== id);
+  log(
+    g,
+    `${removed.name} forfeited. Their unresolved action tokens were removed; their other pieces and resources remain.`,
+    null,
+  );
+  const active = activePlayerIds(g);
+  if (active.length === 1) {
+    g.phase = "finished";
+    g.turn = active[0];
+    g.pending = null;
+    g.context = null;
+    g.eventFlow = null;
+    g.endgameQueue = [];
+    g.scores = scoreGame(g);
+    g.winners = active;
+    g.endReason = "last_player_remaining";
+    log(
+      g,
+      `${player(g, active[0]).name} wins as the last player remaining. Position scores are a snapshot, not the basis of this victory.`,
+      null,
+    );
+    return;
+  }
+  if (g.pending?.kind === "bid") {
+    g.auction!.bids[id] = null;
+    settleBids(g, (g.first + g.players.length - 1) % g.players.length);
+    return;
+  }
+  if (g.turn !== id) return;
+  if (g.pending?.kind === "insurance") {
+    const { after, remaining } = g.pending;
+    advanceActions(g, after, remaining);
+    return;
+  }
+  if (g.pending) return; // A necessary choice keeps its owner; the server delegates it.
+  if (g.phase === "homes") {
+    return; // Home assignment is mandatory and is delegated on their behalf.
+  } else if (g.phase === "plan") {
+    if (g.players.every((p) => p.unplaced === 0)) finishPlanning(g);
+    else
+      do {
+        g.turn = nextActive(g, g.turn);
+      } while (!player(g).unplaced);
+  } else if (g.phase === "actions") advanceActions(g, id);
+  else if (g.phase === "investments" || g.phase === "reinforce")
+    advanceAllocation(g);
+  else if (g.phase === "tech") finishTechTurn(g);
+}
+
 export function applyCommand(
   state: Game,
   actor: number,
@@ -2576,14 +2705,19 @@ export function applyCommand(
     "The game changed. Refresh your choices.",
   );
   requireRule(
-    (actor === state.turn || command.type === "returnCredits") &&
+    (actor === state.turn ||
+      command.type === "returnCredits" ||
+      (command.type === "bid" &&
+        state.pending?.kind === "bid" &&
+        !player(state, actor).forfeited)) &&
       state.phase !== "finished",
     "It is not this player’s turn.",
   );
   command = clone(command);
   const g = clone(state);
   const p = player(g, actor);
-  if (command.type === "bid") {
+  if (command.type === "forfeit") forfeitPlayer(g, command.player);
+  else if (command.type === "bid") {
     requireRule(
       g.phase === "event" &&
         g.pending?.kind === "bid" &&
@@ -2594,23 +2728,8 @@ export function applyCommand(
     const amount = integer(command.amount, 40);
     requireRule(amount <= p.credits, "A bid cannot exceed your Credits.");
     g.auction.bids[actor] = amount;
-    log(g, "Sealed bid committed.");
-    if (g.auction.bids.every((n) => n !== null)) {
-      const order = g.players.map((_, i) => (g.first + i) % g.players.length);
-      const highest = Math.max(...(g.auction.bids as number[])),
-        winner = order.find((id) => g.auction!.bids[id] === highest)!;
-      g.auction.winner = winner;
-      g.auction.paid = highest;
-      player(g, winner).credits -= highest;
-      player(g, winner).reserve += highest;
-      log(
-        g,
-        `Bids revealed: ${order.map((id) => `${player(g, id).name} ${g.auction!.bids[id]}`).join(" · ")}. ${player(g, winner).name} wins and returns ${highest} Credits to Reserve.`,
-        null,
-      );
-      g.turn = winner;
-      g.pending = { kind: "eventSelect" };
-    } else g.turn = (actor + 1) % g.players.length;
+    log(g, "Sealed bid committed.", actor);
+    settleBids(g, actor);
   } else if (command.type === "selectEvent") selectEvent(g, command.event);
   else if (command.type === "eventChoice") chooseEventEffect(g, command);
   else if (command.type === "scramble") {
@@ -2687,7 +2806,11 @@ export function applyCommand(
     if (g.players.every((p) => p.home)) {
       g.phase = "plan";
       g.turn = g.first;
-    } else g.turn++;
+    } else {
+      do {
+        g.turn = (g.turn + 1) % g.players.length;
+      } while (player(g).home);
+    }
   } else if (command.type === "plan") {
     requireRule(
       g.phase === "plan" && !g.pending && p.unplaced > 0,
@@ -2702,7 +2825,7 @@ export function applyCommand(
     else {
       do {
         g.turn = (g.turn + 1) % g.players.length;
-      } while (player(g).unplaced === 0);
+      } while (player(g).forfeited || player(g).unplaced === 0);
     }
   } else if (command.type === "planPass") {
     requireRule(
@@ -2717,13 +2840,15 @@ export function applyCommand(
     log(g, "Strategic Stall: passed without placing an action token.");
     do {
       g.turn = (g.turn + 1) % g.players.length;
-    } while (player(g).unplaced === 0);
+    } while (player(g).forfeited || player(g).unplaced === 0);
   } else if (command.type === "filibuster") {
     requireRule(
       g.pending?.kind === "filibuster",
       "No Filibuster decision is pending.",
     );
-    const remaining = g.pending.remaining;
+    const remaining = g.pending.remaining.filter(
+      (id) => !player(g, id).forfeited,
+    );
     if (!command.skip) {
       const s = system(g, command.system!);
       const index = integer(command.index ?? -1, s.tokens.length - 1);
@@ -3209,8 +3334,8 @@ export function applyCommand(
   return g;
 }
 
-export function sinceLastDecision(g: Game) {
-  const visits = g.decisions.filter((d) => d.player === g.turn);
+export function sinceLastDecision(g: Game, viewer = g.turn) {
+  const visits = g.decisions.filter((d) => d.player === viewer);
   const start = visits.length > 1 ? visits[visits.length - 2].revision : 0;
   return g.log.filter((l) => l.revision > start && l.revision <= g.revision);
 }
@@ -3422,7 +3547,7 @@ export function assertInvariants(g: Game) {
     );
     if (a.winner !== null)
       requireRule(
-        a.bids.every((n) => n !== null) &&
+        a.bids.every((n, id) => n !== null || player(g, id).forfeited) &&
           Number.isInteger(a.winner) &&
           g.players[a.winner] &&
           a.paid === a.bids[a.winner] &&

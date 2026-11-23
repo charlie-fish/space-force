@@ -2819,3 +2819,157 @@ svg.poker-chip {
   background: #f7e5bf;
   color: #242034;
 }
+
+.online-lobby {
+  max-width: 1160px;
+  margin: 0 auto;
+  padding: 24px;
+}
+.lobby-heading {
+  display: flex;
+  gap: 24px;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 26px;
+}
+.lobby-heading img {
+  width: 128px;
+  height: auto;
+  border-radius: 8px;
+}
+.lobby-heading h1 {
+  margin: 8px 0;
+  font-size: max(10pt, clamp(2rem, 5vw, 3.6rem));
+  line-height: 1.05;
+}
+.lobby-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: 18px;
+}
+.lobby-settings {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+  margin: 12px 0;
+}
+.online-lobby label {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  margin: 10px 0;
+}
+.online-lobby input,
+.online-lobby select {
+  width: 100%;
+  min-width: 0;
+}
+.online-lobby .console {
+  margin-bottom: 18px;
+}
+.online-lobby form > button {
+  margin-top: 12px;
+}
+.online-lobby details {
+  margin: 18px 0;
+}
+.online-lobby summary,
+.recovery-key summary {
+  cursor: pointer;
+  font-weight: 700;
+}
+.public-room,
+.saved-seats li,
+.waiting-players li {
+  display: flex;
+  gap: 14px;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 0;
+  border-bottom: 1px solid #bdb5a0;
+}
+.public-room p {
+  margin: 5px 0;
+}
+.saved-seats,
+.waiting-players {
+  padding: 0;
+  list-style: none;
+}
+.saved-seats li > div,
+.waiting-players li > div {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  flex: 1;
+}
+.timing-policy {
+  padding: 12px;
+  background: #dfe9d4;
+  border-radius: 6px;
+  color: #26362b;
+}
+.online-status {
+  padding: 12px;
+  margin: 10px 0;
+  border: 1px solid #b6aa86;
+  border-radius: 7px;
+  background: #f1ead9;
+  color: #292333;
+}
+.online-status-line,
+.online-tools {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  align-items: center;
+}
+.online-status-line > span {
+  flex: 1;
+}
+.online-status p {
+  margin: 10px 0;
+}
+.online-status .warning,
+.online-deadline.warning {
+  padding: 8px;
+  border-left: 3px solid #9d4e26;
+  background: #ffebc7;
+  color: #332118;
+}
+.recovery-key {
+  margin-top: 12px;
+}
+.recovery-key input {
+  width: 100%;
+  margin: 8px 0;
+  font-family: monospace;
+}
+.forfeited-label {
+  color: #7d352d;
+  font-weight: 700;
+}
+@media (max-width: 680px) {
+  .online-lobby {
+    padding: 16px;
+  }
+  .lobby-grid {
+    grid-template-columns: 1fr;
+  }
+  .lobby-heading {
+    align-items: flex-start;
+    gap: 14px;
+  }
+  .lobby-heading img {
+    width: 88px;
+  }
+  .lobby-settings {
+    grid-template-columns: 1fr;
+  }
+  .public-room {
+    flex-wrap: wrap;
+  }
+  .online-status-line {
+    align-items: flex-start;
+  }
+}

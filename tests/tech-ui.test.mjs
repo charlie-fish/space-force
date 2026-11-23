@@ -47,49 +47,29 @@ function confirm(h) {
   h.click('[data-action="confirm-command"]');
 }
 
-test("setup defaults to the last ten Techs, permits Family/mixed, and labels the optional five-Tech scenario", () => {
+test("setup defaults to random Techs and offers only the five printed presets", () => {
   const h = harness();
-  assert.equal(
-    h.root.querySelector('[data-setting="tech-preset"]').value,
-    "remaining",
+  const select = h.root.querySelector('[data-setting="tech-preset"]');
+  assert.equal(select.value, "random");
+  assert.deepEqual(
+    [...select.options].map((o) => o.value),
+    ["random", "family", "aggressive", "cunning", "economic", "peaceful"],
   );
-  assert.match(
-    h.root.querySelector('[data-check="chain-scenario"]').parentElement
-      .textContent,
-    /five Reserve markers.*designer scenario/,
-  );
+  assert.equal(h.root.querySelector('[data-check="chain-scenario"]'), null);
   h.input('[data-setting="tech-preset"]', "family");
-  check(h, "chain-scenario", true);
-  assert.equal(
-    h.root.querySelector('[data-setting="tech-preset"]').value,
-    "chains",
-  );
-  h.input('[data-setting="tech-preset"]', "mixed");
   submit(h);
   assert.deepEqual(h.app.getGame().config, {
-    techPreset: "mixed",
-    scenario: "five-tech-chain",
-    events: "full",
-    eventBatch: "batch-1",
-  });
-  assert.deepEqual(h.app.getGame().players[0].techs, CHAIN_TECHS);
-  assert.equal(h.app.getGame().players[0].reserve, 35);
-  h.close();
-  const family = harness();
-  check(family, "chain-scenario", true);
-  family.input('[data-setting="tech-preset"]', "family");
-  assert.equal(
-    family.root.querySelector('[data-check="chain-scenario"]').checked,
-    false,
-  );
-  submit(family);
-  assert.deepEqual(family.app.getGame().config, {
     techPreset: "family",
     scenario: "standard",
     events: "full",
-    eventBatch: "batch-1",
+    eventBatch: "standard",
   });
-  family.close();
+  assert.ok(
+    h.app
+      .getGame()
+      .players.every((p) => p.techs.length === 0 && p.reserve === 40),
+  );
+  h.close();
 });
 
 test("Disruptor-blocked PLAN systems remain inspectable but cannot place by button or double-click", () => {

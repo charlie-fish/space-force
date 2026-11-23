@@ -1,5 +1,13 @@
 # Change log
 
+## 1.1.0 — 2026-11-23
+
+- Implement live and asynchronous normal-turn multiplayer for 2–7 protected guest seats, with private invitations, public waiting discovery, reviewed readiness/settings, concurrent bidding and handover on lobby leave.
+- Add authoritative per-seat state, transactional SQLite/D1 persistence, command/retry receipts, conditional updates and protected cross-device recovery. Keep hidden maps/decks/Explore effects, unrevealed bids and Foresight private.
+- Implement confirmed live five-minute idle voting and the designer-confirmed asynchronous 48-hour response plus 24-hour grace default, configurable before start. Include pause/resume, atomic response/removal races, token cleanup, mandatory delegation and last-player victory.
+- Remove test scenarios from new-game controls and online validation. Default to Random Techs and Random Events; retain five printed Tech presets and No Events, and start local map codes blank. Keep legacy test saves/replays compatible.
+- Pass 356 automated checks plus the built-Worker integration smoke test; add Node and Worker/D1 deployment adapters, committed migrations, seven-client HTTP/DOM coverage, restart/retry/privacy tests and updated [online guide](docs/ONLINE_PLAY.md). The [simultaneous variant, admin and native apps](docs/NEXT_PHASE.md) remain later work.
+
 ## 1.0.0 — 2026-11-23
 
 - Save the local prototype as a major tagged/archive milestone with unchanged rules, controls and schema/content. Preserve existing 0.22 saves, private bids and pending decisions; retain earlier migrations.

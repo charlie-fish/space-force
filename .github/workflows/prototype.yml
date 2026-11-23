@@ -32,3 +32,5 @@ jobs:
           name: space-force-local-prototype
           path: work/portable/
           retention-days: 14
+      - run: npm run build:worker
+      - run: node --test tests/worker.integration.mjs

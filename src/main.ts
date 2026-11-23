@@ -1,5 +1,5 @@
 import "./style.css";
-import { mountApp } from "./ui.js";
+import { mountGameClient } from "./lobby.js";
 
 let storage: Storage | undefined;
 try {
@@ -7,4 +7,4 @@ try {
 } catch {
   /* Optional local persistence. */
 }
-mountApp(document.getElementById("app")!, storage);
+mountGameClient(document.getElementById("app")!, storage);

@@ -19,7 +19,7 @@ Review priorities and next steps: [REVIEW_CHECKLIST.md](REVIEW_CHECKLIST.md).
 
 - [x] Save major local milestone v1.0.0: safe rules-query/layout efficiency improvements, unchanged functionality, older-save compatibility and a versioned release archive. See [the milestone guide](PLAYTEST_CHANGES_1.0.md).
 - [x] Add [Apple iOS/iPadOS and Android apps](MOBILE_APPS.md) to the specification with shared-service cross-play and a separate delivery milestone.
-- [ ] Implement [the next phase: authoritative remote normal-turn play](NEXT_PHASE.md), with public/private rooms, protected seats, durable/private state and confirmed recovery/dropouts.
+- [x] Implement v1.1 live and asynchronous normal-turn multiplayer: public/private rooms, protected seats, durable/private state, recovery and confirmed dropout handling. See [online play](ONLINE_PLAY.md).
 - [ ] Deliver the mobile apps after the shared service is stable. Before store testing, arrange store accounts/signing ownership, supported OS/device evidence, app assets, support/privacy URLs and optional push configuration. Keep signing secrets outside Git.
 
 - [x] Apply [0.21](PLAYTEST_CHANGES_0.21.md): Event completion/selector summaries, sorted and committed Vorsprung claims, affordable Sabotage defaults, Turtling defaults, action-specific Event reminders and the five text updates.
@@ -36,13 +36,14 @@ Review priorities and next steps: [REVIEW_CHECKLIST.md](REVIEW_CHECKLIST.md).
 - [x] Apply the [0.17 corrections](PLAYTEST_CHANGES_0.17.md): fixed Mercenaries/Rapid Advance order, Insurance eligibility/home rewards, Flexible economy subheading and Go back warnings, and Sabotage wording/payment.
 - [x] C01–C04 confirmed by the designer; record them with R01–R08 in the rules catalogue.
 - [x] Implement home double-click/double-tap, inline Foresight/Flexible Economy, resumable Reserve-limited effects, Filibuster stack-position labels, Sabotage contrast/X reset/minimum payment and corrected Death Sun groups. See [the 0.16 guide](PLAYTEST_CHANGES_0.16.md).
-- [ ] Designer-playtest the three Event batches and combined Tech/Event interactions. Later verify Events/bidding with remote clients and simultaneous mode.
+- [ ] Designer-playtest combined Tech/Event interactions in online rooms and later simultaneous mode. The three test scenarios are retired from new-game setup at the designer’s request.
 - [ ] Complete formal browser/phone and accessibility playtests. The designer has tested desktop/narrow-window layouts; a real Safari phone run remains outstanding. See [phone instructions](PHONE_TESTING.md) and [validation](PROTOTYPE.md#validation).
-- [ ] Implement the confirmed five-minute majority-removal core with reviewed phase handling, skipped turns, audit records, and automatic last-player victory.
+- [x] Implement the confirmed five-minute majority-removal core with reviewed phase handling, skipped turns, audit records, and automatic last-player victory.
 
 - [ ] Complete the personal first-play tutorial in [TUTORIAL.md](TUTORIAL.md). An initial skippable/replayable local phase guide is implemented. Reminder issue #1 stays closed; per-seat progress and later multiplayer teaching remain outstanding.
-- [ ] Implement [asynchronous play](ASYNCHRONOUS_PLAY.md), including protected resume, catch-up history and its own agreed response/grace/removal-vote policy. Do not apply live five-minute inactivity.
-- [ ] Build the public/private lobby and the 4+ player simultaneous-mode recommendation, with explicit host choice, readiness, and fair reconnect handling.
+- [x] Implement [asynchronous normal turns](ASYNCHRONOUS_PLAY.md) with protected resume, catch-up history and the confirmed 48-hour response plus 24-hour grace default; live five-minute inactivity does not apply.
+- [x] Build the public/private normal-turn lobby with reviewed readiness/settings, protected seats and fair reconnect handling.
+- [ ] Add selectable simultaneous actions and recommend that delivered mode at 4+ players; add directory filters, absent-host handover and stale-room expiry.
 - [ ] Prepare approved component images/models from the TTS references, verify their versions against the PDFs/rulings, and create optimised self-hosted web assets. The ZIP contains a preview, not the full linked art/model files.
 
 - [x] Prepare web assets and centre anchors from `13th hex.pdf`: **Asimov only for six players, Adams only for seven**. The supplied Asimov artwork replaces the old blank-hex task.

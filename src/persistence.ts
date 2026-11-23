@@ -27,7 +27,7 @@ export function restoreGame(value: unknown): Game {
     reserveRecoveryFrom?: number;
     confirmedTechRulesFrom?: number;
   };
-  if (stored.engine === "0.22.0") {
+  if (["0.22.0", "1.0.0"].includes(stored.engine)) {
     // Rules and state shape are unchanged in the major local-prototype milestone.
     const compatible: Game = { ...(value as Game), engine: RELEASE_VERSION };
     assertInvariants(compatible);

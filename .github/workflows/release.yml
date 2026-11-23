@@ -82,7 +82,7 @@ jobs:
         run: |
           if ! gh release view "$RELEASE_TAG" > /dev/null 2>&1; then
             gh release create "$RELEASE_TAG" --verify-tag --prerelease \
-              --title "$RELEASE_TAG — local prototype milestone" \
-              --notes "Saved local prototype and versioned downloads. Milestone/validation: https://github.com/$GH_REPO/blob/$RELEASE_TAG/docs/PLAYTEST_CHANGES_1.0.md . Apple/Android apps are specified as future scope; online multiplayer is the next coding phase."
+              --title "$RELEASE_TAG — Space Force playtest" \
+              --notes "Versioned local/static playtest downloads and checksums. These ZIPs run local pass-and-play. For online play, run the service from this version: https://github.com/$GH_REPO/blob/$RELEASE_TAG/README.md . Changes and validation: https://github.com/$GH_REPO/blob/$RELEASE_TAG/CHANGELOG.md ."
           fi
           gh release upload "$RELEASE_TAG" release/*.zip release/SHA256SUMS.txt --clobber

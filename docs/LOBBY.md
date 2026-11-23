@@ -1,6 +1,8 @@
 # Lobby, rooms, and mode recommendations
 
-Updated 16 November 2026 · Specification, not implemented
+Updated 23 November 2026 · Public/private normal-turn lobby implemented in v1.1.0; future variant/cleanup notes retained
+
+Current behaviour and credentials: [online guide](ONLINE_PLAY.md). Automatic absent-host handover, stale-room expiry, directory filters and simultaneous recommendations remain future refinements. The current directory labels live/asynchronous games and removes full/private/started rooms.
 
 ## Confirmed scope
 

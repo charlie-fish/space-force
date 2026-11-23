@@ -61,6 +61,7 @@ export interface Player {
   freeInvestments: Action[];
   blockedAction?: Action;
   slotOwners?: Partial<Record<Action, number>>;
+  forfeited?: boolean;
 }
 export interface MovePayload {
   sources: Record<string, number>;
@@ -256,6 +257,8 @@ export interface Game {
   reserveRecoveryFrom: number;
   confirmedTechRulesFrom: number;
   activeReserveChecksFrom: number;
+  endReason?: "last_player_remaining";
+  forfeitCycle?: { round: number; phase: Phase; first: number };
 }
 export interface GameConfig {
   techPreset:
@@ -303,6 +306,7 @@ export interface ActionChoices {
   replacements?: Replacements;
 }
 export type Command =
+  | { type: "forfeit"; player: number }
   | { type: "bid"; amount: number }
   | { type: "selectEvent"; event: string }
   | ({ type: "eventChoice" } & EventChoices)

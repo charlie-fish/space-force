@@ -1,95 +1,66 @@
 # Space Force
 
-A browser implementation of Charlie Fish's board game, for desktop and mobile.
+A browser implementation of Charlie Fish's board game for **2–7 players**, on desktop or phone.
 
-**Current implementation: local prototype milestone v1.0.0, 23 November 2026.** A complete local pass-and-play game for **2–7 players sharing one device**, with normal turns, **all 30 Techs, all 30 Events and sealed bidding**. Three selectable Event scenarios each contain a pool of ten different cards. New games draw ten for two/three players (six rounds), or eight for four to seven (five rounds). Simpler Events remain available. Remote multiplayer is the next implementation milestone. iOS/iPadOS and Android apps are specified as a later delivery stage.
+**v1.1.0: online normal turns.** Create private invitations or public waiting games, play live or asynchronously, and resume your protected seat on another device. Local pass-and-play remains available. All 30 Techs and 30 Events are implemented. The simultaneous secret-action variant and Apple/Android apps remain later milestones.
 
-## Run the prototype
+## Play and setup
 
-For a desktop playtest without installing Node, open the [v1.0.0 release](https://github.com/charlie-fish/space-force/releases/tag/v1.0.0), download **space-force-v1.0.0-local.zip**, extract the entire ZIP, and try opening `index.html`. Keep its `art/` folder alongside it. If your browser restricts local files, use the HTTP instructions below. The portable copy has build checks; visual browser/device verification is still pending. **On iPhone, open a web address in Safari instead of opening index.html in Files:** see [phone testing instructions](docs/PHONE_TESTING.md).
+Choose **Random Techs** (default) or Family, Aggressive, Cunning, Economic or Peaceful from the rulebook. Events are **Random Events** (default) or **No Events (simple version)**. The map-code field starts blank for local games; a supplied code makes their setup repeatable. Online setup uses a server-private random seed. Test scenarios are removed from new-game controls; existing saved test games still load.
 
+Use the lobby to create a room, join a public waiting game, or enter a private invitation. Everyone reviews the settings and presses Ready; the host starts with the reviewed roster. The actual player count determines the board: Asimov is the six-player centre and Adams is the seven-player centre/home. Two/three players have ten Events and six normal rounds; four to seven have eight and five rounds. Ragnarök can shorten play.
 
-Install [Node.js 24 LTS](https://nodejs.org/), then run:
+Live games use the confirmed five-minute idle policy. Asynchronous rooms default to the designer-confirmed **48-hour response window plus 24-hour grace period**, configurable before starting. Eligible removal requires a strict majority of eligible other players; disconnection alone never forfeits a game. See [online play and recovery](docs/ONLINE_PLAY.md).
+
+**Keep your private seat recovery key private.** An invitation joins an empty waiting seat; the recovery key controls your existing seat. Save that key before clearing browser data or changing device.
+
+## Run online multiplayer
+
+Install [Node.js 24 LTS](https://nodejs.org/), then:
 
 ```sh
 git clone https://github.com/charlie-fish/space-force.git
 cd space-force
 git switch prototype/normal-turns
 npm ci
-npm run dev
+npm run build
+npm start
 ```
 
-Open **http://localhost:5173**. Choose players, names, a Tech display, and **Full Events & sealed bidding**. Select **Batch 1 · Economy & rules**, **Batch 2 · Actions & conflict**, or **Batch 3 · Board & planning**; each is a ten-card pool, drawing ten for two/three players or eight for four to seven. Batch 1 and Last ten Techs are the defaults. Standard random decks and simpler Events are also available. Foresight is legal normally with full Events. For the five-Tech PRODUCE example, enable **R01 chain test**: everyone starts with those Techs using five Reserve markers each.
+Open **http://localhost:3000**. Other devices on the same network can open the computer's network IP on port 3000. For Internet play, set `PUBLIC_ORIGIN` to the external HTTPS origin and run behind an HTTPS reverse proxy or use the D1-backed hosted Worker described in [the deployment guide](docs/ONLINE_PLAY.md#hosting-and-storage). Each device must use the same server address.
 
-Select homes by button or double-click/double-tap. System, planet and edge choices also support board selection and double-click/double-tap confirmation of the current draft. Events start in the first Economy: enter private bids using the covered handoff screens, then the winner chooses a card. Replay the same settings and map code, choosing the discarded alternatives, to test the drawn cards. For four or more players, change the map code to sample the two omitted cards. See the [0.22 playtest guide](docs/PLAYTEST_CHANGES_0.22.md), [0.21 Event feedback guide](docs/PLAYTEST_CHANGES_0.21.md) and [complete batch lists](docs/PLAYTEST_CHANGES_0.20.md). On a phone on the same network, open Vite's Network URL in Safari/Chrome; see [phone instructions](docs/PHONE_TESTING.md).
+The Node service persists games in `private-data/space-force.sqlite`. Set `SPACE_FORCE_DB` and `PORT` to override the database path and port. Keep this directory outside any static hosting root and back it up. The production service is one Node process or the hosted D1 Worker; it is not an in-memory demo.
 
-For a production static build, run `npm run build`; serve the generated `dist/` directory over HTTP(S). `npm run preview` serves that build locally on port 4173. `npm run package` also creates the portable playtest copy in `work/portable/`. The build supports hosting under a subpath. GitHub Actions runs the tests/build and provides a downloadable `space-force-static-prototype` artifact; it does not publish a live site.
+For development, run `npm run dev:online` in one terminal and `npm run dev` in another. Vite proxies `/api` to the service on port 3000. Use Vite's Network address on a phone. [Phone testing instructions](docs/PHONE_TESTING.md) explain why opening HTML from iPhone Files is insufficient.
 
-The [release workflow](.github/workflows/release.yml) verifies a saved version tag and archives tested local/static ZIPs with checksums on its GitHub release. An explicit `release-build/v1.0.0` tag can rebuild the existing `v1.0.0` checkpoint without moving it. Releases remain labelled as prototype milestones.
+## Local pass-and-play and downloads
 
-## Included now
+Select Local pass-and-play in the lobby, or run `npm run dev` without the server. Static hosting and the portable ZIP offer local games only; putting a static ZIP online does not create a multiplayer service.
 
-- Correct layouts, home/hidden pools, and 40 rockets/four chips per player. Six-player games use Asimov; seven-player games use Adams as the central seventh home.
-- Ordered chip stacks, all four actions, Investments, limited supplies, Economy, all thirty Tech effects, nested free-action chains, final scoring and tie-breaks.
-- All Techs: the final additions are Death Sun, Gravity Drive, Soylent Green, Mercenaries, Filibuster, Insurance, Eminent Domain, Sabotage, Flexible Economy and Foresight. Includes carried-Ship/casualty choices, separate Death Sun target groups, replacement Settlements, Insurance while own tokens remain, home-system reward placement, endgame chains and Sabotage without a Research lab discount. Mercenaries always resolves before Rapid Advance. The optional R01 starting-Tech scenario remains available.
-- Board, Techs, Event, Actions and Supply, and Player aid views, including after scoring. Both shared-aid faces appear together. Reserve and Credits stay visible; the player summary shows everyone's public supplies and current scores in order from the current first player, plus invested-slot counts. It starts collapsed at each required decision.
-- Hex artwork is drawn below every placed component, fixing the five-player Clarke/asteroid overlap. System names remain on top. Click/tap the explored system for a clockwise orientation preview before Commit; buttons remain available.
-- Seven designer-approved rocket silhouettes and matching poker-chip rim motifs, with chips anchored to the printed suns.
-- A top Status Box with highlighted turn details, a clear prompt, selected system/stack order, before/after/chained Tech previews before commitment, and a “Since your last turn” history toggle. Completion/resume scrolls to the results once; later view navigation stays available.
-- Inline Foresight with its heading above its button, above the active owner’s Reserve/Credits and one-Credit Flexible Economy returns below. Reserve warnings offer Go back and a reminder to return Credits in the Status Box; unfinished effects preserve previous gains/hooks. Only the active player gets Reserve interruptions; rival gifts use available Reserve and fail automatically when it is empty. C01–C04 are confirmed.
-- Selected-only chip previews with button or double-click/double-tap confirmation, compact owner-coloured stacks, clear legal-chip rings, doubled Settlement rockets and circular black-hole artwork, plus the supplied asteroid-belt and warp tokens.
-- Linked vertical production quantities, target-first attacks, editable Settlement allocations, 60-degree orientation previews before exploration movement choices, and compact selected-first Tech choices with current-state system previews.
-- Map pan/pinch/zoom, grouped pan/zoom/Reset View controls, shortcuts that scroll to their destination (S for Status Box; B/T/E/A/P for views), a 10pt live-text minimum, reduced motion and a skippable contextual guide. Shortcut hints are hidden on phones.
-- Event summaries mark completed one-off effects and name ongoing selectors. Vorsprung supports sorted selection/commit and double-click claims; Sabotage defaults to the highest affordable target. El Mayarah, Economic Boom, Alliance, Black Cloud and Disruptor show relevant reminders; Turtling defaults to available home Ships.
-- System/planet/edge selection and double-confirm on the Board, face-up Explore effect reminders after Prophecy, and original/per-draft Migration settlement totals.
-- Visible Economy stages, sealed bidding/Event selection, Investments/reinforcements on the Board and automatic first-player handover.
-- Explore outcome acknowledgements, locked-commitment Settlement redistribution, Reserve-shortfall pop-ups and confirmations for empty actions, inbound black-hole losses, excess sacrifices, unused reinforcements or ineffective Tech purchases.
-- Editable action and Settlement drafts, without a redundant Undo button. Committed actions and hidden reveals stay locked. Autosave/resume works through pending reveals and choices, with a session fallback when storage is blocked.
-- Exportable local game records with version, setup seed, command history, final state and scores. Deterministic replay tests cover complete games.
-- Optimised, self-hosted artwork from the supplied PDFs, replaceable through stable IDs and an art manifest. No runtime framework, external fonts, Steam links, or 3D engine.
+`npm run package` creates `dist/` for static hosting and `work/portable/` for desktop file opening. Keep `art/` alongside `index.html`. On iPhone, use a web address in Safari. Versioned local/static ZIPs and checksums are archived by the [release workflow](.github/workflows/release.yml); [v1.0.0](https://github.com/charlie-fish/space-force/releases/tag/v1.0.0) remains an immutable local reference.
 
-See [the v1.0.0 milestone and efficiency review](docs/PLAYTEST_CHANGES_1.0.md), [the 0.22 deck and board-choice changes](docs/PLAYTEST_CHANGES_0.22.md), [the 0.21 Event guidance and Tech choices](docs/PLAYTEST_CHANGES_0.21.md), [the 0.20 Events playtest guide](docs/PLAYTEST_CHANGES_0.20.md) and [the previous 0.19 changes](docs/PLAYTEST_CHANGES_0.19.md) and [prototype scope, controls, validation and limitations](docs/PROTOTYPE.md). The [0.18](docs/PLAYTEST_CHANGES_0.18.md), [0.17](docs/PLAYTEST_CHANGES_0.17.md), [0.16](docs/PLAYTEST_CHANGES_0.16.md), [0.15](docs/PLAYTEST_CHANGES_0.15.md), [0.14](docs/PLAYTEST_CHANGES_0.14.md), [0.13](docs/PLAYTEST_CHANGES_0.13.md), [0.12](docs/PLAYTEST_CHANGES_0.12.md), [0.11](docs/PLAYTEST_CHANGES_0.11.md), [0.10](docs/PLAYTEST_CHANGES_0.10.md) and [0.9](docs/PLAYTEST_CHANGES_0.9.md) checklists record previous iterations.
+## Controls and privacy
 
-## Next milestones
+Board, Techs, Event, Actions and Supply, and Player aid remain available through final scoring. Use B/T/E/A/P on desktop, S for the Status Box, touch pan/pinch/swipe on phones, and labelled button alternatives. Change draft selections before Commit; committed moves and hidden reveals cannot be undone. The contextual guide can be dismissed and replayed.
 
-The designer approved the current rockets and reported that all 30 Techs work as intended. The STL handoff is closed. Version 1.0.0 preserves those rules and controls, makes legal-target/artwork calculations cheaper, and records the Apple/Android app specification; combined interactions and real-device verification remain playtest priorities.
+Online commands are validated by the server against the current decision and protected seat. A retry uses the same command ID, so lost responses cannot spend resources twice. Unrevealed systems, Explore effects, Event decks, seed/RNG and other players' unrevealed bids stay server-side. Foresight is returned only to its authorised current owner. Public listings contain waiting-room metadata, not game secrets or credentials.
 
-1. Playtest the three implemented Event batches, bidding, Tech/Event combinations, duration/expiry, forced choices and end timing. Record feedback against the seed and exported game record.
-2. Test real phones through an HTTP(S) preview alongside that work; see [phone instructions](docs/PHONE_TESTING.md). A narrow desktop window does not replace Safari/Chrome testing on a phone.
-3. Follow [the next-phase plan](docs/NEXT_PHASE.md): add the authoritative server, public/private lobby, protected seats, seven independent clients, private state/bids, durable game/audit records, reconnect/recovery and confirmed five-minute majority removal.
-4. Add selectable simultaneous actions, recommended for four or more players, and the specified [asynchronous option](docs/ASYNCHRONOUS_PLAY.md) with its own agreed response/removal policy. Retain normal turns and local play.
-5. Build owner administration, game/score history, feedback management and optional GDPR-aware news sign-up/export. Complete the personal tutorial and cross-browser/device, accessibility, performance, deployment and backup verification before public launch.
-6. Deliver [iPhone/iPad and Android apps](docs/MOBILE_APPS.md) with browser cross-play, lifecycle recovery, optional notifications and store testing using the same rules/service.
-
-Review status, remaining inputs and acceptance checks: [designer checklist](docs/REVIEW_CHECKLIST.md) and [reminders](docs/REMINDERS.md).
-
-The current local game stores the full state on the shared device. Server-owned secrets, access control, durable multi-game records, feedback and mailing data are later milestones. There are no room or sign-up forms in this build.
-
-## Development
+## Verify and build
 
 ```sh
-npm test       # rules, complete games, deterministic replay, assets, and DOM interactions
-npm run check  # strict TypeScript
-npm run build  # production bundle, artwork references and compressed-JavaScript budget
+npm test          # rules, replay, legacy saves, HTTP service and DOM interactions
+npm run check     # strict TypeScript
+npm run package   # static and portable builds; artwork/load-budget checks
+npm run build:worker  # self-contained Worker and committed D1 migrations
+node --test tests/worker.integration.mjs  # deployed-bundle/D1 adapter smoke test
 ```
 
-The 334 automated checks cover all 30 Events and Techs, auctions, pending-choice recovery, and 190 complete seeded games across all supported player counts. DOM tests run in JSDOM; they do not replace visual browser/device testing. See [the validation record](docs/PROTOTYPE.md#validation).
+DOM/HTTP tests exercise independent sessions and complete games; they do not replace real Safari/Chrome/mobile visual and gesture testing. See [implemented scope and validation](docs/PROTOTYPE.md), [v1.1 playtest guide](docs/PLAYTEST_CHANGES_1.1.md), and [next phase](docs/NEXT_PHASE.md).
 
-Code: [engine](src/engine.ts), [UI](src/ui.ts), [state and commands](src/types.ts). Data: [layouts](src/layouts-data.json), [art/anchors](src/art-data.json), [card reference text](src/cards-data.json). All thirty Tech effects are implemented, with printed/random/playtest displays and legal exclusions. All Event effects and bidding are implemented locally; [Event rules and test pools](src/events.ts) remain separate from artwork.
+## Project references
 
-## Project documents
+[Project brief](docs/PROJECT_BRIEF.md) · [Rules and designer rulings](docs/RULES_REVIEW.md) · [Dropouts](docs/DROPOUTS.md) · [Asynchronous play](docs/ASYNCHRONOUS_PLAY.md) · [Review checklist](docs/REVIEW_CHECKLIST.md) · [Reminders](docs/REMINDERS.md) · [Change log](CHANGELOG.md)
 
-- [Designer review checklist and next steps](docs/REVIEW_CHECKLIST.md)
-- [Project brief and delivery stages](docs/PROJECT_BRIEF.md) · [next phase: online multiplayer](docs/NEXT_PHASE.md)
-- [iOS/iPadOS and Android app specification](docs/MOBILE_APPS.md)
-- [Gameplay interface](docs/GAMEPLAY_UI.md) · [dropouts](docs/DROPOUTS.md) · [asynchronous play](docs/ASYNCHRONOUS_PLAY.md) · [tutorial](docs/TUTORIAL.md)
-- [Rules review and confirmed rulings](docs/RULES_REVIEW.md) · [rules data](catalog/rules-clarifications.json)
-- [Assets and provenance](docs/ASSETS.md) · [component design](docs/COMPONENT_DESIGN.md) · [TTS review](docs/TTS_REVIEW.md)
-- [Lobby](docs/LOBBY.md) · [platform release checks](docs/PLATFORM_REVIEW.md)
-- [Decisions](docs/DECISIONS.md) · [outstanding reminders](docs/REMINDERS.md) · [change log](CHANGELOG.md)
+The owner admin area, feedback management, publication-news consent/export, full personal tutorial, simultaneous-action variant and native apps remain specified future work. Online game settings, accepted commands, timestamps, end reason and score records are already persisted for the later admin interface.
 
-## Data and ownership
-
-Space Force is designed by Charlie Fish. No open-source licence has been selected; code licensing and artwork permissions are separate decisions. The original PDFs are registered by filename/checksum and retained outside this public repository. The cover is extracted from the matching rulebook illustration; the original inline PNG binary remains to be archived.
-
-Private game records, feedback, newsletter addresses, consent evidence, credentials, and backups belong in protected backend storage, never this public Git repository.
+Core code: [rules](src/engine.ts), [interface](src/ui.ts), [lobby](src/lobby.ts), [online service](src/online/service.ts), [transport](src/online/client.ts), [Node server](server/node.mjs), [Worker](src/worker.ts). Artwork, card data, player identities and layout anchors remain separate from the service and rules to support future art and expansions.

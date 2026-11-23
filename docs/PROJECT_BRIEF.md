@@ -2,6 +2,8 @@
 
 Updated 23 November 2026 · Product specification with local, live, asynchronous and native mobile delivery
 
+Implemented now: [v1.1.0 live and asynchronous normal turns](PROTOTYPE.md). New-game setup offers Random/printed Techs and Random/No Events, without test scenarios. [Online play](ONLINE_PLAY.md) records the service, timing and recovery behaviour.
+
 ## Intended result
 
 Build a faithful, rules-enforced implementation of Space Force for 2–7 people connected to the same game through desktop/mobile browsers and installable Apple iOS/iPadOS and Android apps with cross-platform play. Make it quick to load, easy to learn, reliable when phones disconnect, and practical to maintain as artwork and rules evolve.
@@ -18,7 +20,7 @@ The user's message defines the software requirements. Attached documents supply 
 | Setup | Support all player counts from 2 to 7, the correct layouts, random content selection, and documented Tech presets. Exclude unused home designs from hidden tiles. Use Asimov only as the six-player centre and Adams only as the seven-player centre/home; neither enters random pools. Replace variant-excluded preset Techs with random legal value-2/3 Techs. Record the selected variables. |
 | Rules | Enforce legal actions, action-token stacks, limited rocket supply, sealed auctions, Tech/Event effects, end conditions, scoring, and ties. |
 | Multiplayer | Synchronise accepted actions and phase changes; preserve hidden information; reject duplicate, stale, out-of-turn, or unauthorised commands. |
-| Recovery | Save games durably and protect seat resumption. In live games, the confirmed five-minute majority-removal policy applies. Asynchronous games need a separate response/deadline policy; ordinary offline waiting is expected. Approved removal skips remaining turns and a sole non-removed player wins. See [DROPOUTS.md](DROPOUTS.md) and [asynchronous play](ASYNCHRONOUS_PLAY.md). |
+| Recovery | Save games durably and protect seat resumption. In live games, the confirmed five-minute majority-removal policy applies. Asynchronous games use the confirmed 48-hour response plus 24-hour grace default; ordinary offline waiting is expected. Approved removal skips remaining turns and a sole non-removed player wins. See [DROPOUTS.md](DROPOUTS.md) and [asynchronous play](ASYNCHRONOUS_PLAY.md). |
 | Navigation | Reach Board, Techs, Event, Actions, and Player Aid through visible controls; keep Reserve/Credits accessible. Support phone pinch/pan/swipe and safe desktop shortcuts with non-gesture alternatives. |
 | Undo | Allow correction only before a move is committed and only if no hidden information has been revealed. No post-commit Undo or table-vote override. |
 | Guidance | Highlight legal choices, explain unavailable actions/current effects, preview consequences, and provide Help plus the required skippable first-play tutorial in [TUTORIAL.md](TUTORIAL.md). |
@@ -27,7 +29,7 @@ The user's message defines the software requirements. Attached documents supply 
 
 Normal turns and the simultaneous-actions variant are distinct settings. Both allow up to seven people to be connected concurrently. The designer has confirmed **normal turns first, then the selectable variant**. Once available, recommend simultaneous play for four or more actual seated players, without silently changing the host's choice. In the variant, only token/slot choices are secret; after reveal, any player can declare a dependency and switch all participants to ordered resolution. See [DECISIONS.md](DECISIONS.md).
 
-Support **local pass-and-play, live online play and asynchronous online play**. Asynchronous participants can leave between decisions and resume later; its timing policy is separate from action-resolution mode. Show pending games, required decisions, deadlines and catch-up history. Fix the agreed asynchronous removal policy at match start; the live five-minute timeout must never apply. Numerical response/grace/vote windows remain to be agreed before implementing that option. See [ASYNCHRONOUS_PLAY.md](ASYNCHRONOUS_PLAY.md).
+Support **local pass-and-play, live online play and asynchronous online play**. Asynchronous participants can leave between decisions and resume later; its timing policy is separate from action-resolution mode. Show pending games, required decisions, deadlines and catch-up history. Fix the agreed asynchronous removal policy at match start; the live five-minute timeout must never apply. The default 48-hour response window plus 24-hour grace is confirmed and implemented; hosts may configure it before start. Votes remain open only while eligibility persists. See [ASYNCHRONOUS_PLAY.md](ASYNCHRONOUS_PLAY.md).
 
 The seven-player supply is 280 rockets, 28 action chips, seven individual action boards, plus one shared two-sided player aid. Existing shared card/token supplies remain unchanged. Reuse the twelve-tile outer layout for six/seven players, adding Asimov or Adams respectively at the centre. Adams supplies the seventh home planet. The designer has confirmed that the original system artwork is current. [game-configuration.json](../catalog/game-configuration.json) records quantities and count-specific setup.
 
@@ -35,7 +37,7 @@ The designer has answered R01–R08 and supplied additional setup, Prophecy, and
 
 ## Mobile applications
 
-Deliver App Store apps for iPhone/iPad and Google Play apps for Android phones/tablets using the same rules, content, online service and private administration. Preserve local pass-and-play, all five views, touch/accessibility controls and existing draft/commit behaviour. Handle backgrounding, network changes, safe retries, protected seat resumption, invitations and optional private notifications. Bundle/cache public assets for offline local play. See [MOBILE_APPS.md](MOBILE_APPS.md) for the proposed shared-client approach, store prerequisites and acceptance criteria. Apps follow the stable shared online service and production readiness milestones. No native packages are included in v1.0.0.
+Deliver App Store apps for iPhone/iPad and Google Play apps for Android phones/tablets using the same rules, content, online service and private administration. Preserve local pass-and-play, all five views, touch/accessibility controls and existing draft/commit behaviour. Handle backgrounding, network changes, safe retries, protected seat resumption, invitations and optional private notifications. Bundle/cache public assets for offline local play. See [MOBILE_APPS.md](MOBILE_APPS.md) for the proposed shared-client approach, store prerequisites and acceptance criteria. Apps follow the stable shared online service and production readiness milestones. No native packages are included in v1.1.0.
 
 ## Lobby and platform review
 

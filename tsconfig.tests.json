@@ -9,11 +9,13 @@
   },
   "include": [
     "src/types.ts",
+    "src/online/**/*.ts",
     "src/content.ts",
     "src/engine.ts",
     "src/geometry.ts",
     "src/persistence.ts",
     "src/ui.ts",
+    "src/lobby.ts",
     "src/**/*.json"
   ],
   "exclude": ["src/main.ts"]

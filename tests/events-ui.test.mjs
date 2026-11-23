@@ -37,37 +37,26 @@ function effect(name) {
 }
 const tile = (id) => `#galaxy .system[data-system="${id}"]`;
 
-test("setup selects all three ten-Event scenarios independently of Tech display and simpler mode", () => {
-  for (const id of Object.keys(EVENT_BATCHES)) {
-    const h = harness();
-    h.input('[data-setting="event-batch"]', id);
-    assert.ok(
-      EVENT_BATCHES[id].cards.every((name) =>
-        h.root.textContent.includes(
-          name === "ragnarok"
-            ? "Ragnarök"
-            : ({ "all-your-base": "All Your Base", "el-mayarah": "El Mayarah" }[
-                name
-              ] ??
-                name
-                  .split("-")
-                  .map((s) => s[0].toUpperCase() + s.slice(1))
-                  .join(" ")),
-        ),
-      ),
-    );
-    h.root
-      .querySelector("#setup-form")
-      .dispatchEvent(
-        new h.window.Event("submit", { bubbles: true, cancelable: true }),
-      );
-    assert.equal(h.app.getGame().config.eventBatch, id);
-    assert.equal(h.app.getGame().events.length, 10);
-    h.close();
-  }
+test("setup offers Random Events by default or No Events without test batches", () => {
   const h = harness();
-  h.input('[data-setting="event-mode"]', "simpler");
+  const select = h.root.querySelector('[data-setting="event-mode"]');
+  assert.equal(select.value, "full");
+  assert.deepEqual(
+    [...select.options].map((o) => o.value),
+    ["full", "simpler"],
+  );
   assert.equal(h.root.querySelector('[data-setting="event-batch"]'), null);
+  h.input('[data-setting="event-mode"]', "simpler");
+  h.root
+    .querySelector("#setup-form")
+    .dispatchEvent(
+      new h.window.Event("submit", { bubbles: true, cancelable: true }),
+    );
+  assert.equal(h.app.getGame().config.events, "simpler");
+  assert.equal(h.app.getGame().config.eventBatch, "standard");
+  h.click('[data-view="event"]');
+  assert.match(h.root.textContent, /No Events/);
+  assert.equal(h.root.querySelector(".event-pair"), null);
   h.close();
 });
 

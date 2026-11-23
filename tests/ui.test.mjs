@@ -364,7 +364,7 @@ test("Genesis without any empty valid planet asks for confirmation while preserv
   h.close();
 });
 
-test("Economy shows every stage, an explicit Event step, and Board reinforcements after Tech", () => {
+test("No Events skips bidding and moves from Investments to Tech, then Board reinforcements", () => {
   const h = harness(),
     g = fixture();
   g.phase = "investments";
@@ -376,15 +376,12 @@ test("Economy shows every stage, an explicit Event step, and Board reinforcement
     /Investments/,
   );
   h.click('[data-action="allocate"]');
-  assert.equal(h.app.getGame().phase, "event");
-  assert.equal(h.app.getView(), "event");
-  assert.equal(h.root.querySelectorAll(".event-pair img").length, 2);
+  assert.equal(h.app.getGame().phase, "tech");
+  assert.equal(h.app.getView(), "techs");
   assert.match(
     h.root.querySelector(".first-player-token").getAttribute("aria-label"),
-    /Event/,
+    /Tech/,
   );
-  h.click('[data-action="continue-event"]');
-  assert.equal(h.app.getView(), "techs");
   h.click('[data-action="pass-tech"]');
   h.click('[data-action="pass-tech"]');
   assert.equal(h.app.getGame().phase, "reinforce");
@@ -700,7 +697,7 @@ test("game export downloads a versioned JSON record with setup, commands, and cu
     h.click('[data-action="export"]');
     const record = JSON.parse(await blob.text());
     assert.match(download, /^space-force-/);
-    assert.equal(record.game.engine, "1.0.0");
+    assert.equal(record.game.engine, "1.1.0");
     assert.equal(record.game.content, "event-decks-board-targets-8");
     assert.equal(record.game.commands.length, record.game.revision);
     assert.equal(record.game.seed, h.app.getGame().seed);

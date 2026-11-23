@@ -176,34 +176,23 @@ test("reducing an uncommitted normal allocation clears Soylent replacements that
   h.close();
 });
 
-test("full Events include Foresight normally; simpler Events still replace it", () => {
-  const h = harness();
-  assert.equal(
-    h.root.querySelector('[data-setting="tech-preset"]').value,
-    "remaining",
-  );
-  assert.equal(
-    h.root.querySelector('[data-setting="event-mode"]').value,
-    "full",
-  );
-  h.input('[data-setting="event-mode"]', "simpler");
-  h.root
-    .querySelector("#setup-form")
-    .dispatchEvent(
-      new h.window.Event("submit", { bubbles: true, cancelable: true }),
+test("printed presets include Foresight with Random Events and exclude it with No Events", () => {
+  for (const mode of ["full", "simpler"]) {
+    const h = harness();
+    h.input('[data-setting="tech-preset"]', "cunning");
+    h.input('[data-setting="event-mode"]', mode);
+    h.root
+      .querySelector("#setup-form")
+      .dispatchEvent(
+        new h.window.Event("submit", { bubbles: true, cancelable: true }),
+      );
+    assert.equal(
+      h.app.getGame().market.includes("tech.foresight"),
+      mode === "full",
     );
-  assert.equal(h.app.getGame().market.includes("tech.foresight"), false);
-  assert.equal(h.app.getGame().config.events, "simpler");
-  h.close();
-  const testGame = harness();
-  testGame.root
-    .querySelector("#setup-form")
-    .dispatchEvent(
-      new testGame.window.Event("submit", { bubbles: true, cancelable: true }),
-    );
-  assert.deepEqual(testGame.app.getGame().market, REMAINING_TECHS);
-  assert.equal(testGame.app.getGame().config.events, "full");
-  testGame.close();
+    assert.equal(h.app.getGame().config.events, mode);
+    h.close();
+  }
 });
 
 test("Gravity Drive controls cap passengers, choose casualties, and confirm the affected owners before movement", () => {

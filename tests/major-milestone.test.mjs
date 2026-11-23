@@ -48,7 +48,7 @@ test("the release, package and saved-state identities agree while rules/content 
     readFileSync(new URL("../package.json", import.meta.url), "utf8"),
   );
   const g = createGame(7);
-  assert.equal(RELEASE_VERSION, "1.0.0");
+  assert.equal(RELEASE_VERSION, "1.1.0");
   assert.equal(pkg.version, RELEASE_VERSION);
   assert.equal(g.engine, RELEASE_VERSION);
   assert.equal(g.schema, GAME_SCHEMA);
