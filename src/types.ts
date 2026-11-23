@@ -1,3 +1,5 @@
+import type { RELEASE_VERSION, GAME_SCHEMA, GAME_CONTENT } from "./version.js";
+
 export type Action = "move" | "settle" | "produce" | "attack";
 export type Phase =
   | "homes"
@@ -190,9 +192,9 @@ export interface Score {
   total: number;
 }
 export interface Game {
-  schema: 11;
-  engine: "0.22.0";
-  content: "event-decks-board-targets-8";
+  schema: typeof GAME_SCHEMA;
+  engine: typeof RELEASE_VERSION;
+  content: typeof GAME_CONTENT;
   config: GameConfig;
   seed: number;
   rng: number;

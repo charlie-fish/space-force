@@ -13,6 +13,8 @@ export const HEX_WIDTH = Math.sqrt(3) * 100;
 export const WARP_WIDTH = 36;
 export const WARP_HEIGHT =
   (WARP_WIDTH * ART.features.warp.height) / ART.features.warp.width;
+const hexInset = (y: number) =>
+  y < 0.25 ? 0.5 - 2 * y : y > 0.75 ? 2 * y - 1.5 : 0;
 export function rotatePoint(x: number, y: number, rotation: number): Point {
   const angle = (rotation * Math.PI) / 3,
     px = (x - 0.5) * HEX_WIDTH,
@@ -50,29 +52,33 @@ export function findOpenSpace(
   const blocks = [...obstacles(s), ...occupied];
   let best = { x: 0.5, y: 0.8 },
     bestScore = -Infinity;
-  for (let y = 0.14; y <= 0.88; y += 0.035)
+  for (let y = 0.14; y <= 0.88; y += 0.035) {
+    const top = y - height / 2,
+      bottom = y + height / 2,
+      inset = Math.max(hexInset(top), hexInset(bottom)),
+      minX = inset + 0.025,
+      maxX = 1 - inset - 0.025;
     for (let x = 0.1; x <= 0.9; x += 0.035) {
-      const inside = [x - width / 2, x + width / 2].every((px) =>
-        [y - height / 2, y + height / 2].every((py) => {
-          const inset = py < 0.25 ? 0.5 - 2 * py : py > 0.75 ? 2 * py - 1.5 : 0;
-          return px > inset + 0.025 && px < 1 - inset - 0.025;
-        }),
-      );
-      if (!inside) continue;
-      const clearance = Math.min(
-        ...blocks.map((p) =>
+      const left = x - width / 2,
+        right = x + width / 2;
+      if (!(left > minX && left < maxX && right > minX && right < maxX))
+        continue;
+      let clearance = Infinity;
+      for (const p of blocks)
+        clearance = Math.min(
+          clearance,
           Math.hypot(
             (x - p.x) / (p.radiusX + width / 2),
             (y - p.y) / (p.radiusY + height / 2),
           ),
-        ),
-      );
+        );
       const score = clearance - Math.abs(y - 0.66) * 0.025;
       if (score > bestScore) {
         best = { x, y };
         bestScore = score;
       }
     }
+  }
   return best;
 }
 export function fleetPositions(s: System): Point[] {

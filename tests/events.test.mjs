@@ -567,7 +567,7 @@ test("active Events persist through the next Investments and are discarded exact
 
 test("0.19 records migrate without enabling Events or changing pieces and remain exactly replayable", () => {
   const g = restoreGame(oldSave);
-  assert.equal(g.engine, "0.22.0");
+  assert.equal(g.engine, "1.0.0");
   assert.equal(g.config.events, "foresight-test");
   assert.equal(g.activeEvent, null);
   for (const key of ["round", "phase", "turn", "systems"])

@@ -2,11 +2,11 @@
 
 A browser implementation of Charlie Fish's board game, for desktop and mobile.
 
-**Current implementation: prototype 0.22.0, 22 November 2026.** A complete local pass-and-play game for **2–7 players sharing one device**, with normal turns, **all 30 Techs, all 30 Events and sealed bidding**. Three selectable Event scenarios each contain a pool of ten different cards. New games draw ten for two/three players (six rounds), or eight for four to seven (five rounds). Simpler Events remain available. Remote multiplayer is the next implementation milestone.
+**Current implementation: local prototype milestone v1.0.0, 23 November 2026.** A complete local pass-and-play game for **2–7 players sharing one device**, with normal turns, **all 30 Techs, all 30 Events and sealed bidding**. Three selectable Event scenarios each contain a pool of ten different cards. New games draw ten for two/three players (six rounds), or eight for four to seven (five rounds). Simpler Events remain available. Remote multiplayer is the next implementation milestone. iOS/iPadOS and Android apps are specified as a later delivery stage.
 
 ## Run the prototype
 
-For a desktop playtest without installing Node, open a successful [Prototype checks run](https://github.com/charlie-fish/space-force/actions/workflows/prototype.yml), download **space-force-local-prototype**, extract the entire ZIP, and try opening `index.html`. Keep its `art/` folder alongside it. If your browser restricts local files, use the HTTP instructions below. The portable copy has build checks; visual browser/device verification is still pending. **On iPhone, open a web address in Safari instead of opening index.html in Files:** see [phone testing instructions](docs/PHONE_TESTING.md).
+For a desktop playtest without installing Node, open the [v1.0.0 release](https://github.com/charlie-fish/space-force/releases/tag/v1.0.0), download **space-force-v1.0.0-local.zip**, extract the entire ZIP, and try opening `index.html`. Keep its `art/` folder alongside it. If your browser restricts local files, use the HTTP instructions below. The portable copy has build checks; visual browser/device verification is still pending. **On iPhone, open a web address in Safari instead of opening index.html in Files:** see [phone testing instructions](docs/PHONE_TESTING.md).
 
 
 Install [Node.js 24 LTS](https://nodejs.org/), then run:
@@ -46,17 +46,18 @@ For a production static build, run `npm run build`; serve the generated `dist/` 
 - Exportable local game records with version, setup seed, command history, final state and scores. Deterministic replay tests cover complete games.
 - Optimised, self-hosted artwork from the supplied PDFs, replaceable through stable IDs and an art manifest. No runtime framework, external fonts, Steam links, or 3D engine.
 
-See [the 0.22 deck and board-choice changes](docs/PLAYTEST_CHANGES_0.22.md), [the 0.21 Event guidance and Tech choices](docs/PLAYTEST_CHANGES_0.21.md), [the 0.20 Events playtest guide](docs/PLAYTEST_CHANGES_0.20.md) and [the previous 0.19 changes](docs/PLAYTEST_CHANGES_0.19.md) and [prototype scope, controls, validation and limitations](docs/PROTOTYPE.md). The [0.18](docs/PLAYTEST_CHANGES_0.18.md), [0.17](docs/PLAYTEST_CHANGES_0.17.md), [0.16](docs/PLAYTEST_CHANGES_0.16.md), [0.15](docs/PLAYTEST_CHANGES_0.15.md), [0.14](docs/PLAYTEST_CHANGES_0.14.md), [0.13](docs/PLAYTEST_CHANGES_0.13.md), [0.12](docs/PLAYTEST_CHANGES_0.12.md), [0.11](docs/PLAYTEST_CHANGES_0.11.md), [0.10](docs/PLAYTEST_CHANGES_0.10.md) and [0.9](docs/PLAYTEST_CHANGES_0.9.md) checklists record previous iterations.
+See [the v1.0.0 milestone and efficiency review](docs/PLAYTEST_CHANGES_1.0.md), [the 0.22 deck and board-choice changes](docs/PLAYTEST_CHANGES_0.22.md), [the 0.21 Event guidance and Tech choices](docs/PLAYTEST_CHANGES_0.21.md), [the 0.20 Events playtest guide](docs/PLAYTEST_CHANGES_0.20.md) and [the previous 0.19 changes](docs/PLAYTEST_CHANGES_0.19.md) and [prototype scope, controls, validation and limitations](docs/PROTOTYPE.md). The [0.18](docs/PLAYTEST_CHANGES_0.18.md), [0.17](docs/PLAYTEST_CHANGES_0.17.md), [0.16](docs/PLAYTEST_CHANGES_0.16.md), [0.15](docs/PLAYTEST_CHANGES_0.15.md), [0.14](docs/PLAYTEST_CHANGES_0.14.md), [0.13](docs/PLAYTEST_CHANGES_0.13.md), [0.12](docs/PLAYTEST_CHANGES_0.12.md), [0.11](docs/PLAYTEST_CHANGES_0.11.md), [0.10](docs/PLAYTEST_CHANGES_0.10.md) and [0.9](docs/PLAYTEST_CHANGES_0.9.md) checklists record previous iterations.
 
 ## Next milestones
 
-The designer approved the current rockets and reported that all 30 Techs work as intended. The STL handoff is closed. Version 0.22 corrects all four-plus-player Event decks, extends board target confirmation, and adds public Explore reminders and original Migration totals; combined interactions and real-device verification remain playtest priorities.
+The designer approved the current rockets and reported that all 30 Techs work as intended. The STL handoff is closed. Version 1.0.0 preserves those rules and controls, makes legal-target/artwork calculations cheaper, and records the Apple/Android app specification; combined interactions and real-device verification remain playtest priorities.
 
 1. Playtest the three implemented Event batches, bidding, Tech/Event combinations, duration/expiry, forced choices and end timing. Record feedback against the seed and exported game record.
 2. Test real phones through an HTTP(S) preview alongside that work; see [phone instructions](docs/PHONE_TESTING.md). A narrow desktop window does not replace Safari/Chrome testing on a phone.
-3. Add the authoritative server, public/private lobby, protected seats, seven independent clients, private state/bids, durable game/audit records, reconnect/recovery and confirmed five-minute majority removal.
+3. Follow [the next-phase plan](docs/NEXT_PHASE.md): add the authoritative server, public/private lobby, protected seats, seven independent clients, private state/bids, durable game/audit records, reconnect/recovery and confirmed five-minute majority removal.
 4. Add selectable simultaneous actions, recommended for four or more players, and the specified [asynchronous option](docs/ASYNCHRONOUS_PLAY.md) with its own agreed response/removal policy. Retain normal turns and local play.
 5. Build owner administration, game/score history, feedback management and optional GDPR-aware news sign-up/export. Complete the personal tutorial and cross-browser/device, accessibility, performance, deployment and backup verification before public launch.
+6. Deliver [iPhone/iPad and Android apps](docs/MOBILE_APPS.md) with browser cross-play, lifecycle recovery, optional notifications and store testing using the same rules/service.
 
 Review status, remaining inputs and acceptance checks: [designer checklist](docs/REVIEW_CHECKLIST.md) and [reminders](docs/REMINDERS.md).
 
@@ -70,14 +71,15 @@ npm run check  # strict TypeScript
 npm run build  # production bundle, artwork references and compressed-JavaScript budget
 ```
 
-The 323 automated checks cover all 30 Events and Techs, auctions, pending-choice recovery, and 187 complete seeded games across all supported player counts. DOM tests run in JSDOM; they do not replace visual browser/device testing. See [the validation record](docs/PROTOTYPE.md#validation).
+The 334 automated checks cover all 30 Events and Techs, auctions, pending-choice recovery, and 190 complete seeded games across all supported player counts. DOM tests run in JSDOM; they do not replace visual browser/device testing. See [the validation record](docs/PROTOTYPE.md#validation).
 
 Code: [engine](src/engine.ts), [UI](src/ui.ts), [state and commands](src/types.ts). Data: [layouts](src/layouts-data.json), [art/anchors](src/art-data.json), [card reference text](src/cards-data.json). All thirty Tech effects are implemented, with printed/random/playtest displays and legal exclusions. All Event effects and bidding are implemented locally; [Event rules and test pools](src/events.ts) remain separate from artwork.
 
 ## Project documents
 
 - [Designer review checklist and next steps](docs/REVIEW_CHECKLIST.md)
-- [Project brief and delivery stages](docs/PROJECT_BRIEF.md)
+- [Project brief and delivery stages](docs/PROJECT_BRIEF.md) · [next phase: online multiplayer](docs/NEXT_PHASE.md)
+- [iOS/iPadOS and Android app specification](docs/MOBILE_APPS.md)
 - [Gameplay interface](docs/GAMEPLAY_UI.md) · [dropouts](docs/DROPOUTS.md) · [asynchronous play](docs/ASYNCHRONOUS_PLAY.md) · [tutorial](docs/TUTORIAL.md)
 - [Rules review and confirmed rulings](docs/RULES_REVIEW.md) · [rules data](catalog/rules-clarifications.json)
 - [Assets and provenance](docs/ASSETS.md) · [component design](docs/COMPONENT_DESIGN.md) · [TTS review](docs/TTS_REVIEW.md)

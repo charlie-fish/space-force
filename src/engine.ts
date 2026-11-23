@@ -53,6 +53,7 @@ import {
   WARP_WIDTH,
   WARP_HEIGHT,
 } from "./geometry.js";
+import { RELEASE_VERSION, GAME_SCHEMA, GAME_CONTENT } from "./version.js";
 
 const clone = <T>(value: T): T => JSON.parse(JSON.stringify(value));
 function requireRule(test: unknown, message: string): asserts test {
@@ -141,9 +142,9 @@ function initializeGame(
     "Choose a supported test setup.",
   );
   const g: Game = {
-    schema: 11,
-    engine: "0.22.0",
-    content: "event-decks-board-targets-8",
+    schema: GAME_SCHEMA,
+    engine: RELEASE_VERSION,
+    content: GAME_CONTENT,
     config: { ...clone(config), events: config.events ?? "simpler" },
     seed: seed >>> 0,
     rng: seed >>> 0,
@@ -371,23 +372,36 @@ export function canMove(
   );
 }
 export function boardConnected(g: Game): boolean {
-  const seen = new Set([g.systems[0].id]);
-  const todo = [g.systems[0]];
+  const positions = g.systems.map((s) => ({
+    system: s,
+    warp: warp(s),
+    edges: edges(s),
+  }));
+  const seen = new Set([positions[0].system.id]);
+  const todo = [positions[0]];
   while (todo.length) {
     const a = todo.pop()!;
-    for (const b of g.systems) {
-      if (seen.has(b.id)) continue;
-      const e = edgeBetween(a, b);
+    for (const b of positions) {
+      if (seen.has(b.system.id)) continue;
+      const e = edgeBetween(a.system, b.system);
       if (
-        (warp(a) && warp(b)) ||
-        (e >= 0 && !edges(a).includes(e) && !edges(b).includes((e + 3) % 6))
+        (a.warp && b.warp) ||
+        (e >= 0 && !a.edges.includes(e) && !b.edges.includes((e + 3) % 6))
       ) {
-        seen.add(b.id);
+        seen.add(b.system.id);
         todo.push(b);
       }
     }
   }
   return seen.size === g.systems.length;
+}
+
+/** Read-only rule queries need an isolated board edit, not a copy of game history. */
+function boardWithSystem(g: Game, target: System): Game {
+  return {
+    ...g,
+    systems: g.systems.map((s) => (s.id === target.id ? target : s)),
+  };
 }
 export function legalOrientations(
   g: Game,
@@ -395,14 +409,14 @@ export function legalOrientations(
   sources: Record<string, number>,
 ): number[] {
   const result: number[] = [];
+  const target = { ...system(g, targetId), revealed: true };
+  const copy = boardWithSystem(g, target);
+  const incoming = Object.entries(sources);
   for (let r = 0; r < 6; r++) {
-    const copy = clone(g);
-    const target = system(copy, targetId);
-    target.revealed = true;
     target.rotation = r;
     if (
       boardConnected(copy) &&
-      Object.entries(sources).every(
+      incoming.every(
         ([id, n]) =>
           n === 0 || canMove(copy, copy.turn, system(copy, id), target),
       )
@@ -455,7 +469,6 @@ export function purchaseReason(
   free = false,
 ): string | null {
   const p = player(g, id);
-  const card = CARD_MAP[tech];
   if (!g.market.includes(tech) || !IMPLEMENTED_TECHS.includes(tech))
     return "This Tech is outside the prototype preset.";
   if (p.techs.includes(tech)) return "You already own this Tech.";
@@ -2363,8 +2376,10 @@ export function featureOptions(
     if (tech === "tech.kessler-syndrome" && !g.features.asteroid)
       for (let edge = 0; edge < 6; edge++) {
         if (edges(s).includes(edge)) continue;
-        const copy = clone(g);
-        system(copy, s.id).extraEdges.push(edge);
+        const copy = boardWithSystem(g, {
+          ...s,
+          extraEdges: [...s.extraEdges, edge],
+        });
         if (boardConnected(copy)) options.push({ system: s.id, edge });
       }
   }
@@ -2383,11 +2398,16 @@ function buy(
     finishTechTurn(g);
     return;
   }
-  requireRule(
-    !purchaseReason(g, tech, g.turn, fullPrice, value, sabotageTarget, free),
-    purchaseReason(g, tech, g.turn, fullPrice, value, sabotageTarget, free) ??
-      "Cannot buy Tech.",
+  const reason = purchaseReason(
+    g,
+    tech,
+    g.turn,
+    fullPrice,
+    value,
+    sabotageTarget,
+    free,
   );
+  requireRule(!reason, reason ?? "Cannot buy Tech.");
   const p = player(g);
   if (tech === "tech.sabotage")
     requireRule(
@@ -3240,9 +3260,9 @@ export function replayGame(
 
 export function assertInvariants(g: Game) {
   requireRule(
-    g.schema === 11 &&
-      g.engine === "0.22.0" &&
-      g.content === "event-decks-board-targets-8",
+    g.schema === GAME_SCHEMA &&
+      g.engine === RELEASE_VERSION &&
+      g.content === GAME_CONTENT,
     "Unsupported saved-game version.",
   );
   requireRule(

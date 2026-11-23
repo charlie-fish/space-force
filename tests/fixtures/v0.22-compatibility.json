@@ -1,0 +1,181 @@
+{
+  "engine": "0.22.0",
+  "commit": "dcfc1214421e65fa21a6cb53aaf04eb9bb616697",
+  "queries": [
+    {
+      "count": 2,
+      "seed": 41,
+      "sha256": "28f49adcd8f7a12bdde6c640ab191959500630df204b64f60ed145fcbfd733d0"
+    },
+    {
+      "count": 3,
+      "seed": 41,
+      "sha256": "5d121e0bc11f8e0653dd35433136ac918805c120b65a4ae729745741e11d81dc"
+    },
+    {
+      "count": 4,
+      "seed": 41,
+      "sha256": "32e11e905de878bcfbf4b219397326b51be6475ea79f70a8c1e0c79f900b9a39"
+    },
+    {
+      "count": 5,
+      "seed": 41,
+      "sha256": "21596d3fdccf1c43a848ba443c5738ddd38f8a9a4958533d79b3ba0db2c6da0e"
+    },
+    {
+      "count": 6,
+      "seed": 41,
+      "sha256": "2576187ec19281e68dd29773da41ec1c348b3075eb4ae93dd522af668d70961b"
+    },
+    {
+      "count": 7,
+      "seed": 41,
+      "sha256": "04f5b029eb5b02ced36a9edaa627fa5b284c58ddfe5311221cfbfc420040d230"
+    }
+  ],
+  "games": [
+    {
+      "count": 2,
+      "seed": 41,
+      "batch": "batch-1",
+      "revision": 164,
+      "round": 6,
+      "scores": [
+        {
+          "player": 0,
+          "planets": 10,
+          "systems": 1,
+          "techs": 1,
+          "credits": 0,
+          "total": 12
+        },
+        {
+          "player": 1,
+          "planets": 9,
+          "systems": 1,
+          "techs": 3,
+          "credits": 0,
+          "total": 13
+        }
+      ],
+      "winners": [
+        1
+      ],
+      "sha256": "8e7b4afe56232c431a23474ab9f194c5871ad73301170ba1cdfa2516c3e98e16"
+    },
+    {
+      "count": 4,
+      "seed": 41,
+      "batch": "batch-2",
+      "revision": 260,
+      "round": 5,
+      "scores": [
+        {
+          "player": 0,
+          "planets": 9,
+          "systems": 2,
+          "techs": 1,
+          "credits": 1,
+          "total": 12
+        },
+        {
+          "player": 1,
+          "planets": 9,
+          "systems": 3,
+          "techs": 1,
+          "credits": 1,
+          "total": 13
+        },
+        {
+          "player": 2,
+          "planets": 7,
+          "systems": 1,
+          "techs": 2,
+          "credits": 0,
+          "total": 10
+        },
+        {
+          "player": 3,
+          "planets": 8,
+          "systems": 3,
+          "techs": 1,
+          "credits": 1,
+          "total": 12
+        }
+      ],
+      "winners": [
+        1
+      ],
+      "sha256": "ff8a015409a5fa2d699b94745a72a7cefbecf1df9f15295f5a1230e2e5466920"
+    },
+    {
+      "count": 7,
+      "seed": 41,
+      "batch": "batch-3",
+      "revision": 456,
+      "round": 5,
+      "scores": [
+        {
+          "player": 0,
+          "planets": 10,
+          "systems": 2,
+          "techs": 1,
+          "credits": 2,
+          "total": 13
+        },
+        {
+          "player": 1,
+          "planets": 8,
+          "systems": 2,
+          "techs": 1,
+          "credits": 0,
+          "total": 11
+        },
+        {
+          "player": 2,
+          "planets": 9,
+          "systems": 2,
+          "techs": 4,
+          "credits": 5,
+          "total": 15
+        },
+        {
+          "player": 3,
+          "planets": 12,
+          "systems": 3,
+          "techs": 2,
+          "credits": 1,
+          "total": 17
+        },
+        {
+          "player": 4,
+          "planets": 8,
+          "systems": 1,
+          "techs": 2,
+          "credits": 0,
+          "total": 11
+        },
+        {
+          "player": 5,
+          "planets": 7,
+          "systems": 3,
+          "techs": 1,
+          "credits": 1,
+          "total": 11
+        },
+        {
+          "player": 6,
+          "planets": 5,
+          "systems": 2,
+          "techs": 3,
+          "credits": 2,
+          "total": 10
+        }
+      ],
+      "winners": [
+        3
+      ],
+      "sha256": "500216ee4ad3f3efeda510e873625a5584256b3209906134ecf47ddf24438e2b"
+    }
+  ]
+}

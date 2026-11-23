@@ -63,6 +63,7 @@ import {
   WARP_HEIGHT,
 } from "./geometry.js";
 import { restoreGame } from "./persistence.js";
+import { RELEASE_VERSION } from "./version.js";
 import {
   intentWarnings,
   reserveNotice,
@@ -95,6 +96,8 @@ interface BoardGesture {
 }
 
 type View = "board" | "techs" | "event" | "actions" | "player_aid";
+const defaultDecisionView = (g: Game): View =>
+  !g.pending && g.phase === "tech" ? "techs" : "board";
 interface Draft {
   action: Action | null;
   slot?: Action;
@@ -582,13 +585,7 @@ export function mountApp(
       bidAmount = 0;
       resetRoster = true;
       reserveWarningOpen = true;
-      view = loaded.pending
-        ? "board"
-        : loaded.phase === "tech"
-          ? "techs"
-          : loaded.phase === "investments"
-            ? "board"
-            : "board";
+      view = defaultDecisionView(loaded);
       draft = freshDraft();
       if (loaded.pending?.kind === "move") {
         draft.sources = { ...loaded.pending.sources };
@@ -733,7 +730,7 @@ export function mountApp(
     return `<aside class="guide" aria-label="Learn as you play"><div><span class="eyebrow">Learn as you play</span><p>${escape(g.pending ? instruction(g) : tips[g.phase])}</p></div>${button("Hide guide", "guide-off", "", false, "quiet")}</aside>`;
   }
   function landing() {
-    return `<main class="landing"><div class="landing-art"><img src="${ART.cover.image}" width="562" height="768" alt="Space Force cover: rocket fleets above a ringed planet"/><span class="cover-credit">A game by Charlie Fish</span></div><section class="landing-copy"><div class="eyebrow">Local pass-and-play · Prototype 0.22</div><h1>Claim your<br/><span>corner of space.</span></h1><p class="lead">Plan your moves. Explore new systems. Settle the galaxy.</p><div class="scope-note"><strong>This build: ${TECH_PRESETS[techPreset].label} · ${eventMode === "full" ? "full Events & bidding" : eventMode === "foresight-test" ? "Tech playtest Events" : "simpler Events"}.</strong><span>A complete local game for 2–7 players on one device, with all 30 Techs, all 30 Events and sealed bidding. Choose an Event test batch below. Remote rooms follow later.</span></div><form id="setup-form"><fieldset><legend>How many players?</legend><div class="player-counts">${Array.from({ length: 6 }, (_, i) => button(String(i + 2), "count", `data-count="${i + 2}" aria-pressed="${count === i + 2}"`, false, count === i + 2 ? "selected" : "")).join("")}</div></fieldset><fieldset class="setup-options"><legend>Tech display</legend><label>Preset <select data-setting="tech-preset">${Object.entries(
+    return `<main class="landing"><div class="landing-art"><img src="${ART.cover.image}" width="562" height="768" alt="Space Force cover: rocket fleets above a ringed planet"/><span class="cover-credit">A game by Charlie Fish</span></div><section class="landing-copy"><div class="eyebrow">Local pass-and-play · Prototype ${RELEASE_VERSION}</div><h1>Claim your<br/><span>corner of space.</span></h1><p class="lead">Plan your moves. Explore new systems. Settle the galaxy.</p><div class="scope-note"><strong>This build: ${TECH_PRESETS[techPreset].label} · ${eventMode === "full" ? "full Events & bidding" : eventMode === "foresight-test" ? "Tech playtest Events" : "simpler Events"}.</strong><span>A complete local game for 2–7 players on one device, with all 30 Techs, all 30 Events and sealed bidding. Choose an Event test batch below. Remote rooms follow later.</span></div><form id="setup-form"><fieldset><legend>How many players?</legend><div class="player-counts">${Array.from({ length: 6 }, (_, i) => button(String(i + 2), "count", `data-count="${i + 2}" aria-pressed="${count === i + 2}"`, false, count === i + 2 ? "selected" : "")).join("")}</div></fieldset><fieldset class="setup-options"><legend>Tech display</legend><label>Preset <select data-setting="tech-preset">${Object.entries(
       TECH_PRESETS,
     )
       .map(
@@ -841,12 +838,11 @@ export function mountApp(
     const sun = s.revealed
       ? rotatePoint(art.sun.x, art.sun.y, rotation)
       : { x: 0, y: 0 };
-    const top = s.tokens[s.tokens.length - 1],
-      eligible =
-        !miniature &&
-        g.phase === "actions" &&
-        !g.pending &&
-        eligibleTokens(g).some((o) => o.id === s.id);
+    const eligible =
+      !miniature &&
+      g.phase === "actions" &&
+      !g.pending &&
+      eligibleTokens(g).some((o) => o.id === s.id);
     const legal =
       !miniature && g.phase === "plan" && !g.pending && canPlan(g, s);
     const planets = !s.revealed
@@ -2513,7 +2509,7 @@ export function mountApp(
       [
         JSON.stringify(
           {
-            application: "Space Force local prototype 0.22.0",
+            application: `Space Force local prototype ${RELEASE_VERSION}`,
             exportedAt: new Date().toISOString(),
             game,
           },
@@ -2552,15 +2548,7 @@ export function mountApp(
   }
   function decisionView() {
     if (!game) return;
-    setView(
-      game.pending
-        ? "board"
-        : game.phase === "tech"
-          ? "techs"
-          : game.phase === "investments"
-            ? "board"
-            : "board",
-    );
+    setView(defaultDecisionView(game));
   }
   function rotateOrientation(delta: number) {
     if (game?.pending?.kind !== "orient") return;
@@ -3718,6 +3706,7 @@ export function mountApp(
       suppressClickUntil = Date.now() + 350;
     }
     const tile = target.closest<SVGElement>("[data-system]");
+    const boardTarget = tile ? readBoardTarget(target) : null;
     if (
       game &&
       event.pointerType === "touch" &&
@@ -3727,8 +3716,8 @@ export function mountApp(
         (game.pending?.kind === "orient" &&
           game.pending.system === tile.dataset.system) ||
         (!(game.phase === "plan" && !game.pending) &&
-          readBoardTarget(target) &&
-          boardConfirmation(game, readBoardTarget(target)!)))
+          boardTarget &&
+          boardConfirmation(game, boardTarget)))
     )
       boardTap = {
         kind:
@@ -3737,7 +3726,7 @@ export function mountApp(
             : game.pending?.kind === "orient"
               ? "orient"
               : "choice",
-        target: readBoardTarget(target) ?? undefined,
+        target: boardTarget ?? undefined,
         id: event.pointerId,
         system: tile.dataset.system!,
         x: event.clientX,

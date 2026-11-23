@@ -1,6 +1,6 @@
 # Reminders and asset handoffs
 
-Updated 22 November 2026. Keep this checklist current as files and checks arrive. These are persistent project reminders, not scheduled notifications.
+Updated 23 November 2026. Keep this checklist current as files and checks arrive. These are persistent project reminders, not scheduled notifications.
 
 Review priorities and next steps: [REVIEW_CHECKLIST.md](REVIEW_CHECKLIST.md).
 
@@ -16,6 +16,11 @@ Review priorities and next steps: [REVIEW_CHECKLIST.md](REVIEW_CHECKLIST.md).
 - [x] **Rocket STL handoff closed (17 November 2026).** The designer approves the current rocket appearances; no STL files are required.
 
 ## Project work to retain
+
+- [x] Save major local milestone v1.0.0: safe rules-query/layout efficiency improvements, unchanged functionality, older-save compatibility and a versioned release archive. See [the milestone guide](PLAYTEST_CHANGES_1.0.md).
+- [x] Add [Apple iOS/iPadOS and Android apps](MOBILE_APPS.md) to the specification with shared-service cross-play and a separate delivery milestone.
+- [ ] Implement [the next phase: authoritative remote normal-turn play](NEXT_PHASE.md), with public/private rooms, protected seats, durable/private state and confirmed recovery/dropouts.
+- [ ] Deliver the mobile apps after the shared service is stable. Before store testing, arrange store accounts/signing ownership, supported OS/device evidence, app assets, support/privacy URLs and optional push configuration. Keep signing secrets outside Git.
 
 - [x] Apply [0.21](PLAYTEST_CHANGES_0.21.md): Event completion/selector summaries, sorted and committed Vorsprung claims, affordable Sabotage defaults, Turtling defaults, action-specific Event reminders and the five text updates.
 

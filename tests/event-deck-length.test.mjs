@@ -49,7 +49,7 @@ test("the last Economy and final results occur in round five for 4–7 players a
 
 test("an actual 0.21 ten-card four-player save preserves its original deck, six-round schedule and final scores", () => {
   let g = restoreGame(old.game);
-  assert.equal(g.engine, "0.22.0");
+  assert.equal(g.engine, "1.0.0");
   assert.equal(g.initialEventCards, 10);
   assert.equal(g.roundLimit, 6);
   for (const key of [

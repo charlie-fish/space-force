@@ -10,6 +10,7 @@ import {
   replayGame,
 } from "./engine.js";
 import type { Command, Game, GameConfig } from "./types.js";
+import { RELEASE_VERSION, GAME_SCHEMA, GAME_CONTENT } from "./version.js";
 
 /** Replay compatible older records, accepting only the newly added pauses. */
 export function restoreGame(value: unknown): Game {
@@ -26,14 +27,20 @@ export function restoreGame(value: unknown): Game {
     reserveRecoveryFrom?: number;
     confirmedTechRulesFrom?: number;
   };
+  if (stored.engine === "0.22.0") {
+    // Rules and state shape are unchanged in the major local-prototype milestone.
+    const compatible: Game = { ...(value as Game), engine: RELEASE_VERSION };
+    assertInvariants(compatible);
+    return compatible;
+  }
   if (["0.20.0", "0.21.0"].includes(stored.engine)) {
     if (stored.schema !== 10 || stored.content !== "full-events-bidding-7")
       throw Error("Invalid legacy save.");
     const compatible: Game = {
       ...(value as Game),
-      schema: 11,
-      engine: "0.22.0",
-      content: "event-decks-board-targets-8",
+      schema: GAME_SCHEMA,
+      engine: RELEASE_VERSION,
+      content: GAME_CONTENT,
       initialEventCards:
         stored.players.length <= 3 ||
         (stored.config?.eventBatch && stored.config.eventBatch !== "standard")

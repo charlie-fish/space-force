@@ -711,7 +711,7 @@ test("genuine 0.14 nested-chain saves migrate at intermediate choices and retain
     });
     assert.equal(g.pending.kind, point.pending);
     assert.equal(g.phase, point.phase);
-    assert.equal(g.engine, "0.22.0");
+    assert.equal(g.engine, "1.0.0");
     assert.ok(g.context);
   }
   const done = restoreGame(oldChain);

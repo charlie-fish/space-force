@@ -1,5 +1,12 @@
 # Change log
 
+## 1.0.0 — 2026-11-23
+
+- Save the local prototype as a major tagged/archive milestone with unchanged rules, controls and schema/content. Preserve existing 0.22 saves, private bids and pending decisions; retain earlier migrations.
+- Replace full-history copies in read-only orientation/asteroid queries with isolated board edits, reuse connectivity data and purchase validation, reduce artwork-search allocations, remove redundant navigation/target work and unused locals. Centralise release identity and enable unused-code compiler checks.
+- Pass 334 checks including 190 complete seeded games, with exact 0.22 compatibility captures for all player counts, three complete state comparisons and a genuine auction checkpoint; strict compilation and static/portable packaging also pass. See [the v1.0.0 record](docs/PLAYTEST_CHANGES_1.0.md) for measured query timings and verification.
+- Add required [Apple iOS/iPadOS and Android apps](docs/MOBILE_APPS.md) to the specification and delivery plan. Record [authoritative online multiplayer](docs/NEXT_PHASE.md) as the next coding phase with explicit acceptance criteria. App packages and remote services remain later work.
+
 ## 0.22.0 — 2026-11-22
 
 - Draw eight Events for every new 4–7-player game, including test batches, giving five normal rounds; retain ten cards/six rounds for 2–3 players. Preserve original decks and results when continuing older saves.
