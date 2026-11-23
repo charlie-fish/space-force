@@ -25,6 +25,8 @@ Select homes by button or double-click/double-tap. System, planet and edge choic
 
 For a production static build, run `npm run build`; serve the generated `dist/` directory over HTTP(S). `npm run preview` serves that build locally on port 4173. `npm run package` also creates the portable playtest copy in `work/portable/`. The build supports hosting under a subpath. GitHub Actions runs the tests/build and provides a downloadable `space-force-static-prototype` artifact; it does not publish a live site.
 
+The [release workflow](.github/workflows/release.yml) verifies a saved version tag and archives tested local/static ZIPs with checksums on its GitHub release. An explicit `release-build/v1.0.0` tag can rebuild the existing `v1.0.0` checkpoint without moving it. Releases remain labelled as prototype milestones.
+
 ## Included now
 
 - Correct layouts, home/hidden pools, and 40 rockets/four chips per player. Six-player games use Asimov; seven-player games use Adams as the central seventh home.

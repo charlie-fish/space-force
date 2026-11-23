@@ -1,0 +1,88 @@
+name: Save prototype release
+
+on:
+  push:
+    tags: ['v*', 'release-build/v*']
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: Existing version tag to build and archive
+        required: true
+        type: string
+
+permissions:
+  contents: read
+
+concurrency:
+  group: prototype-release
+  cancel-in-progress: false
+
+jobs:
+  archive:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - name: Select the saved version
+        id: version
+        env:
+          INPUT_TAG: ${{ inputs.tag }}
+        run: |
+          release_tag="${INPUT_TAG:-${GITHUB_REF_NAME#release-build/}}"
+          [[ "$release_tag" =~ ^v[0-9]+\.[0-9]+\.[0-9]+$ ]]
+          git rev-parse --verify "refs/tags/$release_tag^{commit}"
+          git checkout --detach "$release_tag"
+          echo "tag=$release_tag" >> "$GITHUB_OUTPUT"
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+      - name: Verify release identity
+        env:
+          RELEASE_TAG: ${{ steps.version.outputs.tag }}
+        run: node --input-type=module -e 'import fs from "node:fs"; if (`v${JSON.parse(fs.readFileSync("package.json", "utf8")).version}` !== process.env.RELEASE_TAG) throw Error("Tag/package mismatch");'
+      - run: npm ci
+      - run: npm test
+      - run: npm run package
+      - name: Package versioned archives
+        env:
+          RELEASE_TAG: ${{ steps.version.outputs.tag }}
+        run: |
+          python - <<'PY'
+          import os
+          from pathlib import Path
+          from hashlib import sha256
+          from zipfile import ZipFile, ZIP_DEFLATED
+          output = Path("release")
+          output.mkdir()
+          checks = []
+          for kind, root in [("local", Path("work/portable")), ("static", Path("dist"))]:
+              archive = output / f"space-force-{os.environ['RELEASE_TAG']}-{kind}.zip"
+              with ZipFile(archive, "w", compression=ZIP_DEFLATED, compresslevel=9) as bundle:
+                  for path in sorted(root.rglob("*")):
+                      if path.is_file():
+                          bundle.write(path, path.relative_to(root))
+              with ZipFile(archive) as bundle:
+                  assert bundle.testzip() is None
+                  assert "index.html" in bundle.namelist()
+                  assert any(name.startswith("art/") for name in bundle.namelist())
+              checks.append(f"{sha256(archive.read_bytes()).hexdigest()}  {archive.name}")
+          (output / "SHA256SUMS.txt").write_text("\n".join(checks) + "\n")
+          PY
+      - name: Save the prototype release and downloads
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+          RELEASE_TAG: ${{ steps.version.outputs.tag }}
+        run: |
+          if ! gh release view "$RELEASE_TAG" > /dev/null 2>&1; then
+            gh release create "$RELEASE_TAG" --verify-tag --prerelease \
+              --title "$RELEASE_TAG — local prototype milestone" \
+              --notes "Saved local prototype and versioned downloads. Milestone/validation: https://github.com/$GH_REPO/blob/$RELEASE_TAG/docs/PLAYTEST_CHANGES_1.0.md . Apple/Android apps are specified as future scope; online multiplayer is the next coding phase."
+          fi
+          gh release upload "$RELEASE_TAG" release/*.zip release/SHA256SUMS.txt --clobber
