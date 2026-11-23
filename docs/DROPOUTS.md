@@ -1,6 +1,8 @@
 # Idle-player removal and continued play
 
-Version 0.7 · 15 November 2026 · Specification, not implemented
+Updated 23 November 2026 · Live and asynchronous normal-turn policy implemented in v1.1.0
+
+This confirmed five-minute policy covers **live online play**. Asynchronous play uses [its confirmed 48+24-hour policy](ASYNCHRONOUS_PLAY.md), with required-decision deadlines rather than treating ordinary offline waiting as inactivity. Do not apply this five-minute clock to asynchronous games.
 
 The previous specification covered temporary disconnects, reconnection, waiting-room host handover, and pause/save. It did not define a complete in-match removal-and-skip rule. The designer has now requested that progression rule and confirmed **five minutes** and **approval by a majority of the other active players**.
 
@@ -67,3 +69,7 @@ Privately log eligibility times/reasons, policy version and timeout, warning/ack
 - No participant loses/gains an unaccounted rocket and no forfeited participant can act through an old tab or resume token.
 
 Policy data: [dropout-policy.json](../catalog/dropout-policy.json). All details P01–P05 are settled. [REVIEW_CHECKLIST.md](REVIEW_CHECKLIST.md) now lists prototype checks rather than an outstanding dropout ruling. Verify that delegated decisions use the removed player as actor and that stack cleanup leaves other components intact.
+
+## v1.1 implementation notes
+
+The server implements P01–P05 for normal turns, live and asynchronous rooms. Live disconnection detection allows 45 seconds without a heartbeat before the five-minute absence clock starts. Pauses require unanimous agreement and any active player can resume. Mandatory pre-game home assignment is delegated so later home-based effects cannot stall. Online game records retain the original setup, commands, timestamps, removed seats, completion/end reason and position scores. See [online play](ONLINE_PLAY.md). Simultaneous locked-choice cleanup remains part of that future mode.

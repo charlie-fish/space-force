@@ -1,6 +1,6 @@
 {
-  "schema_version": 2,
-  "status": "specification_not_implemented",
+  "schema_version": 8,
+  "status": "local_prototype_implemented_remote_controls_pending",
   "view_ids": [
     "board",
     "techs",
@@ -43,10 +43,11 @@
     "ArrowKeys": "pan_board",
     "Escape": "close_overlay_restore_focus",
     "?": "shortcut_help",
-    "P": "player_aid"
+    "P": "player_aid",
+    "S": "status_box_scroll_document_top"
   },
   "keyboard_safeguards": {
-    "focus_scope": "game_interface",
+    "focus_scope": "game_interface_or_page_body",
     "camera_requires_board_focus": true,
     "ignore_editable_fields": true,
     "preserve_browser_modifiers": [
@@ -57,15 +58,15 @@
     "character_shortcuts_disableable": true,
     "global_shortcut_commits_game_actions": false
   },
-  "exact_bindings_status": "proposed_for_prototype_review",
+  "exact_bindings_status": "implemented_pending_device_playtest",
   "idle_warning_visible_in_all_views": true,
   "dropout_policy_reference": "dropout-policy.json",
   "view_labels": {
     "board": "Board",
     "techs": "Techs",
     "event": "Event",
-    "actions": "Actions",
-    "player_aid": "Player Aid"
+    "actions": "Actions and Supply",
+    "player_aid": "Player aid"
   },
   "actions_view_contents": [
     "move_into_slot",
@@ -81,8 +82,173 @@
     "both_sides_rendered_together": true,
     "wide_layout": "side_by_side",
     "narrow_layout": "stacked_same_scroll_view",
-    "front_back_toggle_required": false
+    "front_back_toggle_required": false,
+    "heading": "Player aid",
+    "introductory_slogan_and_explanation": false,
+    "undo_definition_in_aid_view": false
   },
   "undo_policy_reference": "undo-policy.json",
-  "tutorial_configuration_reference": "tutorial-configuration.json"
+  "tutorial_configuration_reference": "tutorial-configuration.json",
+  "status_box": {
+    "position": "above_board_and_views",
+    "always_includes": [
+      "current_turn",
+      "players_and_supply",
+      "reserve",
+      "credits",
+      "current_decision"
+    ],
+    "selected_system_explore_count": true,
+    "explore_outcomes_visible": true,
+    "economy_first_player_token_stages": true,
+    "reinforcement_controls_on_board": true,
+    "heading_own_line": true,
+    "desktop_heading": "Status Box (S)",
+    "mobile_heading": "Status Box",
+    "highlighted": [
+      "player_rocket_name_badge"
+    ],
+    "prompt_position": "immediately_below_player_badge",
+    "prompt_colour": "black",
+    "system_stack_order": "numbered_top_to_bottom_list",
+    "players_and_supply_includes_current_scores": true,
+    "history": {
+      "label": "Since your last turn",
+      "collapsible": true,
+      "starts_at": "active_players_preceding_required_decision",
+      "every_decision_counts_as_turn": true,
+      "default": "collapsed_on_render"
+    },
+    "actions_phase_label": "Actions",
+    "players_and_supply_order": "current_first_player_then_existing_player_order",
+    "face_up_explore_effect_reminders": true,
+    "hidden_explore_effect_reminders": false,
+    "migration_counts": [
+      "each_player_original_in_selected_system",
+      "each_player_currently_assigned_in_draft"
+    ]
+  },
+  "plan_placement": {
+    "desktop": "translucent_cursor_hover_then_click_to_select_preview",
+    "touch": "tap_or_drag_and_release_to_select_preview",
+    "invalid_drop_cancels": true,
+    "selection_changeable_before_commit": true,
+    "commit_button": "Place chip here",
+    "preview_only_after_selection": true,
+    "double_click_commits": true,
+    "double_tap_commits": true,
+    "double_activation_bound_to_actor_and_revision": true
+  },
+  "camera_control_labels": {
+    "fit_board": "Reset View",
+    "pan_controls_grouped_with_zoom": true
+  },
+  "shortcut_display": {
+    "desktop": "heading_label_with_key_in_brackets",
+    "mobile": "heading_label_only",
+    "view_shortcuts_scroll_to_panel_top": true,
+    "panel_scroll_accounts_for_sticky_header": true,
+    "extra_scroll_context": "2cm_above_previous_panel_position"
+  },
+  "minimum_live_text_points": 10,
+  "source_image_text_has_semantic_reference": true,
+  "chip_stacks": {
+    "retain_all_chips": true,
+    "rim_colour": "player_colour",
+    "offset": "condensed_up_to_32_world_units_overall",
+    "legal_ring": "opaque_2.5px_behind_every_chip_in_stack",
+    "desktop_hover_ring_changes_colour": true,
+    "order_numbers_on_board": false,
+    "outer_grey_outline": false,
+    "yellow_legal_ring": "slow_blink",
+    "blue_hover_or_focus_ring": "steady",
+    "respect_reduced_motion": true,
+    "rim_side_outlines": {
+      "colour": "black",
+      "screen_width_px": 0.5,
+      "segments": "lower_left_and_lower_right",
+      "centre_unoutlined": true
+    }
+  },
+  "economy_interactions": {
+    "investments_default_view": "board",
+    "investment_overallocation": "keep_edited_choice_reduce_topmost_other_allocation",
+    "reinforcements_capped_by_available": true,
+    "confirm_unused_reinforcements": true,
+    "board_click_allocates_one_if_legal": true,
+    "first_player_handover": "automatic"
+  },
+  "feature_choosers": {
+    "selected_option_first": true,
+    "on_selection_scroll_to_far_left": true,
+    "kinds": [
+      "planet",
+      "system",
+      "system_edge"
+    ],
+    "layout": "compact_horizontal_content_sized_row",
+    "planet_thumbnail_px": 44,
+    "system_previews": {
+      "current_public_state": true,
+      "width_px": 96,
+      "height_px": 110,
+      "same_renderer_as_board": true,
+      "hidden_fronts_revealed": false,
+      "available_in_all_views": true,
+      "nested_controls": false
+    },
+    "unchanged_targets_and_previews_cached": true,
+    "cache_invalidated_on_replaced_position": true,
+    "board_single_click_or_tap": "select_corresponding_status_control",
+    "board_double_click_or_tap": "confirm_whole_current_draft_with_existing_warnings",
+    "applies_to_event_system_and_planet_choices": true,
+    "invalid_or_disabled_target_can_commit": false,
+    "cancel_double_gesture_on": [
+      "view_change",
+      "other_control",
+      "draft_quantity_edit",
+      "new_decision",
+      "pan",
+      "pinch",
+      "pointercancel"
+    ]
+  },
+  "action_controls": {
+    "invest_checkbox_position": "immediately_above_commit",
+    "production_layout": "ships_then_credits_vertical",
+    "production_reserve_limit_explained": true,
+    "empty_attack_defaults_to_invest": true,
+    "attack_targets_auto_increase_sacrifice_to_cost": true,
+    "attack_scroll_preserved": true,
+    "sacrifice_counter": "chosen_over_needed",
+    "exploration_order": [
+      "commit_reveal",
+      "orient",
+      "choose_positive_legal_entry_ships"
+    ],
+    "nonchoice_explore_outcome_requires_ok": true,
+    "reserve_shortfalls_require_ok": false,
+    "confirm_token_tech_with_no_effect": true,
+    "loss_wording": "returned_as_credits",
+    "invest_toggle_scrolls_to": "system_status",
+    "empty_noninvested_actions_require_confirmation": [
+      "move_into",
+      "settle",
+      "attack"
+    ],
+    "incoming_black_hole_losses_require_confirmation": true,
+    "departure_holes_trigger_loss_confirmation": false,
+    "revealed_move_loss_confirmation": "after_orientation_and_ship_quantities",
+    "reserve_warning_display": "modal",
+    "predictable_reserve_shortfall": "confirm_before_commit_or_go_back",
+    "committed_reserve_checkpoint": "modal_confirm_outcome_no_reveal_undo",
+    "background_controls_blocked_during_modal": true,
+    "stale_confirmation_rejected": true,
+    "empty_attack_confirmation": "Use your ATTACK action without attacking any Ships?"
+  },
+  "final_state": {
+    "all_five_views_available": true,
+    "views_below_completed_results": true,
+    "navigation_mutates_game": false
+  }
 }

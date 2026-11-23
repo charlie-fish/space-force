@@ -6,7 +6,7 @@ pdf.player-aid,SpaceForce Player aid v1.50.pdf,1.50,4,672426,5db8e80a43407590337
 video.rules,https://www.youtube.com/watch?v=b5LjEQc_m4Y,,,,,Access throttled; contents not verified
 tts.mod,Re__Space_Force_TTS_changes.zip,,,121388,02a473590184f7884a7375b978080f93ee01f9365244116d7cbc64085df4e12c,Received and inspected: save JSON and 256x256 preview; external art/model references; embedded table-control Lua; scripts not executed
 image.front-cover,SPACE FORCE.png,,,,,Visual reference supplied inline in conversation; original binary and checksum not archived in checkout
-models.rockets,,,,,,Awaiting original rocket STL files and colour mapping; distinct seventh silhouette also required
+models.rockets,,,,,,Rocket STL handoff closed 2026-11-17; designer approves the current seven SVG appearances
 pdf.centre-hexes,13th hex.pdf,,1,294902,3aa7e41f29553d721c336cf8ac5f7c86ced8d2d9196cfbe984e6e66dcdb677f6,"Reviewed visually; page 1 left Adams for seven-player centre, right Asimov for six-player centre; restrictions from designer request"
 tts.save,TS_Save_1560.json,,,692331,ab10425507612bec49a55a2acd3d564b0808e6d60880930f1ae9f9e3b39dd6a6,Inspected member of supplied TTS ZIP; original retained outside public repository
 tts.preview,TS_Save_1560.png,,,82962,48d2d3207326ff785b944bb3841fe1a17350af30797f28fb992f9a9306baed40,Inspected member of supplied TTS ZIP; original retained outside public repository

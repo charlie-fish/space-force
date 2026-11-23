@@ -1,44 +1,32 @@
-# Designer review, reminders, and next steps
+# Designer review and next steps
 
-Updated 15 November 2026 · Specification v0.7
+23 November 2026 · v1.1.0 online playtest
 
-There is no playable application yet. Review the documents/data now; interaction and browser checks become concrete in the first prototype. These checks do not reopen the already-resolved R01–R08 or the confirmed original-hex versions.
+## Check now
 
-## Check next
+- [ ] Use [the online play guide](ONLINE_PLAY.md) to create a private live room and an asynchronous room from separate devices. Check invitations, public waiting discovery, Ready/settings resets and correct setup for the actual count.
+- [ ] Confirm new-game options are Random/printed Tech presets and Random/No Events, with no test scenarios and a blank local map code.
+- [ ] Play complete two-player and seven-player games, including Tech/Event combinations and sealed bidding in different submission orders. Verify the agreed round counts and final scores/views.
+- [ ] On iPhone Safari and Android Chrome, test tapping/double-tapping, gestures, small-screen readability, phone sleep, refresh during a decision and reconnect. See [phone instructions](PHONE_TESTING.md). Narrow desktop testing does not replace this.
+- [ ] Resume one protected seat in another browser using its private recovery key. Never include that key in feedback. Verify private bids and Foresight from each player's perspective.
+- [ ] Exercise live warning/removal, resignation, delegated mandatory choices, unresolved stack-token removal and last-player victory. Async defaults are confirmed at 48 hours plus 24 hours grace; closing/reopening must not extend the deadline.
+- [ ] Check catch-up history and inspect all five views while another player acts. Report the room format, player count, round/decision and observed behaviour.
 
-| Priority | Item | Where to review |
-| --- | --- | --- |
-| 1 | P01–P05 are confirmed, including inactivity, warnings, voting eligibility, stack cleanup, delegation, bids, and forfeit results. Verify these behaviours in the prototype. | [Dropout rule](DROPOUTS.md) |
-| 2 | Five destinations, persistent Reserve/Credits counts, phone pinch/pan/swipe separation, and the proposed B/T/E/A/P shortcuts with camera/help controls. | [Gameplay interface](GAMEPLAY_UI.md) |
-| 3 | Confirm the provisional seventh player's orange colour, twin-pod silhouette, and triangular chip rim; check the final six/seven shape-to-colour mapping when STLs arrive. | [Component design](COMPONENT_DESIGN.md), [game configuration](../catalog/game-configuration.json) |
-| 4 | Verify the confirmed Undo boundary in the prototype: uncommitted moves only, with no hidden-information reveal. Committed moves cannot be undone. | [Project brief: undo](PROJECT_BRIEF.md#undo-policy) |
-| 5 | Public/private lobby, ready/start behaviour, the 4+ recommendation with host choice, and proposed waiting-room handover/expiry defaults. Those waiting-room timers are separate from confirmed five-minute in-game inactivity. | [Lobby](LOBBY.md), [lobby configuration](../catalog/lobby-configuration.json) |
-| 6 | Verify transcribed planet capacities, features, tile anchors/orientations, and layouts when the board prototype is shown. Current source versions are confirmed; Asimov is six-player centre only and Adams seven-player centre only. | [Asset map](ASSETS.md), [systems catalogue](../catalog/systems.csv), [rules review](RULES_REVIEW.md) |
-| 7 | Admin game/score records, forfeit labels, feedback management, email export and consent wording, data retention, and whether the proposed browser/size targets meet your audience's needs. | [Project brief](PROJECT_BRIEF.md), [platform review](PLATFORM_REVIEW.md) |
-| 8 | Verify the required first-play tutorial: personal contextual guidance, skip/replay, commit/undo limits, five views, and no forced multiplayer script. Both shared-aid faces must be visible. | [Tutorial specification](TUTORIAL.md) |
+Code and current guide: [repository branch](https://github.com/charlie-fish/space-force/tree/prototype/normal-turns), [pull request #2](https://github.com/charlie-fish/space-force/pull/2), [change log](../CHANGELOG.md), [implemented scope](PROTOTYPE.md).
 
-## Outstanding from you
+## Outstanding reminders
 
-- Rocket STL files and colour mapping, including a seventh design if available. Provisional silhouettes let development continue.
-- Optional Tabletop Simulator Workshop URL. The supplied TTS ZIP has already been received and inspected; there is no need to resend it.
-- When preparing hosting: domain and budget, expected simultaneous rooms, owner login preference, privacy controller/contact and jurisdiction, audience/retention preferences, any mailing provider, and code/art licensing choices. These are launch inputs, not prerequisites for a local rules/UI prototype. See [DECISIONS.md](DECISIONS.md#needed-before-public-deployment-or-collecting-addresses).
+- Rocket STLs are closed; current rocket appearances are approved.
+- The TTS ZIP was received and inspected. The Workshop URL is an optional extra reference; its linked remote art/models may still need archiving.
+- Archive the original cover PNG binary when available; its supplied appearance is already used as the cover reference.
+- Complete the personal first-play tutorial. Its specification is incorporated and reminder issue #1 remains closed.
+- Before collecting newsletter addresses, agree controller/contact, privacy notice, retention and unsubscribe/deletion handling. Before publishing mobile apps, arrange store/signing ownership and support/privacy details.
+- Rehearse backups/restores and decide server monitoring, retention and stale-room/absent-host cleanup before broad launch.
 
-## Outstanding implementation reminders
+## Following implementation
 
-- Build the required first-play teaching in [TUTORIAL.md](TUTORIAL.md). Issue #1 is closed as incorporated into the specification, not as an implementation completion.
-- Prepare optimised component art from the PDFs and approved TTS links, ingest the cover source, and encode Asimov/Adams anchors.
-- Implement seven distinct silhouettes/rim patterns, responsive navigation, public/private rooms, simultaneous play and its recommendation, and reviewed dropout handling.
-- Implement the private admin area, game audit/results, feedback, and optional consented news sign-up/export.
+1. Review multiplayer on real devices, then implement selectable simultaneous secret planning and ordered dependency resolution; recommend it for four or more players when available.
+2. Build owner administration for the already-persisted game/audit/results records, feedback and separate consented news export.
+3. Finish personal teaching/accessibility and production operations, then deliver Apple/Android apps using the shared service.
 
-The live checklist is [REMINDERS.md](REMINDERS.md). TTS review: [TTS_REVIEW.md](TTS_REVIEW.md). Original-hex confirmation and TTS-save receipt are completed items.
-
-## Next development steps
-
-1. Build the deterministic normal-turn rules engine and meaningful setup/action/resource/scoring tests for two to seven players, using the confirmed rules and versioned data.
-2. Build a playable local board with the five views, Reserve/Credits display, safe gestures/shortcuts, and provisional replaceable art. Review it on a phone and desktop.
-3. Add server-authoritative public/private rooms, seven independent clients, secret bids, save/rejoin, undo, and the reviewed five-minute majority-removal policy.
-4. Complete all Techs/Events and combinations; add selectable simultaneous actions, dependency handling, and the four-plus-player recommendation.
-5. Add owner administration, game/result audit, feedback, and optional newsletter consent/export, using real deployment/privacy configuration.
-6. Deliver the required tutorial and finish accessibility, browser/device, load, deployment/recovery, and backup-restore verification before release.
-
-All known rule clarifications are settled. Start the normal-turn rules/UI prototype with provisional replaceable art; asset handoffs and visual refinement can continue alongside development.
+The detailed ongoing list is [REMINDERS.md](REMINDERS.md); the delivery plan is [NEXT_PHASE.md](NEXT_PHASE.md). No additional rule interpretation or STL handoff blocks the next phase.

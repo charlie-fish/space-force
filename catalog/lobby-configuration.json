@@ -1,6 +1,6 @@
 {
-  "schema_version": 2,
-  "status": "specification_not_implemented",
+  "schema_version": 4,
+  "status": "online_normal_turns_implemented_v1.1.0",
   "user_requirements_date": "2026-11-15",
   "game_configuration_reference": "game-configuration.json",
   "minimum_players": 2,
@@ -34,13 +34,15 @@
     "recommended_mode": "simultaneous_actions",
     "requires_mode_delivered": true,
     "host_can_choose_normal_turns": true,
-    "automatic_mode_switch": false
+    "automatic_mode_switch": false,
+    "scope": "live_online_play"
   },
   "readiness": {
     "all_starting_players_connected_and_ready": true,
     "reset_on_material_settings_or_roster_change": true,
     "start_against_reviewed_roster_settings_revision": true,
-    "host_may_start_below_capacity_after_review": true
+    "host_may_start_below_capacity_after_review": true,
+    "all_starting_players_connected_and_ready_scope": "live_online_play"
   },
   "seat_assignment": {
     "atomic": true,
@@ -51,9 +53,10 @@
     "waiting_host_transfer_grace_seconds": 120,
     "empty_waiting_room_expiry_minutes": 30,
     "defaults_subject_to_playtesting": true,
-    "active_game_has_no_enforced_turn_clock": true,
+    "active_game_has_no_enforced_turn_clock": false,
     "disconnect_does_not_auto_submit_secret_choices": true,
-    "active_disconnected_seat_not_given_to_stranger": true
+    "active_disconnected_seat_not_given_to_stranger": true,
+    "status": "future_operational_cleanup_and_absent_host_transfer"
   },
   "public_abuse_controls": [
     "room_creation_join_rate_limits",
@@ -76,5 +79,32 @@
     "implementation_status": "not_implemented",
     "superseded_reminder_issue": 1,
     "reminder_issue_state": "closed"
-  }
+  },
+  "play_formats": [
+    "local_pass_and_play",
+    "online_live",
+    "online_asynchronous"
+  ],
+  "play_format_is_separate_from_action_resolution": true,
+  "asynchronous_play": {
+    "status": "normal_turns_implemented_v1.1.0",
+    "specification_reference": "../docs/ASYNCHRONOUS_PLAY.md",
+    "normal_turns_first": true,
+    "all_players_continuously_connected_required": false,
+    "review_timing_policy_before_start": true,
+    "response_deadline_server_owned": true,
+    "offline_between_decisions_is_expected": true,
+    "use_live_five_minute_removal_policy": false,
+    "removal_policy_values_status": "designer_confirmed_2026-11-23",
+    "response_window_seconds": 172800,
+    "grace_seconds": 86400,
+    "removal_vote_window_seconds": null,
+    "record_policy_at_start": true,
+    "notifications_opt_in_separate_from_newsletter": true,
+    "vote_expiry": "valid_response_or_eligibility_change",
+    "approval": "strict_majority_of_other_nonremoved_nonoverdue_players"
+  },
+  "implemented_action_resolution_modes": [
+    "normal_turns"
+  ]
 }

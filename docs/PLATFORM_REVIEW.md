@@ -66,3 +66,7 @@ Agree the expected concurrent-room load before setting capacity promises. Limit 
 | Operations | Multi-room load target met, deployment compatibility, backup restoration, protected export, and retention/withdrawal checks |
 
 No application tests or performance measurements have been run at the specification stage. Add these checks to the implementation milestones; avoid treating a documented target as verified behaviour.
+
+## Apple and Android app delivery · 23 November 2026
+
+Native app scope is recorded in [MOBILE_APPS.md](MOBILE_APPS.md). Verify mixed browser/iOS/Android games, protected credentials, deep-link invitation boundaries, opt-in/private notifications, background/termination/network-change recovery, offline local play, supported OS/devices, update compatibility and store signing/privacy requirements. App work follows the [shared online service](NEXT_PHASE.md); this local milestone does not implement app packages.

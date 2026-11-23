@@ -1,64 +1,66 @@
 # Space Force
 
-An online implementation of Charlie Fish's board game, planned for 2–7 players using desktop and mobile browsers.
+A browser implementation of Charlie Fish's board game for **2–7 players**, on desktop or phone.
 
-**Current status: specification v0.7, 15 November 2026.** The specification includes five-view navigation, one shared two-sided aid, pre-commit-only Undo, confirmed dropout rulings P01–P05, and the required first-play tutorial. All dropout details P01–P05 are confirmed. A playable application has not been implemented or deployed.
+**v1.1.0: online normal turns.** Create private invitations or public waiting games, play live or asynchronously, and resume your protected seat on another device. Local pass-and-play remains available. All 30 Techs and 30 Events are implemented. The simultaneous secret-action variant and Apple/Android apps remain later milestones.
 
-## Project documents
+## Play and setup
 
-- [Designer review checklist and next steps](docs/REVIEW_CHECKLIST.md)
-- [Project brief and delivery stages](docs/PROJECT_BRIEF.md)
-- [In-game views, gestures, and shortcuts](docs/GAMEPLAY_UI.md)
-- [Idle-player removal and continued play](docs/DROPOUTS.md)
-- [Required first-play tutorial](docs/TUTORIAL.md)
-- [Rules review and implementation questions](docs/RULES_REVIEW.md)
-- [Source files and artwork plan](docs/ASSETS.md)
-- [Rocket, chip, and action-board design](docs/COMPONENT_DESIGN.md)
-- [Public/private lobby and mode recommendations](docs/LOBBY.md)
-- [Platform best practices and release checks](docs/PLATFORM_REVIEW.md)
-- [Tabletop Simulator archive review](docs/TTS_REVIEW.md)
-- [Decisions and information needed](docs/DECISIONS.md)
-- [Reminders and outstanding asset handoffs](docs/REMINDERS.md)
-- [Change log](CHANGELOG.md)
+Choose **Random Techs** (default) or Family, Aggressive, Cunning, Economic or Peaceful from the rulebook. Events are **Random Events** (default) or **No Events (simple version)**. The map-code field starts blank for local games; a supplied code makes their setup repeatable. Online setup uses a server-private random seed. Test scenarios are removed from new-game controls; existing saved test games still load.
 
-## Component catalogue
+Use the lobby to create a room, join a public waiting game, or enter a private invitation. Everyone reviews the settings and presses Ready; the host starts with the reviewed roster. The actual player count determines the board: Asimov is the six-player centre and Adams is the seven-player centre/home. Two/three players have ten Events and six normal rounds; four to seven have eight and five rounds. Ragnarök can shorten play.
 
-- [Source register](catalog/sources.csv)
-- [Tech and Event cards](catalog/cards.csv): 30 of each, with PDF page references.
-- [Systems](catalog/systems.csv): 14 supplied designs. Asimov is the centre only for six players; Adams is the centre only for seven. The original twelve designs are confirmed current.
-- [Game configuration](catalog/game-configuration.json): player limit, component quantities, setup by player count, and provisional orange seventh-player style.
-- [Lobby configuration](catalog/lobby-configuration.json): public/private rooms, readiness, and the four-plus-player recommendation with explicit host mode choice.
-- [Interaction defaults](catalog/interaction-configuration.json): five views, persistent resources, gestures, and scoped shortcuts.
-- [Dropout policy](catalog/dropout-policy.json): confirmed removal and P01–P05 rulings.
-- [Undo policy](catalog/undo-policy.json): uncommitted moves only, with no hidden-information reveal.
-- [Tutorial requirements](catalog/tutorial-configuration.json): first-play teaching incorporated into the specification.
-- [TTS inventory](catalog/tts-inventory.json): received save/preview, deck and model counts, and external asset dependencies.
-- [Explore tokens](catalog/explore-tokens.csv): the complete 16-token distribution, including the three extra copies specified by the designer.
-- [Tech presets](catalog/tech-presets.json): the five presets from rulebook page 24.
-- [Designer rulings](catalog/rules-clarifications.json): confirmed rules, variant replacement policy, and the five-Tech PRODUCE example, ready to guide engine implementation.
+Live games use the confirmed five-minute idle policy. Asynchronous rooms default to the designer-confirmed **48-hour response window plus 24-hour grace period**, configurable before starting. Eligible removal requires a strict majority of eligible other players; disconnection alone never forfeits a game. See [online play and recovery](docs/ONLINE_PLAY.md).
 
-The catalogue is an inventory, not an executable ruleset. Visual transcriptions of the systems need a second check before becoming production game data.
+**Keep your private seat recovery key private.** An invitation joins an empty waiting seat; the recovery key controls your existing seat. Save that key before clearing browser data or changing device.
 
-## Working approach
+## Run online multiplayer
 
-Use Git branches and pull requests for implementation, meaningful rules and multiplayer tests, and versioned releases. Record the engine, content, settings, and deployed release used by each game. Keep artwork references separate from rule identifiers so art can change independently.
+Install [Node.js 24 LTS](https://nodejs.org/), then:
 
-The agreed delivery order is normal turns first, then the simultaneous-actions variant on rulebook page 14 as a selectable mode. Both support up to seven connected players. Recommend simultaneous actions for four or more seated players when available, while preserving the host's choice. Apply the designer's clarifications alongside the printed rules; Rapid Advance uses the almanac wording and does not perform a SETTLE action.
+```sh
+git clone https://github.com/charlie-fish/space-force.git
+cd space-force
+git switch prototype/normal-turns
+npm ci
+npm run build
+npm start
+```
 
-Use the supplied `SPACE FORCE.png` front-cover graphic as the visual reference, the six original rocket silhouettes from rulebook page 2 plus a seventh distinct silhouette, and poker-chip action tokens with individual rim patterns. Token diameter, system suns, and action-board receiving indentations must match.
+Open **http://localhost:3000**. Other devices on the same network can open the computer's network IP on port 3000. For Internet play, set `PUBLIC_ORIGIN` to the external HTTPS origin and run behind an HTTPS reverse proxy or use the D1-backed hosted Worker described in [the deployment guide](docs/ONLINE_PLAY.md#hosting-and-storage). Each device must use the same server address.
 
-At seven players the supply is **280 rockets, 28 action chips, seven action boards, plus one shared two-sided player aid**. The original twelve tiles form the outer layout; use Adams as the seventh home system in the centre. At six players, use Asimov in the centre. Each of those setups uses thirteen hexes; the two special centre tiles are never used together.
+The Node service persists games in `private-data/space-force.sqlite`. Set `SPACE_FORCE_DB` and `PORT` to override the database path and port. Keep this directory outside any static hosting root and back it up. The production service is one Node process or the hosted D1 Worker; it is not an in-memory demo.
 
-The lobby supports creating public games, joining waiting public games, and creating/joining unlisted private rooms. In play, use Board, Techs, Event, Actions, and Player Aid views with visible Reserve/Credits. After five minutes of qualifying inactivity, a majority of the other active players can remove the idle participant; their future turns are skipped and a sole remaining player wins. A skippable first-play tutorial is required by [TUTORIAL.md](docs/TUTORIAL.md); its reminder issue #1 is superseded by the specification. Undo is limited to an uncommitted move with no hidden-information reveal.
+For development, run `npm run dev:online` in one terminal and `npm run dev` in another. Vite proxies `/api` to the service on port 3000. Use Vite's Network address on a phone. [Phone testing instructions](docs/PHONE_TESTING.md) explain why opening HTML from iPhone Files is insufficient.
 
-## First playable prototype
+## Local pass-and-play and downloads
 
-No further designer decisions or final art files are required to start implementation. The first milestone is a local normal-turn game: rules/state engine, playable board and five views, draft-only Undo, a complete round/game loop, and meaningful rules/device checks. Use the supplied references and provisional silhouettes while the STLs and final art are prepared.
+Select Local pass-and-play in the lobby, or run `npm run dev` without the server. Static hosting and the portable ZIP offer local games only; putting a static ZIP online does not create a multiplayer service.
 
-Remote play then adds the authoritative server, protected rooms/seats, synchronisation, save/rejoin, and the confirmed dropout policy. Production hosting/domain, newsletter privacy settings, and final artwork are later launch work. See [next development steps](docs/REVIEW_CHECKLIST.md#next-development-steps).
+`npm run package` creates `dist/` for static hosting and `work/portable/` for desktop file opening. Keep `art/` alongside `index.html`. On iPhone, use a web address in Safari. Versioned local/static ZIPs and checksums are archived by the [release workflow](.github/workflows/release.yml); [v1.0.0](https://github.com/charlie-fish/space-force/releases/tag/v1.0.0) remains an immutable local reference.
 
-## Data and ownership
+## Controls and privacy
 
-Space Force is designed by Charlie Fish. No open-source licence has been selected. Source-code licensing and artwork permissions are separate decisions.
+Board, Techs, Event, Actions and Supply, and Player aid remain available through final scoring. Use B/T/E/A/P on desktop, S for the Status Box, touch pan/pinch/swipe on phones, and labelled button alternatives. Change draft selections before Commit; committed moves and hidden reveals cannot be undone. The contextual guide can be dismissed and replayed.
 
-This repository is public. Game records, feedback, newsletter addresses, consent evidence, credentials, and database backups belong in protected backend storage. The supplied original PDFs are registered by filename and checksum; their source files are retained outside this repository.
+Online commands are validated by the server against the current decision and protected seat. A retry uses the same command ID, so lost responses cannot spend resources twice. Unrevealed systems, Explore effects, Event decks, seed/RNG and other players' unrevealed bids stay server-side. Foresight is returned only to its authorised current owner. Public listings contain waiting-room metadata, not game secrets or credentials.
+
+## Verify and build
+
+```sh
+npm test          # rules, replay, legacy saves, HTTP service and DOM interactions
+npm run check     # strict TypeScript
+npm run package   # static and portable builds; artwork/load-budget checks
+npm run build:worker  # self-contained Worker and committed D1 migrations
+node --test tests/worker.integration.mjs  # deployed-bundle/D1 adapter smoke test
+```
+
+DOM/HTTP tests exercise independent sessions and complete games; they do not replace real Safari/Chrome/mobile visual and gesture testing. See [implemented scope and validation](docs/PROTOTYPE.md), [v1.1 playtest guide](docs/PLAYTEST_CHANGES_1.1.md), and [next phase](docs/NEXT_PHASE.md).
+
+## Project references
+
+[Project brief](docs/PROJECT_BRIEF.md) · [Rules and designer rulings](docs/RULES_REVIEW.md) · [Dropouts](docs/DROPOUTS.md) · [Asynchronous play](docs/ASYNCHRONOUS_PLAY.md) · [Review checklist](docs/REVIEW_CHECKLIST.md) · [Reminders](docs/REMINDERS.md) · [Change log](CHANGELOG.md)
+
+The owner admin area, feedback management, publication-news consent/export, full personal tutorial, simultaneous-action variant and native apps remain specified future work. Online game settings, accepted commands, timestamps, end reason and score records are already persisted for the later admin interface.
+
+Core code: [rules](src/engine.ts), [interface](src/ui.ts), [lobby](src/lobby.ts), [online service](src/online/service.ts), [transport](src/online/client.ts), [Node server](server/node.mjs), [Worker](src/worker.ts). Artwork, card data, player identities and layout anchors remain separate from the service and rules to support future art and expansions.

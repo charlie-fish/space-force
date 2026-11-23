@@ -1,14 +1,14 @@
 # Component design and player identity
 
-Updated for the designer's seven-player extension on 13 November 2026. Requirements guide the future interface; graphics and snapping have not been implemented. Specific seventh-player visual choices below are provisional design choices.
+Updated 17 November 2026. Seven distinct rocket silhouettes, poker-chip rim patterns and snapping are implemented locally. The designer approves the current rocket appearances; the STL handoff is closed.
 
 ## Visual reference
 
 Use the supplied `SPACE FORCE.png` front-cover graphic as the branding reference: dark violet space, orange and sage spacecraft, cream highlights, textured illustration, and retro lettering. Preserve it as a replaceable cover asset. Detailed card text and interactive controls still need readable semantic HTML/SVG.
 
-The six original player rocket silhouettes come from **rulebook page 2**, not from recolouring the spacecraft on the cover. Preserve those visibly different outlines. Add a seventh distinct silhouette in a new player colour. Use the forthcoming STL files to verify the original forms and colour mapping.
+The six original player rocket silhouettes come from **rulebook page 2**, not from recolouring the spacecraft on the cover. Preserve those visibly different outlines. Add a seventh distinct silhouette in a new player colour. The current SVG appearances are accepted; STL verification is no longer required.
 
-The provisional seventh-player style is **orange (`#E87522`)**, a **twin-pod rocket silhouette** (two rocket bodies joined by a narrow bridge), and a **triangular chip-rim pattern**. These are replaceable visual choices, not designer-supplied final art. Keep the seventh silhouette and rim pattern distinct from all six original identities, including in greyscale.
+The accepted seventh-player style is **orange (`#E58A43`)**, a **twin-pod rocket silhouette** (two rocket bodies joined by a narrow bridge), and a **triangular chip-rim pattern**. These implemented visual choices are designer-approved and remain replaceable for future art. Keep the seventh silhouette and rim pattern distinct from all six original identities, including in greyscale.
 
 ## Supply and ownership
 
@@ -49,7 +49,7 @@ Use the sun of **Asimov** as the centre anchor in six-player games, and the sun 
 
 - The designer has confirmed that the original twelve system hexes are the latest versions. Routine transcription/geometry checks still apply when encoding them.
 - Asimov and Adams have been supplied. Use Asimov only at the six-player centre and Adams only at the seven-player centre. Neither enters a random tile pool.
-- Await the original rocket STL files, check colour mapping, and refine the provisional seventh-player silhouette as appropriate.
+- Rocket STL action closed: keep the accepted current silhouettes and continue device readability checks.
 - Keep source assets, optimised web art, hit areas, and semantic game data separate so replacements do not change stable piece IDs.
 
 The received TTS save contains 240 rockets in six colour groups sharing one mesh. Preserve the distinct-silhouette requirement from the rulebook/designer rather than adopting that shared mesh as the final player design. See [TTS_REVIEW.md](TTS_REVIEW.md), [REMINDERS.md](REMINDERS.md), and [ASSETS.md](ASSETS.md) for inventory, handoffs, and provenance.

@@ -1,0 +1,45 @@
+{
+  "schema_version": 1,
+  "status": "specified_not_implemented",
+  "source": "Designer request, 2026-11-23",
+  "specification": "../docs/MOBILE_APPS.md",
+  "platforms": {
+    "apple": {
+      "operating_systems": ["iOS", "iPadOS"],
+      "devices": ["iPhone", "iPad"],
+      "distribution": "Apple App Store"
+    },
+    "android": {
+      "devices": ["phone", "tablet"],
+      "distribution": "Google Play"
+    }
+  },
+  "minimum_players": 2,
+  "maximum_players": 7,
+  "browser_cross_play": true,
+  "shared_rules_content_and_service": true,
+  "offline_local_pass_and_play": true,
+  "multiplayer_commit_authority": "server",
+  "online_modes": "same_as_implemented_server_modes",
+  "inactivity_policy": "server_owned_and_separate_for_live_and_asynchronous",
+  "resume_credentials": "Keychain_or_Keystore_backed_storage",
+  "invitations": "verified_universal_links_and_app_links_with_browser_fallback",
+  "notifications": {
+    "optional": true,
+    "private_information_in_payload": false,
+    "separate_from_newsletter_consent": true,
+    "game_usable_when_permission_denied": true
+  },
+  "native_shell": {
+    "status": "engineering_proposal_pending_device_spike",
+    "initial_candidate": "Capacitor",
+    "reuse_web_client": true
+  },
+  "delivery_stage": 6,
+  "prerequisites": [
+    "stable_authoritative_online_service",
+    "tutorial_and_production_privacy_support_ready",
+    "store_accounts_signing_and_release_assets",
+    "mixed_platform_real_device_testing"
+  ]
+}
